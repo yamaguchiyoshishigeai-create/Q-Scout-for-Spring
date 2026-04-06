@@ -3,11 +3,13 @@ package com.qscout.spring.rule;
 import com.qscout.spring.domain.ProjectContext;
 import com.qscout.spring.domain.Severity;
 import com.qscout.spring.domain.Violation;
+import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class PackageDependencyViolationRule extends AbstractTextRule {
     @Override
     public String ruleId() {

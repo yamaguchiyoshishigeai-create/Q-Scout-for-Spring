@@ -6,10 +6,12 @@ import com.qscout.spring.domain.ProjectContext;
 import com.qscout.spring.domain.RuleResult;
 import com.qscout.spring.domain.Violation;
 import com.qscout.spring.rule.Rule;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class DefaultRuleEngine implements RuleEngine {
     private final List<Rule> rules;
 

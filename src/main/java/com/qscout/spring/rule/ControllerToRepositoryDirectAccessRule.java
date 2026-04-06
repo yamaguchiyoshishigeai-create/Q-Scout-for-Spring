@@ -3,6 +3,7 @@ package com.qscout.spring.rule;
 import com.qscout.spring.domain.ProjectContext;
 import com.qscout.spring.domain.Severity;
 import com.qscout.spring.domain.Violation;
+import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Component
 public class ControllerToRepositoryDirectAccessRule extends AbstractTextRule {
     private static final Pattern REPOSITORY_FIELD = Pattern.compile("(\\w+Repository)\\s+(\\w+)\\s*[;=]");
 
@@ -45,12 +47,7 @@ public class ControllerToRepositoryDirectAccessRule extends AbstractTextRule {
             String line = lines.get(i);
             for (String variable : repositoryVariables) {
                 if (line.contains(variable + ".") && !line.contains("class ")) {
-                    violations.add(violation(
-                            file,
-                            i + 1,
-                            "Controller appears to call repository directly via '" + variable + "'.",
-                            Severity.HIGH
-                    ));
+                    violations.add(violation(file, i + 1, "Controller accesses repository directly via " + variable + ".", Severity.HIGH));
                 }
             }
         }

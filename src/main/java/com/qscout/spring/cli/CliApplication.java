@@ -1,15 +1,8 @@
 package com.qscout.spring.cli;
 
-import com.qscout.spring.application.AiMarkdownGenerator;
-import com.qscout.spring.application.ProjectScanner;
-import com.qscout.spring.application.ReportGenerator;
-import com.qscout.spring.application.RuleEngine;
-import com.qscout.spring.application.ScoreCalculator;
+import com.qscout.spring.application.SharedAnalysisService;
 import com.qscout.spring.domain.AnalysisRequest;
-import com.qscout.spring.domain.AnalysisResult;
 import com.qscout.spring.domain.ExecutionSummary;
-import com.qscout.spring.domain.ProjectContext;
-import com.qscout.spring.domain.ScoreSummary;
 import com.qscout.spring.infrastructure.AiMarkdownFileGenerator;
 import com.qscout.spring.infrastructure.DefaultProjectScanner;
 import com.qscout.spring.infrastructure.DefaultRuleEngine;
@@ -23,56 +16,38 @@ import com.qscout.spring.rule.PackageDependencyViolationRule;
 import com.qscout.spring.rule.Rule;
 import com.qscout.spring.rule.TransactionalMisuseRule;
 
-import java.nio.file.Path;
 import java.util.List;
 
 public final class CliApplication {
     private final ArgumentParser argumentParser;
-    private final ProjectScanner projectScanner;
-    private final RuleEngine ruleEngine;
-    private final ScoreCalculator scoreCalculator;
-    private final ReportGenerator reportGenerator;
-    private final AiMarkdownGenerator aiMarkdownGenerator;
+    private final SharedAnalysisService sharedAnalysisService;
 
     public CliApplication() {
         this(
                 new ArgumentParser(),
-                new DefaultProjectScanner(),
-                new DefaultRuleEngine(defaultRules()),
-                new DefaultScoreCalculator(),
-                new MarkdownReportGenerator(),
-                new AiMarkdownFileGenerator()
+                new SharedAnalysisService(
+                        new DefaultProjectScanner(),
+                        new DefaultRuleEngine(defaultRules()),
+                        new DefaultScoreCalculator(),
+                        new MarkdownReportGenerator(),
+                        new AiMarkdownFileGenerator()
+                )
         );
     }
 
-    public CliApplication(
-            ArgumentParser argumentParser,
-            ProjectScanner projectScanner,
-            RuleEngine ruleEngine,
-            ScoreCalculator scoreCalculator,
-            ReportGenerator reportGenerator,
-            AiMarkdownGenerator aiMarkdownGenerator
-    ) {
+    public CliApplication(ArgumentParser argumentParser, SharedAnalysisService sharedAnalysisService) {
         this.argumentParser = argumentParser;
-        this.projectScanner = projectScanner;
-        this.ruleEngine = ruleEngine;
-        this.scoreCalculator = scoreCalculator;
-        this.reportGenerator = reportGenerator;
-        this.aiMarkdownGenerator = aiMarkdownGenerator;
+        this.sharedAnalysisService = sharedAnalysisService;
     }
 
     public ExecutionSummary run(String[] args) {
         AnalysisRequest request = argumentParser.parse(args);
-        ProjectContext projectContext = projectScanner.scan(request);
-        AnalysisResult analysisResult = ruleEngine.analyze(projectContext);
-        ScoreSummary scoreSummary = scoreCalculator.calculate(analysisResult);
-        Path humanReportPath = reportGenerator.generate(analysisResult, scoreSummary, request.outputDirectory());
-        Path aiReportPath = aiMarkdownGenerator.generate(analysisResult, request.outputDirectory());
+        SharedAnalysisService.SharedAnalysisResult result = sharedAnalysisService.execute(request);
         return new ExecutionSummary(
-                scoreSummary.finalScore(),
-                scoreSummary.totalViolations(),
-                humanReportPath,
-                aiReportPath
+                result.scoreSummary().finalScore(),
+                result.scoreSummary().totalViolations(),
+                result.reportArtifact().humanReportPath(),
+                result.reportArtifact().aiReportPath()
         );
     }
 

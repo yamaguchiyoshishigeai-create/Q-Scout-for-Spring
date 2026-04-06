@@ -3,11 +3,13 @@ package com.qscout.spring.rule;
 import com.qscout.spring.domain.ProjectContext;
 import com.qscout.spring.domain.Severity;
 import com.qscout.spring.domain.Violation;
+import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class ExceptionSwallowingRule extends AbstractTextRule {
     @Override
     public String ruleId() {
@@ -41,30 +43,26 @@ public class ExceptionSwallowingRule extends AbstractTextRule {
 
     private String collectBlock(List<String> lines, int startIndex) {
         StringBuilder builder = new StringBuilder();
-        int balance = 0;
-        boolean opened = false;
+        int braceBalance = 0;
         for (int i = startIndex; i < lines.size(); i++) {
-            String line = lines.get(i);
-            builder.append(line).append(System.lineSeparator());
-            balance += count(line, '{');
-            balance -= count(line, '}');
-            if (line.contains("{")) {
-                opened = true;
-            }
-            if (opened && balance <= 0) {
+            String current = lines.get(i);
+            builder.append(current).append(System.lineSeparator());
+            braceBalance += count(current, '{');
+            braceBalance -= count(current, '}');
+            if (braceBalance <= 0 && current.contains("}")) {
                 break;
             }
         }
         return builder.toString();
     }
 
-    private int count(String line, char target) {
-        int total = 0;
-        for (char value : line.toCharArray()) {
-            if (value == target) {
-                total++;
+    private int count(String value, char target) {
+        int count = 0;
+        for (int i = 0; i < value.length(); i++) {
+            if (value.charAt(i) == target) {
+                count++;
             }
         }
-        return total;
+        return count;
     }
 }

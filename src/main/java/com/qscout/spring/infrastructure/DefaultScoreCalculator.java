@@ -4,7 +4,9 @@ import com.qscout.spring.application.ScoreCalculator;
 import com.qscout.spring.domain.AnalysisResult;
 import com.qscout.spring.domain.ScoreSummary;
 import com.qscout.spring.domain.Severity;
+import org.springframework.stereotype.Component;
 
+@Component
 public class DefaultScoreCalculator implements ScoreCalculator {
     @Override
     public ScoreSummary calculate(AnalysisResult analysisResult) {

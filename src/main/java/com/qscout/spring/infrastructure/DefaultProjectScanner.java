@@ -4,10 +4,12 @@ import com.qscout.spring.application.ProjectScanner;
 import com.qscout.spring.domain.AnalysisRequest;
 import com.qscout.spring.domain.ProjectContext;
 import com.qscout.spring.util.FileCollector;
+import org.springframework.stereotype.Component;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+@Component
 public class DefaultProjectScanner implements ProjectScanner {
     @Override
     public ProjectContext scan(AnalysisRequest request) {

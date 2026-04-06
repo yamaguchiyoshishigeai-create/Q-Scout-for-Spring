@@ -4,9 +4,11 @@ import com.qscout.spring.application.AiMarkdownGenerator;
 import com.qscout.spring.domain.AnalysisResult;
 import com.qscout.spring.domain.Violation;
 import com.qscout.spring.util.MarkdownWriter;
+import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 
+@Component
 public class AiMarkdownFileGenerator implements AiMarkdownGenerator {
     @Override
     public Path generate(AnalysisResult analysisResult, Path outputDirectory) {

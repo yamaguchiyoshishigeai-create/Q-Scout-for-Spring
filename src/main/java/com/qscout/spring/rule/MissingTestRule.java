@@ -4,6 +4,7 @@ import com.qscout.spring.domain.ProjectContext;
 import com.qscout.spring.domain.RuleResult;
 import com.qscout.spring.domain.Severity;
 import com.qscout.spring.domain.Violation;
+import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Component
 public class MissingTestRule implements Rule {
     @Override
     public String ruleId() {
@@ -41,11 +43,12 @@ public class MissingTestRule implements Rule {
                         Severity.LOW,
                         mainFile,
                         1,
-                        "No matching test class found for " + className + ".",
+                        "Test class not found for " + className + ".",
                         ""
                 ));
             }
         }
-        return new RuleResult(ruleId(), ruleName(), violations);
+
+        return new RuleResult(ruleId(), ruleName(), List.copyOf(violations));
     }
 }

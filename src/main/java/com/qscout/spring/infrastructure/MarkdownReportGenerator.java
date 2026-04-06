@@ -6,9 +6,11 @@ import com.qscout.spring.domain.RuleResult;
 import com.qscout.spring.domain.ScoreSummary;
 import com.qscout.spring.domain.Violation;
 import com.qscout.spring.util.MarkdownWriter;
+import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 
+@Component
 public class MarkdownReportGenerator implements ReportGenerator {
     @Override
     public Path generate(AnalysisResult analysisResult, ScoreSummary scoreSummary, Path outputDirectory) {
