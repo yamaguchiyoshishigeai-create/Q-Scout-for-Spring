@@ -1,0 +1,13 @@
+# 最小API設計 v0.1 - 実行フロー
+
+1. Main.main(args)
+2. CliApplication.run(args)
+3. ArgumentParserがAnalysisRequestを生成
+4. ProjectScanner.scan(request)
+5. RuleEngine.analyze(projectContext)
+6. ScoreCalculator.calculate(analysisResult)
+7. ReportGenerator.generate(...)
+8. AiMarkdownGenerator.generate(...)
+9. ReportArtifactを生成
+10. ExecutionSummaryを生成
+11. 標準出力へサマリー表示

@@ -1,0 +1,62 @@
+# 最小API設計 v0.1 - DTO定義
+
+public record AnalysisRequest(
+    Path projectRootPath,
+    Path outputDirectory
+) {}
+
+public record ProjectContext(
+    Path projectRootPath,
+    Path pomXmlPath,
+    List<Path> mainJavaFiles,
+    List<Path> testJavaFiles
+) {}
+
+public record Violation(
+    String ruleId,
+    String ruleName,
+    Severity severity,
+    Path filePath,
+    Integer lineNumber,
+    String message,
+    String codeSnippet
+) {}
+
+public enum Severity {
+    HIGH,
+    MEDIUM,
+    LOW
+}
+
+public record RuleResult(
+    String ruleId,
+    String ruleName,
+    List<Violation> violations
+) {}
+
+public record AnalysisResult(
+    ProjectContext projectContext,
+    List<RuleResult> ruleResults,
+    List<Violation> allViolations
+) {}
+
+public record ScoreSummary(
+    int initialScore,
+    int finalScore,
+    int highCount,
+    int mediumCount,
+    int lowCount,
+    int totalViolations
+) {}
+
+public record ReportArtifact(
+    Path humanReportPath,
+    Path aiReportPath
+) {}
+
+public record ExecutionSummary(
+    int finalScore,
+    int totalViolations,
+    Path humanReportPath,
+    Path aiReportPath
+) {}

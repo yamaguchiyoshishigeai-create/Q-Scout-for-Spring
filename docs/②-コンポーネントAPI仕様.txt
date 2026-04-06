@@ -1,0 +1,40 @@
+# 最小API設計 v0.1 - コンポーネントAPI
+
+public interface ProjectScanner {
+    ProjectContext scan(AnalysisRequest request);
+}
+
+public interface Rule {
+    String ruleId();
+    String ruleName();
+    RuleResult evaluate(ProjectContext projectContext);
+}
+
+public interface RuleEngine {
+    AnalysisResult analyze(ProjectContext projectContext);
+}
+
+public interface ScoreCalculator {
+    ScoreSummary calculate(AnalysisResult analysisResult);
+}
+
+public interface ReportGenerator {
+    Path generate(
+        AnalysisResult analysisResult,
+        ScoreSummary scoreSummary,
+        Path outputDirectory
+    );
+}
+
+public interface AiMarkdownGenerator {
+    Path generate(
+        AnalysisResult analysisResult,
+        Path outputDirectory
+    );
+}
+
+public final class CliApplication {
+    public ExecutionSummary run(String[] args) {
+        // 実装予定
+    }
+}

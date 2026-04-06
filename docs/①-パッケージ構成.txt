@@ -1,0 +1,47 @@
+# 最小API設計 v0.1 - パッケージ構成
+
+com.qscout.spring
+
+├─ cli
+│  ├─ Main
+│  ├─ CliApplication
+│  └─ ArgumentParser
+│
+├─ application
+│  ├─ ProjectScanner
+│  ├─ RuleEngine
+│  ├─ ScoreCalculator
+│  ├─ ReportGenerator
+│  └─ AiMarkdownGenerator
+│
+├─ domain
+│  ├─ AnalysisRequest
+│  ├─ ProjectContext
+│  ├─ AnalysisResult
+│  ├─ RuleResult
+│  ├─ Violation
+│  ├─ Severity
+│  ├─ ScoreSummary
+│  ├─ ReportArtifact
+│  └─ ExecutionSummary
+│
+├─ rule
+│  ├─ Rule
+│  ├─ ControllerToRepositoryDirectAccessRule
+│  ├─ FieldInjectionRule
+│  ├─ TransactionalMisuseRule
+│  ├─ ExceptionSwallowingRule
+│  ├─ MissingTestRule
+│  └─ PackageDependencyViolationRule
+│
+├─ infrastructure
+│  ├─ DefaultProjectScanner
+│  ├─ DefaultRuleEngine
+│  ├─ DefaultScoreCalculator
+│  ├─ MarkdownReportGenerator
+│  └─ AiMarkdownFileGenerator
+│
+└─ util
+   ├─ FileCollector
+   ├─ CodeSnippetExtractor
+   └─ MarkdownWriter

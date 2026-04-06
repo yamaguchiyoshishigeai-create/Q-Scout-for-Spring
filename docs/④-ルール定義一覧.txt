@@ -1,0 +1,19 @@
+# 最小API設計 v0.1 - ルール定義
+
+1. ControllerToRepositoryDirectAccessRule
+   - ControllerからRepository直接参照を検出
+
+2. FieldInjectionRule
+   - フィールドインジェクション検出
+
+3. TransactionalMisuseRule
+   - @Transactionalの過不足検出
+
+4. ExceptionSwallowingRule
+   - 例外握りつぶし検出
+
+5. MissingTestRule
+   - テストクラス有無検出
+
+6. PackageDependencyViolationRule
+   - パッケージ依存逆流検出

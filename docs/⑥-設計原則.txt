@@ -1,0 +1,22 @@
+# 最小API設計 v0.1 - 設計原則
+
+1. AI非依存コア
+- AIなしで全機能が成立する構造
+
+2. レポート分離
+- 人間用MarkdownとAI用Markdownは完全分離
+
+3. ルール単位拡張
+- Ruleインターフェースで拡張可能
+
+4. DTO共通化
+- 違反はViolationに統一
+
+5. 過設計回避
+- MVPでは必要最小限に限定
+
+6. CLI中心設計
+- 外部APIは未定義（将来対応）
+
+7. 責務分離
+- Scanner / Engine / Calculator / Generator を分離

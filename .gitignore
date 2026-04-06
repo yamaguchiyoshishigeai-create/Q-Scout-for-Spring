@@ -1,0 +1,16 @@
+# Maven build output
+/target/
+
+# Local Maven cache used in this workspace
+/.m2home/
+/.m2home-link/
+
+# Generated analysis output
+/sample-output/
+
+# IDE and OS noise
+/.idea/
+/.vscode/
+*.iml
+Thumbs.db
+.DS_Store
