@@ -37,8 +37,10 @@ public class WebPageController {
         try {
             model.addAttribute("response", webAnalysisService.analyze(file));
         } catch (InvalidUploadException | InvalidProjectStructureException exception) {
+            logger.warn("Input validation failed during web analysis. filename={}", file != null ? file.getOriginalFilename() : null, exception);
             model.addAttribute("error", new ErrorViewModel(exception.getMessage(), "INPUT_ERROR", true));
         } catch (AnalysisTimeoutException exception) {
+            logger.warn("Web analysis timed out. filename={}", file != null ? file.getOriginalFilename() : null, exception);
             model.addAttribute("error", new ErrorViewModel(exception.getMessage(), "TIMEOUT", true));
         } catch (RuntimeException exception) {
             logger.error("Unexpected web analysis error.", exception);

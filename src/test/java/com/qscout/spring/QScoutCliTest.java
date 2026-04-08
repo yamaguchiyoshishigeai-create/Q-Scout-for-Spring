@@ -11,7 +11,6 @@ import com.qscout.spring.domain.ScoreSummary;
 import com.qscout.spring.infrastructure.DefaultProjectScanner;
 import com.qscout.spring.infrastructure.DefaultRuleEngine;
 import com.qscout.spring.infrastructure.DefaultScoreCalculator;
-import com.qscout.spring.infrastructure.MarkdownReportGenerator;
 import com.qscout.spring.rule.ControllerToRepositoryDirectAccessRule;
 import com.qscout.spring.rule.ExceptionSwallowingRule;
 import com.qscout.spring.rule.FieldInjectionRule;
@@ -70,11 +69,11 @@ class QScoutCliTest {
         DefaultScoreCalculator calculator = new DefaultScoreCalculator();
         ScoreSummary summary = calculator.calculate(analyzeSample());
 
-        assertEquals(46, summary.finalScore());
-        assertEquals(9, summary.totalViolations());
+        assertEquals(55, summary.finalScore());
+        assertEquals(6, summary.totalViolations());
         assertEquals(3, summary.highCount());
-        assertEquals(4, summary.mediumCount());
-        assertEquals(2, summary.lowCount());
+        assertEquals(3, summary.mediumCount());
+        assertEquals(0, summary.lowCount());
     }
 
     @Test
@@ -95,7 +94,7 @@ class QScoutCliTest {
         AnalysisResult analysisResult = analyzeSample();
 
         assertTrue(analysisResult.allViolations().stream().anyMatch(v -> v.ruleId().equals("R001")));
-        assertTrue(analysisResult.allViolations().stream().anyMatch(v -> v.ruleId().equals("R005")));
+        assertTrue(analysisResult.allViolations().stream().anyMatch(v -> v.ruleId().equals("R004")));
         assertTrue(analysisResult.allViolations().stream().anyMatch(v -> !v.codeSnippet().isBlank()));
         assertFalse(analysisResult.ruleResults().isEmpty());
     }
@@ -118,4 +117,3 @@ class QScoutCliTest {
         return result;
     }
 }
-

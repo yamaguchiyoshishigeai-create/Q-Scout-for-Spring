@@ -28,12 +28,18 @@ public class ExceptionSwallowingRule extends AbstractTextRule {
             String line = lines.get(i);
             if (line.contains("catch (")) {
                 String block = collectBlock(lines, i);
-                String normalized = block.replaceAll("\\s+", " ").trim();
+                String normalized = normalize(block);
                 boolean rethrows = normalized.contains("throw ");
-                boolean logs = normalized.contains("log.") || normalized.contains("logger.") || normalized.contains("printStackTrace");
-                boolean empty = normalized.matches(".*catch \\(.*\\) \\{ ?\\}.*");
-                boolean onlyComment = normalized.matches(".*catch \\(.*\\) \\{ ?//.*");
-                if (!rethrows && !logs && (empty || onlyComment || block.lines().count() <= 3)) {
+                boolean logs = containsLogging(normalized);
+                boolean exits = normalized.contains("System.exit(");
+                boolean empty = isEmptyCatchBlock(block);
+                boolean returnsNull = normalized.contains("return null;");
+                boolean returnsEmptyString = normalized.contains("return \"\";");
+                boolean cleanupOnly = containsCleanup(normalized) && !logs;
+                if (rethrows || exits) {
+                    continue;
+                }
+                if (empty || returnsNull || returnsEmptyString || cleanupOnly) {
                     violations.add(violation(file, i + 1, "Caught exception appears to be swallowed without logging or rethrow.", Severity.HIGH));
                 }
             }
@@ -44,16 +50,62 @@ public class ExceptionSwallowingRule extends AbstractTextRule {
     private String collectBlock(List<String> lines, int startIndex) {
         StringBuilder builder = new StringBuilder();
         int braceBalance = 0;
+        boolean opened = false;
         for (int i = startIndex; i < lines.size(); i++) {
             String current = lines.get(i);
             builder.append(current).append(System.lineSeparator());
-            braceBalance += count(current, '{');
-            braceBalance -= count(current, '}');
-            if (braceBalance <= 0 && current.contains("}")) {
+            String segment = current;
+            if (i == startIndex) {
+                int catchIndex = current.indexOf("catch");
+                segment = catchIndex >= 0 ? current.substring(catchIndex) : current;
+            }
+            int opens = count(segment, '{');
+            int closes = count(segment, '}');
+            if (opens > 0) {
+                opened = true;
+            }
+            braceBalance += opens;
+            braceBalance -= closes;
+            if (opened && braceBalance <= 0) {
                 break;
             }
         }
         return builder.toString();
+    }
+
+    private String normalize(String block) {
+        return block.replaceAll("/\\*.*?\\*/", " ")
+                .replaceAll("//.*", " ")
+                .replaceAll("\\s+", " ")
+                .trim();
+    }
+
+    private boolean containsLogging(String normalized) {
+        return normalized.contains("log.")
+                || normalized.contains("logger.")
+                || normalized.contains("printStackTrace")
+                || normalized.contains("System.err");
+    }
+
+    private boolean containsCleanup(String normalized) {
+        return normalized.contains("close(")
+                || normalized.contains("cleanup")
+                || normalized.contains("deleteIfExists(")
+                || normalized.contains("rollback(")
+                || normalized.contains("flush(");
+    }
+
+    private boolean isEmptyCatchBlock(String block) {
+        String withoutComments = block.replaceAll("/\\*.*?\\*/", " ")
+                .replaceAll("//.*", " ");
+        int catchIndex = withoutComments.indexOf("catch");
+        String relevant = catchIndex >= 0 ? withoutComments.substring(catchIndex) : withoutComments;
+        int start = relevant.indexOf('{');
+        int end = relevant.lastIndexOf('}');
+        if (start < 0 || end <= start) {
+            return false;
+        }
+        return relevant.substring(start + 1, end).trim().isEmpty();
     }
 
     private int count(String value, char target) {

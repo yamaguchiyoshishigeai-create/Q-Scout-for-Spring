@@ -1,6 +1,8 @@
 package com.qscout.spring.web.service;
 
 import com.qscout.spring.web.exception.ArtifactExpiredException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -15,6 +17,7 @@ import java.util.regex.Pattern;
 
 @Service
 public class TempWorkspaceService {
+    private static final Logger logger = LoggerFactory.getLogger(TempWorkspaceService.class);
     private static final Pattern REQUEST_ID_PATTERN = Pattern.compile("^[0-9a-fA-F-]{36}$");
     private static final Duration RETENTION = Duration.ofMinutes(15);
 
@@ -37,6 +40,7 @@ public class TempWorkspaceService {
     }
 
     public void cleanupNow(WorkspaceContext workspace) {
+        logger.info("Cleaning up workspace. requestId={}, rootDir={}", workspace.requestId(), workspace.rootDir());
         deleteRecursively(workspace.rootDir());
     }
 
@@ -77,11 +81,13 @@ public class TempWorkspaceService {
                 if (Files.isDirectory(candidate)) {
                     String requestId = candidate.getFileName().toString();
                     if (REQUEST_ID_PATTERN.matcher(requestId).matches() && isExpired(requestId)) {
+                        logger.info("Removing expired workspace. requestId={}, rootDir={}", requestId, candidate);
                         deleteRecursively(candidate);
                     }
                 }
             }
         } catch (IOException exception) {
+            logger.warn("Failed to scan temporary workspace directory for cleanup. baseDir={}", baseDir, exception);
             // Best effort cleanup only.
         }
     }
@@ -95,10 +101,12 @@ public class TempWorkspaceService {
                 try {
                     Files.deleteIfExists(path);
                 } catch (IOException exception) {
+                    logger.warn("Failed to delete temporary workspace path. path={}", path, exception);
                     // Best effort cleanup only.
                 }
             });
         } catch (IOException exception) {
+            logger.warn("Failed to walk temporary workspace for cleanup. rootDir={}", rootDir, exception);
             // Best effort cleanup only.
         }
     }

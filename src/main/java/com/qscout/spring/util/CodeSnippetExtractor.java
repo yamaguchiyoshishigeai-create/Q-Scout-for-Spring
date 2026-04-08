@@ -1,11 +1,16 @@
 package com.qscout.spring.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
 public final class CodeSnippetExtractor {
+    private static final Logger logger = LoggerFactory.getLogger(CodeSnippetExtractor.class);
+
     private CodeSnippetExtractor() {
     }
 
@@ -31,6 +36,7 @@ public final class CodeSnippetExtractor {
             }
             return builder.toString().trim();
         } catch (IOException exception) {
+            logger.warn("Failed to extract code snippet. filePath={}, centerLine={}", filePath, centerLine, exception);
             return "";
         }
     }
