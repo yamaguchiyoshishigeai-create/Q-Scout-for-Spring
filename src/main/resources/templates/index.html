@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ja" xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}">
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="#{page.home.title}">Q-Scout for Spring</title>
+    <title>Q-Scout for Spring</title>
     <style>
         :root {
             --bg: linear-gradient(135deg, #f7f1e8 0%, #e6efe9 100%);
@@ -21,11 +21,13 @@
         .shell { max-width: 960px; margin: 0 auto; padding: 32px 20px 64px; }
         .hero, .panel { background: rgba(255, 253, 248, 0.92); border: 1px solid rgba(17, 100, 102, 0.12); border-radius: 20px; box-shadow: 0 18px 40px rgba(31, 42, 46, 0.08); backdrop-filter: blur(8px); }
         .hero { padding: 28px; margin-bottom: 24px; }
-        .topbar { display: flex; justify-content: flex-end; margin-bottom: 14px; }
-        .lang-switch { display: inline-flex; gap: 12px; padding: 10px 14px; border-radius: 999px; background: rgba(255, 253, 248, 0.92); border: 1px solid rgba(17, 100, 102, 0.12); box-shadow: 0 12px 28px rgba(31, 42, 46, 0.06); }
-        .lang-switch a { color: var(--accent); font-weight: 700; text-decoration: none; }
         h1 { margin: 0 0 12px; font-size: clamp(2rem, 4vw, 3rem); }
-        .lead { margin: 0; color: var(--muted); line-height: 1.7; }
+        .lead { margin: 0 0 24px; color: var(--muted); line-height: 1.8; }
+        .hero-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+        .hero-card { background: rgba(215, 236, 233, 0.55); border-radius: 16px; padding: 16px 18px; }
+        .hero-card h2 { margin: 0 0 10px; font-size: 1rem; color: var(--accent); }
+        .hero-card ul { margin: 0; padding-left: 18px; line-height: 1.7; }
+        .hero-card p { margin: 0; line-height: 1.7; color: var(--muted); }
         .panel { padding: 24px; }
         .limits { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 20px 0 24px; }
         .limit-card { background: var(--accent-soft); border-radius: 14px; padding: 14px; }
@@ -45,37 +47,66 @@
 </head>
 <body>
 <div class="shell">
-    <div class="topbar">
-        <nav class="lang-switch" aria-label="Language switcher">
-            <a th:href="@{/(lang='ja')}" th:text="#{lang.ja}">日本語</a>
-            <a th:href="@{/(lang='en')}" th:text="#{lang.en}">English</a>
-        </nav>
-    </div>
     <section class="hero">
-        <h1 th:text="#{app.title}">Q-Scout for Spring</h1>
-        <p class="lead" th:text="#{page.home.lead}">Spring Boot / Maven プロジェクトの zip をアップロードすると、既存CLI資産を使って品質診断を同期実行し、その場で結果と Markdown を返します。</p>
+        <h1>Q-Scout for Spring</h1>
+        <p class="lead">Spring Boot / Maven プロジェクトの zip をアップロードすると、既存 CLI 資産を利用して品質診断を同期実行し、その場で結果と Markdown レポートを返します。</p>
+        <div class="hero-grid">
+            <article class="hero-card">
+                <h2>現在の対応範囲</h2>
+                <ul>
+                    <li>Java 17 想定</li>
+                    <li>Spring Boot プロジェクト</li>
+                    <li>Maven プロジェクト</li>
+                    <li>単一リポジトリ</li>
+                    <li>単一モジュール構成</li>
+                </ul>
+            </article>
+            <article class="hero-card">
+                <h2>アップロード条件</h2>
+                <ul>
+                    <li>zip 形式のみ</li>
+                    <li>ルートに pom.xml を含むこと</li>
+                    <li>Java ソースコードを含むこと</li>
+                    <li>最大 20MB</li>
+                </ul>
+            </article>
+            <article class="hero-card">
+                <h2>現時点で非対応</h2>
+                <ul>
+                    <li>Gradle プロジェクト</li>
+                    <li>マルチモジュール構成</li>
+                    <li>Spring Framework 単体構成</li>
+                    <li>Kotlin 主体プロジェクト</li>
+                    <li>マルチリポジトリ横断分析</li>
+                </ul>
+            </article>
+            <article class="hero-card">
+                <h2>補足</h2>
+                <p>現在は同期実行の Web MVP です。上記対応範囲外の構成では、正しく判定できない場合があります。</p>
+            </article>
+        </div>
     </section>
     <section class="panel">
-        <form method="post" th:action="@{/analyze}" enctype="multipart/form-data" id="analyzeForm">
+        <form method="post" action="/analyze" enctype="multipart/form-data" id="analyzeForm">
             <div class="limits">
-                <div class="limit-card"><div th:text="#{limit.allowedFileType}">対応形式</div><strong th:text="${limits.allowedFileType}">zip</strong></div>
-                <div class="limit-card"><div th:text="#{limit.maxUploadSize}">最大サイズ</div><strong><span th:text="${limits.maxUploadSizeMb}">20</span><span th:text="#{unit.mb}">MB</span></strong></div>
-                <div class="limit-card"><div th:text="#{limit.maxExecutionTime}">実行制限</div><strong><span th:text="${limits.maxExecutionSeconds}">60</span><span th:text="#{unit.seconds}">秒</span></strong></div>
+                <div class="limit-card"><div>対応形式</div><strong th:text="${limits.allowedFileType}">zip</strong></div>
+                <div class="limit-card"><div>最大サイズ</div><strong><span th:text="${limits.maxUploadSizeMb}">20</span>MB</strong></div>
+                <div class="limit-card"><div>実行制限</div><strong><span th:text="${limits.maxExecutionSeconds}">60</span>秒</strong></div>
             </div>
-            <label for="projectZip" th:text="#{form.upload.label}">pom.xml を含む Spring Boot / Maven / 単一モジュールの zip を選択してください</label>
+            <label for="projectZip">pom.xml を含む Spring Boot / Maven / 単一モジュールの zip を選択してください</label>
             <input id="projectZip" type="file" name="projectZip" accept=".zip,application/zip">
-            <button id="submitButton" type="submit" th:text="#{form.upload.button}">解析を実行する</button>
-            <p id="running" th:text="#{form.upload.running}">解析中です。しばらくお待ちください。</p>
+            <button id="submitButton" type="submit">解析を実行する</button>
+            <p id="running">解析中です。しばらくお待ちください。</p>
         </form>
         <div class="notice error" th:if="${error != null}">
             <strong th:text="${error.userMessage}">エラーが発生しました。</strong>
-            <p th:if="${error.retryable}" th:text="#{error.retryable}">内容を確認して再度アップロードしてください。</p>
+            <p th:if="${error.retryable}">内容を確認して再度アップロードしてください。</p>
         </div>
         <div class="result" th:if="${response != null}">
             <strong th:text="${response.message}">解析が完了しました。</strong>
             <div class="metrics">
-                <div class="metric"><span th:text="#{result.score.label}">総合スコア</span><strong th:text="${response.finalScore}">0</strong></div>
-                <div class="metric"><span th:text="#{result.violations.label}">違反件数</span><strong th:text="${response.totalViolations}">0</strong></div>
+                <div class="metric"><span>総合スコア</span><strong th:text="${response.finalScore}">0</strong></div>
+                <div class="metric"><span>違反件数</span><strong th:text="${response.totalViolations}">0</strong></div>
                 <div class="metric"><span>HIGH</span><strong th:text="${response.highCount}">0</strong></div>
                 <div class="metric"><span>MEDIUM</span><strong th:text="${response.mediumCount}">0</strong></div>
                 <div class="metric"><span>LOW</span><strong th:text="${response.lowCount}">0</strong></div>

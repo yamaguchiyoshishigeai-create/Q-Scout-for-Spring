@@ -20,7 +20,7 @@ public class ZipExtractionService {
         try (InputStream inputStream = file.getInputStream()) {
             Files.copy(inputStream, uploadZipPath);
         } catch (IOException exception) {
-            throw new InvalidUploadException("error.invalidUpload.saveFailed", "アップロードファイルの保存に失敗しました。", exception);
+            throw new InvalidUploadException("アップロードファイルの保存に失敗しました。", exception);
         }
     }
 
@@ -31,7 +31,7 @@ public class ZipExtractionService {
             while ((entry = zipInputStream.getNextEntry()) != null) {
                 Path target = extractedDir.resolve(entry.getName()).normalize();
                 if (!target.startsWith(extractedDir.normalize())) {
-                    throw new InvalidUploadException("error.invalidUpload.illegalPath", "zip内に不正なパスが含まれています。");
+                    throw new InvalidUploadException("zip内に不正なパスが含まれています。");
                 }
                 if (entry.isDirectory()) {
                     Files.createDirectories(target);
@@ -45,11 +45,7 @@ public class ZipExtractionService {
                 zipInputStream.closeEntry();
             }
         } catch (IOException exception) {
-            throw new InvalidUploadException(
-                    "error.invalidUpload.unreadableArchive",
-                    "zipファイルの解凍に失敗しました。破損していないか確認してください。",
-                    exception
-            );
+            throw new InvalidUploadException("zipファイルの解凍に失敗しました。破損していないか確認してください。", exception);
         }
     }
 
@@ -67,20 +63,14 @@ public class ZipExtractionService {
                     .map(Path::getParent)
                     .forEach(candidates::add);
         } catch (IOException exception) {
-            throw new InvalidProjectStructureException("error.projectStructure.resolveFailed", "プロジェクトルートの判定に失敗しました。");
+            throw new InvalidProjectStructureException("プロジェクトルートの判定に失敗しました。");
         }
 
         if (candidates.isEmpty()) {
-            throw new InvalidProjectStructureException(
-                    "error.projectStructure.pomNotFound",
-                    "pom.xml が見つかりません。Spring Boot / Mavenプロジェクトをアップロードしてください。"
-            );
+            throw new InvalidProjectStructureException("pom.xml が見つかりません。Spring Boot / Mavenプロジェクトをアップロードしてください。");
         }
         if (candidates.size() > 1) {
-            throw new InvalidProjectStructureException(
-                    "error.projectStructure.multipleCandidates",
-                    "pom.xml を持つ候補が複数見つかりました。単一プロジェクトのzipを指定してください。"
-            );
+            throw new InvalidProjectStructureException("pom.xml を持つ候補が複数見つかりました。単一プロジェクトのzipを指定してください。");
         }
         return candidates.get(0).normalize();
     }

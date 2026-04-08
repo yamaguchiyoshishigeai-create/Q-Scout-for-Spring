@@ -7,13 +7,10 @@ import com.qscout.spring.web.dto.WebAnalysisResponse;
 import com.qscout.spring.web.exception.AnalysisTimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Path;
-import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -30,33 +27,28 @@ public class WebAnalysisService {
     private final TempWorkspaceService tempWorkspaceService;
     private final ZipExtractionService zipExtractionService;
     private final SharedAnalysisService sharedAnalysisService;
-    private final MessageSource messageSource;
 
     public WebAnalysisService(
             UploadValidationService uploadValidationService,
             TempWorkspaceService tempWorkspaceService,
             ZipExtractionService zipExtractionService,
-            SharedAnalysisService sharedAnalysisService,
-            MessageSource messageSource
+            SharedAnalysisService sharedAnalysisService
     ) {
         this.uploadValidationService = uploadValidationService;
         this.tempWorkspaceService = tempWorkspaceService;
         this.zipExtractionService = zipExtractionService;
         this.sharedAnalysisService = sharedAnalysisService;
-        this.messageSource = messageSource;
     }
 
     public WebAnalysisResponse analyze(MultipartFile projectZip) {
         uploadValidationService.validate(projectZip);
         TempWorkspaceService.WorkspaceContext workspace = tempWorkspaceService.createWorkspace();
-        Locale locale = LocaleContextHolder.getLocale();
         try {
             zipExtractionService.saveUpload(projectZip, workspace.uploadZipPath());
             zipExtractionService.extract(workspace.uploadZipPath(), workspace.extractedDir());
             Path projectRoot = zipExtractionService.resolveProjectRoot(workspace.extractedDir());
             SharedAnalysisService.SharedAnalysisResult result = executeWithTimeout(
-                    new AnalysisRequest(projectRoot, workspace.outputDir()),
-                    locale
+                    new AnalysisRequest(projectRoot, workspace.outputDir())
             );
             return new WebAnalysisResponse(
                     workspace.requestId(),
@@ -65,9 +57,9 @@ public class WebAnalysisService {
                     result.scoreSummary().highCount(),
                     result.scoreSummary().mediumCount(),
                     result.scoreSummary().lowCount(),
-                    new DownloadLinkView(message("download.human.label", locale), "/download/" + workspace.requestId() + "/human", "qscout-report.md"),
-                    new DownloadLinkView(message("download.ai.label", locale), "/download/" + workspace.requestId() + "/ai", "qscout-ai-input.md"),
-                    message("success.analysis.completed", locale),
+                    new DownloadLinkView("人間向けMarkdown", "/download/" + workspace.requestId() + "/human", "qscout-report.md"),
+                    new DownloadLinkView("AI入力Markdown", "/download/" + workspace.requestId() + "/ai", "qscout-ai-input.md"),
+                    "解析が完了しました。",
                     false,
                     true
             );
@@ -78,17 +70,13 @@ public class WebAnalysisService {
         }
     }
 
-    private SharedAnalysisService.SharedAnalysisResult executeWithTimeout(AnalysisRequest request, Locale locale) {
+    private SharedAnalysisService.SharedAnalysisResult executeWithTimeout(AnalysisRequest request) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         try {
-            Future<SharedAnalysisService.SharedAnalysisResult> future = executor.submit(() -> sharedAnalysisService.execute(request, locale));
+            Future<SharedAnalysisService.SharedAnalysisResult> future = executor.submit(() -> sharedAnalysisService.execute(request));
             return future.get(MAX_EXECUTION_SECONDS, TimeUnit.SECONDS);
         } catch (TimeoutException exception) {
-            throw new AnalysisTimeoutException(
-                    "error.timeout",
-                    "解析が時間制限を超えました。より小さいプロジェクトで再試行してください。",
-                    exception
-            );
+            throw new AnalysisTimeoutException("解析が時間制限を超えました。より小さいプロジェクトで再試行してください。", exception);
         } catch (ExecutionException exception) {
             Throwable cause = exception.getCause();
             if (cause instanceof RuntimeException runtimeException) {
@@ -101,9 +89,5 @@ public class WebAnalysisService {
         } finally {
             executor.shutdownNow();
         }
-    }
-
-    private String message(String key, Locale locale) {
-        return messageSource.getMessage(key, null, locale);
     }
 }
