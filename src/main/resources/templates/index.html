@@ -11,7 +11,8 @@
             --ink: #1f2a2e;
             --muted: #5d6a70;
             --accent: #116466;
-            --accent-soft: #d7ece9;
+            --accent-soft: rgba(215, 236, 233, 0.55);
+            --line: rgba(17, 100, 102, 0.16);
             --error-bg: #fdecec;
             --error-border: #d36b6b;
             --success-bg: #edf8f1;
@@ -19,16 +20,20 @@
         }
         body { margin: 0; font-family: "Segoe UI", "Hiragino Sans", sans-serif; background: var(--bg); color: var(--ink); }
         .shell { max-width: 960px; margin: 0 auto; padding: 32px 20px 64px; }
-        .hero, .panel { background: rgba(255, 253, 248, 0.92); border: 1px solid rgba(17, 100, 102, 0.12); border-radius: 20px; box-shadow: 0 18px 40px rgba(31, 42, 46, 0.08); backdrop-filter: blur(8px); }
-        .hero { padding: 28px; margin-bottom: 24px; }
-        h1 { margin: 0 0 12px; font-size: clamp(2rem, 4vw, 3rem); }
-        .lead { margin: 0 0 24px; color: var(--muted); line-height: 1.8; }
-        .hero-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
-        .hero-card { background: rgba(215, 236, 233, 0.55); border-radius: 16px; padding: 16px 18px; }
-        .hero-card h2 { margin: 0 0 10px; font-size: 1rem; color: var(--accent); }
-        .hero-card ul { margin: 0; padding-left: 18px; line-height: 1.7; }
-        .hero-card p { margin: 0; line-height: 1.7; color: var(--muted); }
-        .panel { padding: 24px; }
+        .hero, .panel, .section { background: rgba(255, 253, 248, 0.92); border: 1px solid rgba(17, 100, 102, 0.12); border-radius: 20px; box-shadow: 0 18px 40px rgba(31, 42, 46, 0.08); backdrop-filter: blur(8px); }
+        .hero, .section, .panel { padding: 28px; }
+        .hero, .section { margin-bottom: 20px; }
+        h1 { margin: 0 0 14px; font-size: clamp(2rem, 4vw, 3rem); }
+        h2 { margin: 0 0 14px; font-size: 1.25rem; }
+        .lead { margin: 0 0 12px; color: var(--ink); line-height: 1.85; font-size: 1.03rem; }
+        .sublead { margin: 0; color: var(--muted); line-height: 1.7; }
+        .section-copy { margin: 0 0 16px; color: var(--muted); line-height: 1.7; }
+        .support-table { width: 100%; border-collapse: collapse; background: white; border-radius: 16px; overflow: hidden; border: 1px solid var(--line); }
+        .support-table th, .support-table td { padding: 14px 16px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+        .support-table th { width: 34%; background: var(--accent-soft); font-weight: 700; }
+        .support-table tr:last-child th, .support-table tr:last-child td { border-bottom: 0; }
+        .unsupported-list { margin: 0; padding-left: 20px; line-height: 1.8; }
+        .note { margin: 14px 0 0; color: var(--muted); font-size: 0.96rem; line-height: 1.7; }
         .limits { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 20px 0 24px; }
         .limit-card { background: var(--accent-soft); border-radius: 14px; padding: 14px; }
         label { display: block; margin-bottom: 8px; font-weight: 600; }
@@ -43,50 +48,56 @@
         .metric strong { display: block; font-size: 1.6rem; margin-top: 6px; }
         .downloads a { display: inline-block; margin-right: 12px; margin-top: 10px; color: var(--accent); font-weight: 700; }
         #running { display: none; margin-top: 18px; color: var(--muted); }
+        @media (max-width: 640px) {
+            .hero, .section, .panel { padding: 22px; }
+            .support-table, .support-table tbody, .support-table tr, .support-table th, .support-table td { display: block; width: 100%; }
+            .support-table tr { border-bottom: 1px solid var(--line); }
+            .support-table tr:last-child { border-bottom: 0; }
+            .support-table th, .support-table td { border-bottom: 0; padding-bottom: 8px; }
+            .support-table td { padding-top: 0; padding-bottom: 14px; }
+        }
     </style>
 </head>
 <body>
 <div class="shell">
     <section class="hero">
         <h1>Q-Scout for Spring</h1>
-        <p class="lead">Spring Boot / Maven プロジェクトの zip をアップロードすると、既存 CLI 資産を利用して品質診断を同期実行し、その場で結果と Markdown レポートを返します。</p>
-        <div class="hero-grid">
-            <article class="hero-card">
-                <h2>現在の対応範囲</h2>
-                <ul>
-                    <li>Java 17 想定</li>
-                    <li>Spring Boot プロジェクト</li>
-                    <li>Maven プロジェクト</li>
-                    <li>単一リポジトリ</li>
-                    <li>単一モジュール構成</li>
-                </ul>
-            </article>
-            <article class="hero-card">
-                <h2>アップロード条件</h2>
-                <ul>
-                    <li>zip 形式のみ</li>
-                    <li>ルートに pom.xml を含むこと</li>
-                    <li>Java ソースコードを含むこと</li>
-                    <li>最大 20MB</li>
-                </ul>
-            </article>
-            <article class="hero-card">
-                <h2>現時点で非対応</h2>
-                <ul>
-                    <li>Gradle プロジェクト</li>
-                    <li>マルチモジュール構成</li>
-                    <li>Spring Framework 単体構成</li>
-                    <li>Kotlin 主体プロジェクト</li>
-                    <li>マルチリポジトリ横断分析</li>
-                </ul>
-            </article>
-            <article class="hero-card">
-                <h2>補足</h2>
-                <p>現在は同期実行の Web MVP です。上記対応範囲外の構成では、正しく判定できない場合があります。</p>
-            </article>
-        </div>
+        <p class="lead">Spring Boot / Maven プロジェクトの zip をアップロードすると、<br>既存 CLI 資産を利用して品質診断を同期実行し、<br>結果と Markdown レポートをその場で確認できます。</p>
+        <p class="sublead">現在は Web MVP として、現行対応範囲のプロジェクトを対象に提供しています。</p>
     </section>
+
+    <section class="section">
+        <h2>現在の対応範囲</h2>
+        <table class="support-table">
+            <tbody>
+            <tr><th scope="row">Java</th><td>17 想定</td></tr>
+            <tr><th scope="row">フレームワーク</th><td>Spring Boot</td></tr>
+            <tr><th scope="row">ビルドツール</th><td>Maven</td></tr>
+            <tr><th scope="row">リポジトリ構成</th><td>単一リポジトリ</td></tr>
+            <tr><th scope="row">モジュール構成</th><td>単一モジュール</td></tr>
+            <tr><th scope="row">入力形式</th><td>zip</td></tr>
+            <tr><th scope="row">必須ファイル</th><td>ルートに pom.xml</td></tr>
+            <tr><th scope="row">ソース条件</th><td>Java ソースコードを含むこと</td></tr>
+            <tr><th scope="row">最大サイズ</th><td>20MB</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="section">
+        <h2>現時点で非対応</h2>
+        <ul class="unsupported-list">
+            <li>Gradle プロジェクト</li>
+            <li>マルチモジュール構成</li>
+            <li>Spring Framework 単体構成</li>
+            <li>Kotlin 主体プロジェクト</li>
+            <li>マルチリポジトリ横断分析</li>
+        </ul>
+        <p class="note">対応範囲外の構成では、正しく判定できない場合があります。</p>
+    </section>
+
     <section class="panel">
+        <h2>プロジェクト zip をアップロード</h2>
+        <p class="section-copy">zip 形式の Spring Boot / Maven プロジェクトを選択してください。</p>
         <form method="post" action="/analyze" enctype="multipart/form-data" id="analyzeForm">
             <div class="limits">
                 <div class="limit-card"><div>対応形式</div><strong th:text="${limits.allowedFileType}">zip</strong></div>
