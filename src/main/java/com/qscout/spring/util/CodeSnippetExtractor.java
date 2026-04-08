@@ -10,6 +10,7 @@ import java.util.List;
 
 public final class CodeSnippetExtractor {
     private static final Logger logger = LoggerFactory.getLogger(CodeSnippetExtractor.class);
+    private static final String UNAVAILABLE_SNIPPET = "[snippet unavailable]";
 
     private CodeSnippetExtractor() {
     }
@@ -37,7 +38,7 @@ public final class CodeSnippetExtractor {
             return builder.toString().trim();
         } catch (IOException exception) {
             logger.warn("Failed to extract code snippet. filePath={}, centerLine={}", filePath, centerLine, exception);
-            return "";
+            return UNAVAILABLE_SNIPPET;
         }
     }
 }
