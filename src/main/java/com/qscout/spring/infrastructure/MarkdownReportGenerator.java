@@ -49,11 +49,16 @@ public class MarkdownReportGenerator implements ReportGenerator {
         }
 
         builder.append("## Improvement Hints").append(System.lineSeparator()).append(System.lineSeparator());
-        builder.append("- Replace field injection with constructor injection.").append(System.lineSeparator());
-        builder.append("- Keep transaction boundaries in the service layer.").append(System.lineSeparator());
-        builder.append("- Prefer service mediation over controller-to-repository access.").append(System.lineSeparator());
-        builder.append("- Log, wrap, or rethrow exceptions instead of swallowing them.").append(System.lineSeparator());
-        builder.append("- Fill obvious unit/integration test gaps.").append(System.lineSeparator());
+        if (analysisResult.allViolations().isEmpty()) {
+            builder.append("- No immediate improvements required.").append(System.lineSeparator());
+            builder.append("- The project passed all current Q-Scout checks.").append(System.lineSeparator());
+        } else {
+            builder.append("- Replace field injection with constructor injection.").append(System.lineSeparator());
+            builder.append("- Keep transaction boundaries in the service layer.").append(System.lineSeparator());
+            builder.append("- Prefer service mediation over controller-to-repository access.").append(System.lineSeparator());
+            builder.append("- Log, wrap, or rethrow exceptions instead of swallowing them.").append(System.lineSeparator());
+            builder.append("- Fill obvious unit/integration test gaps.").append(System.lineSeparator());
+        }
 
         return MarkdownWriter.write(outputDirectory, "qscout-report.md", builder.toString());
     }

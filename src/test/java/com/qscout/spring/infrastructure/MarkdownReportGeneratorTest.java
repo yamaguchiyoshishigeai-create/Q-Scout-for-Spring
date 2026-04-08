@@ -34,10 +34,11 @@ class MarkdownReportGeneratorTest {
         assertThat(content).contains("## Rule Summary");
         assertThat(content).contains("## Violations");
         assertThat(content).contains("Controller To Repository Direct Access");
+        assertThat(content).contains("Replace field injection with constructor injection.");
     }
 
     @Test
-    void generatesReportEvenWhenThereAreNoViolations() throws IOException {
+    void generatesNaturalSuccessMessageWhenThereAreNoViolations() throws IOException {
         AnalysisResult empty = new AnalysisResult(
                 new ProjectContext(Path.of("project"), Path.of("project/pom.xml"), List.of(), List.of()),
                 List.of(),
@@ -48,6 +49,10 @@ class MarkdownReportGeneratorTest {
 
         assertThat(content).contains("No violations detected.");
         assertThat(content).contains("## Improvement Hints");
+        assertThat(content).contains("No immediate improvements required.");
+        assertThat(content).contains("The project passed all current Q-Scout checks.");
+        assertThat(content).doesNotContain("Replace field injection with constructor injection.");
+        assertThat(content).doesNotContain("Fill obvious unit/integration test gaps.");
     }
 
     private AnalysisResult analysisResultWithViolation() {
