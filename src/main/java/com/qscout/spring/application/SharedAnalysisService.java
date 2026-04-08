@@ -6,6 +6,8 @@ import com.qscout.spring.domain.ReportArtifact;
 import com.qscout.spring.domain.ScoreSummary;
 import org.springframework.stereotype.Service;
 
+import java.util.Locale;
+
 @Service
 public class SharedAnalysisService {
     private final ProjectScanner projectScanner;
@@ -29,10 +31,14 @@ public class SharedAnalysisService {
     }
 
     public SharedAnalysisResult execute(AnalysisRequest request) {
+        return execute(request, Locale.JAPANESE);
+    }
+
+    public SharedAnalysisResult execute(AnalysisRequest request, Locale locale) {
         AnalysisResult analysisResult = ruleEngine.analyze(projectScanner.scan(request));
         ScoreSummary scoreSummary = scoreCalculator.calculate(analysisResult);
         ReportArtifact reportArtifact = new ReportArtifact(
-                reportGenerator.generate(analysisResult, scoreSummary, request.outputDirectory()),
+                reportGenerator.generate(analysisResult, scoreSummary, request.outputDirectory(), locale),
                 aiMarkdownGenerator.generate(analysisResult, request.outputDirectory())
         );
         return new SharedAnalysisResult(analysisResult, scoreSummary, reportArtifact);

@@ -15,24 +15,28 @@ public class UploadValidationService {
 
     public void validate(MultipartFile file) {
         if (file == null || file.isEmpty()) {
-            throw new InvalidUploadException("zipファイルを選択してください。");
+            throw new InvalidUploadException("error.invalidUpload.required", "zipファイルを選択してください。");
         }
 
         String filename = file.getOriginalFilename();
         if (filename == null || !filename.toLowerCase(Locale.ROOT).endsWith(".zip")) {
-            throw new InvalidUploadException("アップロード可能なのはzipファイルのみです。");
+            throw new InvalidUploadException("error.invalidUpload.fileType", "アップロード可能なのはzipファイルのみです。");
         }
 
         if (file.getSize() > MAX_UPLOAD_SIZE_BYTES) {
-            throw new InvalidUploadException("ファイルサイズが上限を超えています。20MB以下のzipを指定してください。");
+            throw new InvalidUploadException("error.invalidUpload.fileSize", "ファイルサイズが上限を超えています。20MB以下のzipを指定してください。");
         }
 
         try (InputStream inputStream = file.getInputStream(); ZipInputStream zipInputStream = new ZipInputStream(inputStream)) {
             if (zipInputStream.getNextEntry() == null) {
-                throw new InvalidUploadException("zipファイルの中身が空です。解析対象プロジェクトを含めてください。");
+                throw new InvalidUploadException("error.invalidUpload.emptyArchive", "zipファイルの中身が空です。解析対象プロジェクトを含めてください。");
             }
         } catch (IOException exception) {
-            throw new InvalidUploadException("zipファイルの解凍に失敗しました。破損していないか確認してください。", exception);
+            throw new InvalidUploadException(
+                    "error.invalidUpload.unreadableArchive",
+                    "zipファイルの解凍に失敗しました。破損していないか確認してください。",
+                    exception
+            );
         }
     }
 }
