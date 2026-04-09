@@ -82,3 +82,4 @@ CLI execution writes the following files under the specified output directory.
 1. `mvn -q -DskipTests package`
 2. `run-self-analysis.bat`
 3. Open the generated `samples\sample-output\self-analysis\qscout-report.md`
+

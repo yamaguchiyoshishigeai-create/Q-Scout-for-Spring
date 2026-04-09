@@ -5,7 +5,6 @@ $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $samplesRoot = Join-Path $repoRoot "samples"
-$runsRoot = Join-Path $samplesRoot "sample-runs"
 $outputRoot = Join-Path $samplesRoot "sample-output"
 $resultPath = Join-Path $samplesRoot "CodexExec.result"
 $summaryPath = Join-Path $samplesRoot "sample-comparison-summary.md"
@@ -95,17 +94,16 @@ function Get-RecommendedUse {
 }
 
 New-Item -ItemType Directory -Force -Path $samplesRoot | Out-Null
-New-Item -ItemType Directory -Force -Path $runsRoot | Out-Null
 New-Item -ItemType Directory -Force -Path $outputRoot | Out-Null
 Set-Content -LiteralPath $resultPath -Value "# Codex Execution Result`r`n"
 Set-Content -LiteralPath $summaryPath -Value "# Sample Comparison Summary`r`n"
-Write-ResultLog -Status "OK" -Code "F1_PREPARE_DONE" -Message ("Prepared: {0}, {1}, {2}" -f $samplesRoot, $runsRoot, $outputRoot)
+Write-ResultLog -Status "OK" -Code "F1_PREPARE_DONE" -Message ("Prepared: {0}, {1}" -f $samplesRoot, $outputRoot)
 
 $rows = New-Object System.Collections.Generic.List[object]
 
 foreach ($sample in $targets) {
     $sampleDir = Join-Path $samplesRoot $sample.Name
-    $runDir = Join-Path $runsRoot $sample.Name
+    $runDir = Join-Path $outputRoot $sample.Name
     $cloneLog = Join-Path $runDir "clone.log"
     $buildLog = Join-Path $runDir "build.log"
     $qscoutLog = Join-Path $runDir "qscout.log"
@@ -271,7 +269,7 @@ if ($failedClone -gt 0 -or $failedQScout -gt 0) {
     $summaryLines.Add("")
     $summaryLines.Add("- 完了したフェーズ: フェーズ1, フェーズ2, フェーズ3, フェーズ4, フェーズ5")
     $summaryLines.Add("- 未完了フェーズ: なし。ただし一部サンプルは失敗あり")
-    $summaryLines.Add("- 失敗理由: clone 失敗や解析失敗の詳細は samples/CodexExec.result と samples/sample-runs 配下ログを参照")
+    $summaryLines.Add("- 失敗理由: clone 失敗や解析失敗の詳細は samples/CodexExec.result と samples/sample-output 配下ログを参照")
     $summaryLines.Add("- 再開時の開始地点: 失敗したサンプルのフェーズ2またはフェーズ4から再実行")
     $tempRecommended = $rows | Sort-Object Recommendation, Sample | Select-Object -First 2
     $summaryLines.Add(("- 現時点での暫定推奨サンプル: {0}" -f (($tempRecommended | ForEach-Object { $_.Sample }) -join ", ")))
@@ -279,4 +277,6 @@ if ($failedClone -gt 0 -or $failedQScout -gt 0) {
 
 Set-Content -LiteralPath $summaryPath -Value ($summaryLines -join "`r`n")
 Write-ResultLog -Status "OK" -Code "F5_SUMMARY_DONE" -Message ("summary={0}" -f $summaryPath)
+
+
 
