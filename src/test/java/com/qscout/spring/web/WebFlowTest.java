@@ -46,7 +46,7 @@ class WebFlowTest {
                 "projectZip",
                 "sample-project.zip",
                 "application/zip",
-                zipDirectory(Path.of("src/test/resources/sample-project").toAbsolutePath().normalize())
+                zipDirectory(Path.of("samples/sample-project").toAbsolutePath().normalize())
         );
 
         MvcResult result = mockMvc.perform(multipart("/analyze").file(zip))
@@ -97,3 +97,4 @@ class WebFlowTest {
         }
     }
 }
+

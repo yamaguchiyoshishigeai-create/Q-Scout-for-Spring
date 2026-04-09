@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class QScoutCliTest {
-    private final Path sampleProject = Path.of("src/test/resources/sample-project").toAbsolutePath().normalize();
+    private final Path sampleProject = Path.of("samples/sample-project").toAbsolutePath().normalize();
 
     @Test
     void parsesArguments() {
@@ -117,3 +117,4 @@ class QScoutCliTest {
         return result;
     }
 }
+

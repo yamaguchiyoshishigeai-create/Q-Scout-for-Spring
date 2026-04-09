@@ -39,7 +39,7 @@ java -Dloader.main=com.qscout.spring.cli.Main -cp target/q-scout-for-spring-0.1.
 Example:
 
 ```bash
-java -Dloader.main=com.qscout.spring.cli.Main -cp target/q-scout-for-spring-0.1.0-SNAPSHOT.jar org.springframework.boot.loader.launch.PropertiesLauncher src/test/resources/sample-project samples/sample-output/cli-check
+java -Dloader.main=com.qscout.spring.cli.Main -cp target/q-scout-for-spring-0.1.0-SNAPSHOT.jar org.springframework.boot.loader.launch.PropertiesLauncher samples/sample-project samples/sample-output/cli-check
 ```
 
 ## Helper scripts
