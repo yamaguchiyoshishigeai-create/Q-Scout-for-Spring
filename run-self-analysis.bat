@@ -3,7 +3,7 @@ setlocal
 
 set "SCRIPT_DIR=%~dp0"
 set "PROJECT_ROOT=%SCRIPT_DIR%."
-set "OUTPUT_DIR=%SCRIPT_DIR%sample-output\self-analysis"
+set "OUTPUT_DIR=%SCRIPT_DIR%samples\sample-output\self-analysis"
 
 if not "%~1"=="" set "OUTPUT_DIR=%~1"
 

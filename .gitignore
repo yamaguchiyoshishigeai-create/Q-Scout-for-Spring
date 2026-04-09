@@ -7,6 +7,11 @@
 
 # Generated analysis output
 /sample-output/
+/sample-runs/
+/sample-comparison-summary.md
+/samples/sample-output/
+/samples/sample-runs/
+/samples/sample-comparison-summary.md
 
 # IDE and OS noise
 /.idea/
@@ -14,3 +19,7 @@
 *.iml
 Thumbs.db
 .DS_Store
+
+# Codex 実行結果
+CodexExec.result
+/samples/CodexExec.result

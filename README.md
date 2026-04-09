@@ -39,7 +39,7 @@ java -Dloader.main=com.qscout.spring.cli.Main -cp target/q-scout-for-spring-0.1.
 Example:
 
 ```bash
-java -Dloader.main=com.qscout.spring.cli.Main -cp target/q-scout-for-spring-0.1.0-SNAPSHOT.jar org.springframework.boot.loader.launch.PropertiesLauncher src/test/resources/sample-project sample-output/cli-check
+java -Dloader.main=com.qscout.spring.cli.Main -cp target/q-scout-for-spring-0.1.0-SNAPSHOT.jar org.springframework.boot.loader.launch.PropertiesLauncher src/test/resources/sample-project samples/sample-output/cli-check
 ```
 
 ## Helper scripts
@@ -58,10 +58,16 @@ Self-analysis of the current repository:
 run-self-analysis.bat
 ```
 
+Sample evaluation with aggregated artifacts under `samples\`:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\run-sample-evaluation-under-samples.ps1
+```
+
 Optional custom output directory:
 
 ```bat
-run-self-analysis.bat sample-output\self-analysis-custom
+run-self-analysis.bat samples\sample-output\self-analysis-custom
 ```
 
 ## Output files
@@ -75,4 +81,4 @@ CLI execution writes the following files under the specified output directory.
 
 1. `mvn -q -DskipTests package`
 2. `run-self-analysis.bat`
-3. Open the generated `sample-output\self-analysis\qscout-report.md`
+3. Open the generated `samples\sample-output\self-analysis\qscout-report.md`
