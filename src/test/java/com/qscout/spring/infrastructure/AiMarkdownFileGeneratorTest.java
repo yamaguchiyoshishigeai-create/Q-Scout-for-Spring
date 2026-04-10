@@ -6,11 +6,13 @@ import com.qscout.spring.domain.Severity;
 import com.qscout.spring.domain.Violation;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Locale;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -21,7 +23,7 @@ class AiMarkdownFileGeneratorTest {
     Path tempDir;
 
     @Test
-    void generatesAiMarkdownWithExpectedStructure() throws IOException {
+    void generatesAiMarkdownWithExpectedEnglishStructure() throws IOException {
         Path path = generator.generate(analysisResultWithViolation(), tempDir);
         String content = Files.readString(path);
 
@@ -31,6 +33,24 @@ class AiMarkdownFileGeneratorTest {
         assertThat(content).contains("## Detected Issues");
         assertThat(content).contains("### Issue 1");
         assertThat(content).contains("## Instructions");
+    }
+
+    @Test
+    void keepsAiMarkdownInEnglishEvenWhenJapaneseLocaleIsSelected() throws IOException {
+        Locale previous = LocaleContextHolder.getLocale();
+        LocaleContextHolder.setLocale(Locale.JAPANESE);
+        try {
+            Path path = generator.generate(analysisResultWithViolation(), tempDir);
+            String content = Files.readString(path);
+
+            assertThat(content).contains("# Project Analysis Input");
+            assertThat(content).contains("## Instructions");
+            assertThat(content).doesNotContain("Q-Scout 診断レポート");
+            assertThat(content).doesNotContain("改善ヒント");
+            assertThat(content).doesNotContain("違反は検出されませんでした。");
+        } finally {
+            LocaleContextHolder.setLocale(previous);
+        }
     }
 
     @Test
@@ -45,6 +65,7 @@ class AiMarkdownFileGeneratorTest {
 
         assertThat(content).contains("No issues detected.");
         assertThat(content).contains("## Instructions");
+        assertThat(content).doesNotContain("違反は検出されませんでした。");
     }
 
     private AnalysisResult analysisResultWithViolation() {

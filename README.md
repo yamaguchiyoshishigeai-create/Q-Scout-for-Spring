@@ -9,6 +9,8 @@ mvn test
 mvn -q -DskipTests package
 ```
 
+`mvn test` includes i18n regression coverage for the default Japanese locale, `?lang=ja` / `?lang=en` switching, localized human reports, zero-violation report messages, and the English-only AI Markdown contract.
+
 ## Web start
 
 ```bash
@@ -82,4 +84,3 @@ CLI execution writes the following files under the specified output directory.
 1. `mvn -q -DskipTests package`
 2. `run-self-analysis.bat`
 3. Open the generated `samples\sample-output\self-analysis\qscout-report.md`
-
