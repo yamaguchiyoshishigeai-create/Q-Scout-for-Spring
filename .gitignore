@@ -10,6 +10,7 @@
 /sample-comparison-summary.md
 /samples/sample-output/
 /samples/sample-comparison-summary.md
+/samples/*.zip
 
 # IDE and OS noise
 /.idea/

@@ -1,5 +1,6 @@
 package com.qscout.spring.web;
 
+import com.qscout.spring.web.service.UploadValidationService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -109,6 +110,40 @@ class WebFlowTest {
     }
 
     @Test
+    void showsUploadTooLargeModalInJapanese() throws Exception {
+        mockMvc.perform(multipart("/analyze").file(oversizedZip()))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeExists("uploadErrorModal"))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("アップロードに失敗しました")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("アップロードしたzipファイルが上限サイズ20MBを超えています。")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("20MB以下のzipファイルを選択して、再度実行してください。")));
+    }
+
+    @Test
+    void showsUploadTooLargeModalInEnglishAfterLocaleSwitch() throws Exception {
+        MockHttpSession session = (MockHttpSession) mockMvc.perform(get("/").param("lang", "en"))
+                .andReturn()
+                .getRequest()
+                .getSession(false);
+
+        mockMvc.perform(multipart("/analyze").file(oversizedZip()).session(session))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeExists("uploadErrorModal"))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Upload failed")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("The uploaded zip file exceeds the 20MB limit.")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Please choose a zip file of 20MB or less and try again.")));
+    }
+
+    @Test
+    void homePageIncludesClientSideUploadSizeGuard() throws Exception {
+        mockMvc.perform(get("/"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("data-max-upload-bytes=\"20971520\"")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("id=\"uploadErrorModal\"")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("handleTooLargeFile")));
+    }
+
+    @Test
     void analyzesZipAndAllowsDownloadsInJapaneseByDefault() throws Exception {
         MockMultipartFile zip = new MockMultipartFile(
                 "projectZip",
@@ -196,6 +231,15 @@ class WebFlowTest {
     void rejectsInvalidFileKey() throws Exception {
         mockMvc.perform(get("/download/{requestId}/{fileKey}", "00000000-0000-0000-0000-000000000000", "bad"))
                 .andExpect(status().isNotFound());
+    }
+
+    private MockMultipartFile oversizedZip() {
+        return new MockMultipartFile(
+                "projectZip",
+                "too-large.zip",
+                "application/zip",
+                new byte[(int) UploadValidationService.MAX_UPLOAD_SIZE_BYTES + 1]
+        );
     }
 
     private byte[] zipDirectory(Path root) {

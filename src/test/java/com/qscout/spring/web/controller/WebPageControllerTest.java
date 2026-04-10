@@ -3,9 +3,11 @@ package com.qscout.spring.web.controller;
 import com.qscout.spring.i18n.MessageSources;
 import com.qscout.spring.web.dto.DownloadLinkView;
 import com.qscout.spring.web.dto.ErrorViewModel;
+import com.qscout.spring.web.dto.UploadErrorModalView;
 import com.qscout.spring.web.dto.WebAnalysisResponse;
 import com.qscout.spring.web.exception.AnalysisTimeoutException;
 import com.qscout.spring.web.exception.InvalidUploadException;
+import com.qscout.spring.web.exception.UploadTooLargeException;
 import com.qscout.spring.web.service.WebAnalysisService;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
@@ -35,6 +37,24 @@ class WebPageControllerTest {
         assertThat(view).isEqualTo("index");
         assertThat(model.getAttribute("response")).isEqualTo(response);
         assertThat(model.getAttribute("limits")).isNotNull();
+    }
+
+    @Test
+    void mapsTooLargeUploadToModalModel() {
+        WebAnalysisService webAnalysisService = mock(WebAnalysisService.class);
+        WebPageController controller = new WebPageController(webAnalysisService, MessageSources.create());
+        MockMultipartFile file = new MockMultipartFile("projectZip", "large.zip", "application/zip", new byte[]{1});
+        when(webAnalysisService.analyze(file)).thenThrow(new UploadTooLargeException("too large"));
+
+        ConcurrentModel model = new ConcurrentModel();
+        controller.analyze(file, model);
+
+        UploadErrorModalView modal = (UploadErrorModalView) model.getAttribute("uploadErrorModal");
+        assertThat(modal).isNotNull();
+        assertThat(modal.title()).isEqualTo("アップロードに失敗しました");
+        assertThat(modal.body()).isEqualTo("アップロードしたzipファイルが上限サイズ20MBを超えています。");
+        assertThat(modal.retry()).isEqualTo("20MB以下のzipファイルを選択して、再度実行してください。");
+        assertThat(model.getAttribute("error")).isNull();
     }
 
     @Test

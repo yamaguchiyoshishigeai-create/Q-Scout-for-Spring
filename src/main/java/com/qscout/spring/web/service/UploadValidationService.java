@@ -2,6 +2,7 @@ package com.qscout.spring.web.service;
 
 import com.qscout.spring.i18n.MessageSources;
 import com.qscout.spring.web.exception.InvalidUploadException;
+import com.qscout.spring.web.exception.UploadTooLargeException;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,7 +37,7 @@ public class UploadValidationService {
         }
 
         if (file.getSize() > MAX_UPLOAD_SIZE_BYTES) {
-            throw new InvalidUploadException(message("error.invalidUpload.size"));
+            throw new UploadTooLargeException(message("error.invalidUpload.size"));
         }
 
         try (InputStream inputStream = file.getInputStream(); ZipInputStream zipInputStream = new ZipInputStream(inputStream)) {

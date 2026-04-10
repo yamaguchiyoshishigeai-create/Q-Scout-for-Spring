@@ -3,9 +3,11 @@ package com.qscout.spring.web.controller;
 import com.qscout.spring.i18n.MessageSources;
 import com.qscout.spring.web.dto.ErrorViewModel;
 import com.qscout.spring.web.dto.ExecutionLimitView;
+import com.qscout.spring.web.dto.UploadErrorModalView;
 import com.qscout.spring.web.exception.AnalysisTimeoutException;
 import com.qscout.spring.web.exception.InvalidProjectStructureException;
 import com.qscout.spring.web.exception.InvalidUploadException;
+import com.qscout.spring.web.exception.UploadTooLargeException;
 import com.qscout.spring.web.service.WebAnalysisService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +42,13 @@ public class WebPageController {
         populateCommon(model);
         try {
             model.addAttribute("response", webAnalysisService.analyze(file));
+        } catch (UploadTooLargeException exception) {
+            logger.warn("Upload exceeded size limit during controller validation. filename={}", file != null ? file.getOriginalFilename() : null, exception);
+            model.addAttribute("uploadErrorModal", new UploadErrorModalView(
+                    message("error.upload.tooLarge.title"),
+                    message("error.upload.tooLarge.body"),
+                    message("error.upload.tooLarge.retry")
+            ));
         } catch (InvalidUploadException | InvalidProjectStructureException exception) {
             logger.warn("Input validation failed during web analysis. filename={}", file != null ? file.getOriginalFilename() : null, exception);
             model.addAttribute("error", new ErrorViewModel(exception.getMessage(), "INPUT_ERROR", true));

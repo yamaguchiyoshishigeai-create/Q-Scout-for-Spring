@@ -17,6 +17,7 @@
             --error-border: #d36b6b;
             --success-bg: #edf8f1;
             --success-border: #4d8b63;
+            --modal-backdrop: rgba(31, 42, 46, 0.45);
         }
         body { margin: 0; font-family: "Segoe UI", "Hiragino Sans", sans-serif; background: var(--bg); color: var(--ink); }
         .shell { max-width: 960px; margin: 0 auto; padding: 32px 20px 64px; }
@@ -51,6 +52,12 @@
         .metric strong { display: block; font-size: 1.6rem; margin-top: 6px; }
         .downloads a { display: inline-block; margin-right: 12px; margin-top: 10px; color: var(--accent); font-weight: 700; }
         #running { display: none; margin-top: 18px; color: var(--muted); }
+        .modal-overlay { display: none; position: fixed; inset: 0; z-index: 1000; align-items: center; justify-content: center; padding: 20px; background: var(--modal-backdrop); }
+        .modal-overlay.is-visible { display: flex; }
+        .modal-card { width: min(100%, 440px); background: var(--panel); border: 1px solid var(--line); border-radius: 20px; box-shadow: 0 24px 56px rgba(31, 42, 46, 0.2); padding: 24px; }
+        .modal-card h3 { margin: 0 0 12px; font-size: 1.2rem; }
+        .modal-card p { margin: 0 0 12px; line-height: 1.7; color: var(--muted); }
+        .modal-card button { margin-top: 8px; }
         @media (max-width: 640px) {
             .hero, .section, .panel { padding: 22px; }
             .support-table, .support-table tbody, .support-table tr, .support-table th, .support-table td { display: block; width: 100%; }
@@ -58,6 +65,7 @@
             .support-table tr:last-child { border-bottom: 0; }
             .support-table th, .support-table td { border-bottom: 0; padding-bottom: 8px; }
             .support-table td { padding-top: 0; padding-bottom: 14px; }
+            .modal-card { padding: 22px; }
         }
     </style>
 </head>
@@ -108,7 +116,8 @@
     <section class="panel">
         <h2 th:text="#{page.home.section.upload}">プロジェクト zip をアップロード</h2>
         <p class="section-copy" th:text="#{form.upload.description}">zip 形式の Spring Boot / Maven プロジェクトを選択してください。</p>
-        <form method="post" action="/analyze" enctype="multipart/form-data" id="analyzeForm">
+        <form method="post" th:action="@{/analyze}" enctype="multipart/form-data" id="analyzeForm"
+              th:attr="data-max-upload-bytes=${limits.maxUploadSizeMb * 1024 * 1024},data-upload-too-large-title=#{error.upload.tooLarge.title},data-upload-too-large-body=#{error.upload.tooLarge.body},data-upload-too-large-retry=#{error.upload.tooLarge.retry}">
             <div class="limits">
                 <div class="limit-card"><div th:text="#{form.upload.limit.type}">対応形式</div><strong th:text="${limits.allowedFileType}">zip</strong></div>
                 <div class="limit-card"><div th:text="#{form.upload.limit.size}">最大サイズ</div><strong><span th:text="${limits.maxUploadSizeMb}">20</span>MB</strong></div>
@@ -139,14 +148,90 @@
         </div>
     </section>
 </div>
+<div id="uploadErrorModal" class="modal-overlay" th:classappend="${uploadErrorModal != null} ? ' is-visible' : ''"
+     th:attr="data-open=${uploadErrorModal != null},data-server-title=${uploadErrorModal != null ? uploadErrorModal.title() : ''},data-server-body=${uploadErrorModal != null ? uploadErrorModal.body() : ''},data-server-retry=${uploadErrorModal != null ? uploadErrorModal.retry() : ''},data-close-label=#{dialog.close}">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="uploadErrorTitle">
+        <h3 id="uploadErrorTitle" th:text="${uploadErrorModal != null ? uploadErrorModal.title() : #messages.msg('error.upload.tooLarge.title')}">アップロードに失敗しました</h3>
+        <p id="uploadErrorBody" th:text="${uploadErrorModal != null ? uploadErrorModal.body() : #messages.msg('error.upload.tooLarge.body')}">アップロードしたzipファイルが上限サイズ20MBを超えています。</p>
+        <p id="uploadErrorRetry" th:text="${uploadErrorModal != null ? uploadErrorModal.retry() : #messages.msg('error.upload.tooLarge.retry')}">20MB以下のzipファイルを選択して、再度実行してください。</p>
+        <button id="uploadErrorClose" type="button" th:text="#{dialog.close}">閉じる</button>
+    </div>
+</div>
 <script>
     const form = document.getElementById('analyzeForm');
+    const fileInput = document.getElementById('projectZip');
     const button = document.getElementById('submitButton');
     const running = document.getElementById('running');
-    form.addEventListener('submit', function () {
+    const modal = document.getElementById('uploadErrorModal');
+    const modalTitle = document.getElementById('uploadErrorTitle');
+    const modalBody = document.getElementById('uploadErrorBody');
+    const modalRetry = document.getElementById('uploadErrorRetry');
+    const modalClose = document.getElementById('uploadErrorClose');
+    const maxUploadBytes = Number(form.dataset.maxUploadBytes || 0);
+
+    function showUploadError(title, body, retry) {
+        modalTitle.textContent = title;
+        modalBody.textContent = body;
+        modalRetry.textContent = retry;
+        modal.classList.add('is-visible');
+        button.disabled = false;
+        running.style.display = 'none';
+    }
+
+    function hideUploadError() {
+        modal.classList.remove('is-visible');
+    }
+
+    function isTooLarge(file) {
+        return Boolean(file) && maxUploadBytes > 0 && file.size > maxUploadBytes;
+    }
+
+    function handleTooLargeFile() {
+        showUploadError(
+            form.dataset.uploadTooLargeTitle,
+            form.dataset.uploadTooLargeBody,
+            form.dataset.uploadTooLargeRetry
+        );
+        fileInput.value = '';
+    }
+
+    fileInput.addEventListener('change', function () {
+        const file = fileInput.files[0];
+        if (isTooLarge(file)) {
+            handleTooLargeFile();
+        }
+    });
+
+    form.addEventListener('submit', function (event) {
+        const file = fileInput.files[0];
+        if (isTooLarge(file)) {
+            event.preventDefault();
+            handleTooLargeFile();
+            return;
+        }
         button.disabled = true;
         running.style.display = 'block';
     });
+
+    modalClose.addEventListener('click', hideUploadError);
+    modal.addEventListener('click', function (event) {
+        if (event.target === modal) {
+            hideUploadError();
+        }
+    });
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+            hideUploadError();
+        }
+    });
+
+    if (modal.dataset.open === 'true') {
+        showUploadError(
+            modal.dataset.serverTitle || form.dataset.uploadTooLargeTitle,
+            modal.dataset.serverBody || form.dataset.uploadTooLargeBody,
+            modal.dataset.serverRetry || form.dataset.uploadTooLargeRetry
+        );
+    }
 </script>
 </body>
 </html>
