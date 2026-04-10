@@ -35,8 +35,13 @@ class MarkdownReportGeneratorTest {
 
             assertThat(reportPath.getFileName().toString()).isEqualTo("qscout-report.md");
             assertThat(content).contains("# Q-Scout 診断レポート");
+            assertThat(content).contains("- 対象: project");
+            assertThat(content).contains("- 総合スコア: 88/100");
+            assertThat(content).contains("- 重大度内訳: HIGH=0, MEDIUM=1, LOW=1");
             assertThat(content).contains("## このレポートの読み方");
             assertThat(content).contains("## ルール別サマリ");
+            assertThat(content).contains("## 違反一覧");
+            assertThat(content).contains("## 改善ヒント");
             assertThat(content).contains("意味: Controller が永続化アクセスを直接扱っており");
             assertThat(content).contains("読み取りのヒント: 単純 read-only 参照は条件付き許容余地がありますが");
             assertThat(content).contains("このルールの読み方: この指摘は一律の絶対悪ではなく");
@@ -59,7 +64,13 @@ class MarkdownReportGeneratorTest {
             String content = Files.readString(reportPath);
 
             assertThat(content).contains("# Q-Scout Report");
+            assertThat(content).contains("- Target: project");
+            assertThat(content).contains("- Overall Score: 88/100");
+            assertThat(content).contains("- Severity Counts: HIGH=0, MEDIUM=1, LOW=1");
             assertThat(content).contains("## How To Read This Report");
+            assertThat(content).contains("## Rule Summary");
+            assertThat(content).contains("## Violations");
+            assertThat(content).contains("## Improvement Hints");
             assertThat(content).contains("### Controller To Repository Direct Access (1)");
             assertThat(content).contains("Meaning: Controllers are touching persistence concerns directly");
             assertThat(content).contains("Reading hint: Simple read-only access may be conditionally acceptable");
@@ -102,6 +113,7 @@ class MarkdownReportGeneratorTest {
             assertThat(content).contains("現時点では大きな設計劣化の兆候は確認されていません。");
             assertThat(content).contains("現時点で直ちに対応すべき改善はありません。");
             assertThat(content).contains("このプロジェクトは現行の Q-Scout チェックをすべて通過しました。");
+            assertThat(content).contains("## 改善ヒント");
             assertThat(content).doesNotContain("フィールドインジェクションの代わりにコンストラクタインジェクションを採用しましょう。");
             assertThat(content).doesNotContain("Keep transaction boundaries in the service layer.");
         } finally {
@@ -119,10 +131,29 @@ class MarkdownReportGeneratorTest {
 
             assertThat(content).contains("No violations detected.");
             assertThat(content).contains("Current checks did not find clear signs of major design deterioration at this time.");
-            assertThat(content).contains("No immediate improvements are required.");
+            assertThat(content).contains("No immediate improvements required.");
             assertThat(content).contains("The project passed all current Q-Scout checks.");
+            assertThat(content).contains("## Improvement Hints");
             assertThat(content).doesNotContain("Replace field injection with constructor injection.");
             assertThat(content).doesNotContain("フィールドインジェクションの代わりにコンストラクタインジェクションを採用しましょう。");
+        } finally {
+            LocaleContextHolder.setLocale(previous);
+        }
+    }
+
+    @Test
+    void keepsImprovementHintsForViolationReports() throws IOException {
+        Locale previous = LocaleContextHolder.getLocale();
+        LocaleContextHolder.setLocale(Locale.ENGLISH);
+        try {
+            Path reportPath = generator.generate(analysisResultWithViolation(), new ScoreSummary(100, 88, 0, 1, 1, 2), tempDir);
+            String content = Files.readString(reportPath);
+
+            assertThat(content).contains("## Improvement Hints");
+            assertThat(content).contains("Replace field injection with constructor injection.");
+            assertThat(content).contains("Keep transaction boundaries in the service layer.");
+            assertThat(content).contains("Prefer service mediation over controller-to-repository access.");
+            assertThat(content).doesNotContain("No immediate improvements required.");
         } finally {
             LocaleContextHolder.setLocale(previous);
         }

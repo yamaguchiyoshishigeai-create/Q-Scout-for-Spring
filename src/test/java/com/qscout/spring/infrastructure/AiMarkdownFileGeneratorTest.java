@@ -47,11 +47,14 @@ class AiMarkdownFileGeneratorTest {
             String content = Files.readString(path);
 
             assertThat(content).contains("# Project Analysis Input");
+            assertThat(content).contains("## Project Summary");
+            assertThat(content).contains("## Detected Issues");
             assertThat(content).contains("## Instructions");
             assertThat(content).contains("Rule meaning:");
             assertThat(content).doesNotContain("Q-Scout 診断レポート");
             assertThat(content).doesNotContain("改善ヒント");
             assertThat(content).doesNotContain("違反は検出されませんでした。");
+            assertThat(content).doesNotContain("説明してください");
         } finally {
             LocaleContextHolder.setLocale(previous);
         }

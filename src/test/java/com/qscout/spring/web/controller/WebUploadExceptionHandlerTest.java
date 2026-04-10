@@ -45,6 +45,30 @@ class WebUploadExceptionHandlerTest {
         }
     }
 
+    @Test
+    void localizesMultipartLimitMessageInEnglish() throws Exception {
+        Locale previous = LocaleContextHolder.getLocale();
+        LocaleContextHolder.setLocale(Locale.ENGLISH);
+        try {
+            MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new ThrowingUploadController())
+                    .setControllerAdvice(new WebUploadExceptionHandler(MessageSources.create()))
+                    .build();
+
+            var result = mockMvc.perform(post("/analyze").locale(Locale.ENGLISH))
+                    .andExpect(status().is3xxRedirection())
+                    .andExpect(redirectedUrl("/"))
+                    .andExpect(flash().attributeExists("uploadErrorModal"))
+                    .andReturn();
+
+            UploadErrorModalView modal = (UploadErrorModalView) result.getFlashMap().get("uploadErrorModal");
+            assertThat(modal.title()).isEqualTo("Upload failed");
+            assertThat(modal.body()).isEqualTo("The uploaded zip file exceeds the 20MB limit.");
+            assertThat(modal.retry()).isEqualTo("Please choose a zip file of 20MB or less and try again.");
+        } finally {
+            LocaleContextHolder.setLocale(previous);
+        }
+    }
+
     @Controller
     static class ThrowingUploadController {
         @PostMapping("/analyze")
