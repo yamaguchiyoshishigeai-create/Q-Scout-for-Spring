@@ -30,10 +30,10 @@ public class PackageDependencyViolationRule extends AbstractTextRule {
         for (int i = 0; i < lines.size(); i++) {
             String line = lines.get(i);
             if (controller && line.contains("import ") && line.contains(".repository.")) {
-                violations.add(violation(file, i + 1, "Controller imports repository layer directly.", Severity.MEDIUM));
+                violations.add(violation(file, i + 1, message("rule.R006.message.controllerImportsRepository", "Controller imports repository layer directly."), Severity.MEDIUM));
             }
             if (repository && line.contains("import ") && (line.contains(".service.") || line.contains(".controller."))) {
-                violations.add(violation(file, i + 1, "Repository depends on upper layer package.", Severity.MEDIUM));
+                violations.add(violation(file, i + 1, message("rule.R006.message.repositoryDependsUpper", "Repository depends on upper layer package."), Severity.MEDIUM));
             }
         }
         return violations;

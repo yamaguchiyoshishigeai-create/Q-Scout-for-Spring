@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<html th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Q-Scout for Spring</title>
+    <title th:text="#{page.home.title}">Q-Scout for Spring</title>
     <style>
         :root {
             --bg: linear-gradient(135deg, #f7f1e8 0%, #e6efe9 100%);
@@ -23,6 +23,9 @@
         .hero, .panel, .section { background: rgba(255, 253, 248, 0.92); border: 1px solid rgba(17, 100, 102, 0.12); border-radius: 20px; box-shadow: 0 18px 40px rgba(31, 42, 46, 0.08); backdrop-filter: blur(8px); }
         .hero, .section, .panel { padding: 28px; }
         .hero, .section { margin-bottom: 20px; }
+        .topbar { display: flex; justify-content: flex-end; margin-bottom: 12px; }
+        .locale-switcher { display: inline-flex; gap: 12px; background: rgba(255,255,255,0.75); border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; }
+        .locale-switcher a { color: var(--accent); font-weight: 700; text-decoration: none; }
         h1 { margin: 0 0 14px; font-size: clamp(2rem, 4vw, 3rem); }
         h2 { margin: 0 0 14px; font-size: 1.25rem; }
         .lead { margin: 0 0 12px; color: var(--ink); line-height: 1.85; font-size: 1.03rem; }
@@ -60,64 +63,71 @@
 </head>
 <body>
 <div class="shell">
+    <div class="topbar">
+        <nav class="locale-switcher">
+            <a th:href="@{/(lang='ja')}" th:text="#{lang.ja}">日本語</a>
+            <a th:href="@{/(lang='en')}" th:text="#{lang.en}">English</a>
+        </nav>
+    </div>
+
     <section class="hero">
-        <h1>Q-Scout for Spring</h1>
-        <p class="lead">Spring Boot / Maven プロジェクトの zip をアップロードすると、<br>既存 CLI 資産を利用して品質診断を同期実行し、<br>結果と Markdown レポートをその場で確認できます。</p>
-        <p class="sublead">現在は Web MVP として、現行対応範囲のプロジェクトを対象に提供しています。</p>
+        <h1 th:text="#{page.home.hero.title}">Q-Scout for Spring</h1>
+        <p class="lead" th:text="#{page.home.hero.lead}">Spring Boot / Maven プロジェクトの zip をアップロードすると、既存 CLI 資産を利用して品質診断を同期実行し、結果と Markdown レポートをその場で確認できます。</p>
+        <p class="sublead" th:text="#{page.home.hero.sublead}">現在は Web MVP として、現行対応範囲のプロジェクトを対象に提供しています。</p>
     </section>
 
     <section class="section">
-        <h2>現在の対応範囲</h2>
+        <h2 th:text="#{page.home.section.supported}">現在の対応範囲</h2>
         <table class="support-table">
             <tbody>
-            <tr><th scope="row">Java</th><td>17 想定</td></tr>
-            <tr><th scope="row">フレームワーク</th><td>Spring Boot</td></tr>
-            <tr><th scope="row">ビルドツール</th><td>Maven</td></tr>
-            <tr><th scope="row">リポジトリ構成</th><td>単一リポジトリ</td></tr>
-            <tr><th scope="row">モジュール構成</th><td>単一モジュール</td></tr>
-            <tr><th scope="row">入力形式</th><td>zip</td></tr>
-            <tr><th scope="row">必須ファイル</th><td>ルートに pom.xml</td></tr>
-            <tr><th scope="row">ソース条件</th><td>Java ソースコードを含むこと</td></tr>
-            <tr><th scope="row">最大サイズ</th><td>20MB</td></tr>
+            <tr><th scope="row" th:text="#{page.home.support.java}">Java</th><td th:text="#{page.home.support.java.value}">17 想定</td></tr>
+            <tr><th scope="row" th:text="#{page.home.support.framework}">フレームワーク</th><td th:text="#{page.home.support.framework.value}">Spring Boot</td></tr>
+            <tr><th scope="row" th:text="#{page.home.support.build}">ビルドツール</th><td th:text="#{page.home.support.build.value}">Maven</td></tr>
+            <tr><th scope="row" th:text="#{page.home.support.repository}">リポジトリ構成</th><td th:text="#{page.home.support.repository.value}">単一リポジトリ</td></tr>
+            <tr><th scope="row" th:text="#{page.home.support.module}">モジュール構成</th><td th:text="#{page.home.support.module.value}">単一モジュール</td></tr>
+            <tr><th scope="row" th:text="#{page.home.support.input}">入力形式</th><td th:text="#{page.home.support.input.value}">zip</td></tr>
+            <tr><th scope="row" th:text="#{page.home.support.required}">必須ファイル</th><td th:text="#{page.home.support.required.value}">ルートに pom.xml</td></tr>
+            <tr><th scope="row" th:text="#{page.home.support.source}">ソース条件</th><td th:text="#{page.home.support.source.value}">Java ソースコードを含むこと</td></tr>
+            <tr><th scope="row" th:text="#{page.home.support.maxSize}">最大サイズ</th><td th:text="#{page.home.support.maxSize.value}">20MB</td></tr>
             </tbody>
         </table>
     </section>
 
     <section class="section">
-        <h2>現時点で非対応</h2>
+        <h2 th:text="#{page.home.section.unsupported}">現時点で非対応</h2>
         <ul class="unsupported-list">
-            <li>Gradle プロジェクト</li>
-            <li>マルチモジュール構成</li>
-            <li>Spring Framework 単体構成</li>
-            <li>Kotlin 主体プロジェクト</li>
-            <li>マルチリポジトリ横断分析</li>
+            <li th:text="#{page.home.unsupported.gradle}">Gradle プロジェクト</li>
+            <li th:text="#{page.home.unsupported.multimodule}">マルチモジュール構成</li>
+            <li th:text="#{page.home.unsupported.springFramework}">Spring Framework 単体構成</li>
+            <li th:text="#{page.home.unsupported.kotlin}">Kotlin 主体プロジェクト</li>
+            <li th:text="#{page.home.unsupported.multirepo}">マルチリポジトリ横断分析</li>
         </ul>
-        <p class="note">対応範囲外の構成では、正しく判定できない場合があります。</p>
+        <p class="note" th:text="#{page.home.unsupported.note}">対応範囲外の構成では、正しく判定できない場合があります。</p>
     </section>
 
     <section class="panel">
-        <h2>プロジェクト zip をアップロード</h2>
-        <p class="section-copy">zip 形式の Spring Boot / Maven プロジェクトを選択してください。</p>
+        <h2 th:text="#{page.home.section.upload}">プロジェクト zip をアップロード</h2>
+        <p class="section-copy" th:text="#{form.upload.description}">zip 形式の Spring Boot / Maven プロジェクトを選択してください。</p>
         <form method="post" action="/analyze" enctype="multipart/form-data" id="analyzeForm">
             <div class="limits">
-                <div class="limit-card"><div>対応形式</div><strong th:text="${limits.allowedFileType}">zip</strong></div>
-                <div class="limit-card"><div>最大サイズ</div><strong><span th:text="${limits.maxUploadSizeMb}">20</span>MB</strong></div>
-                <div class="limit-card"><div>実行制限</div><strong><span th:text="${limits.maxExecutionSeconds}">60</span>秒</strong></div>
+                <div class="limit-card"><div th:text="#{form.upload.limit.type}">対応形式</div><strong th:text="${limits.allowedFileType}">zip</strong></div>
+                <div class="limit-card"><div th:text="#{form.upload.limit.size}">最大サイズ</div><strong><span th:text="${limits.maxUploadSizeMb}">20</span>MB</strong></div>
+                <div class="limit-card"><div th:text="#{form.upload.limit.timeout}">実行制限</div><strong><span th:text="${limits.maxExecutionSeconds}">60</span><span th:text="${#locale.language == 'ja' ? '秒' : 's'}">秒</span></strong></div>
             </div>
-            <label for="projectZip">pom.xml を含む Spring Boot / Maven / 単一モジュールの zip を選択してください</label>
+            <label for="projectZip" th:text="#{form.upload.label}">pom.xml を含む Spring Boot / Maven / 単一モジュールの zip を選択してください</label>
             <input id="projectZip" type="file" name="projectZip" accept=".zip,application/zip">
-            <button id="submitButton" type="submit">解析を実行する</button>
-            <p id="running">解析中です。しばらくお待ちください。</p>
+            <button id="submitButton" type="submit" th:text="#{form.upload.button}">解析を実行する</button>
+            <p id="running" th:text="#{form.upload.running}">解析中です。しばらくお待ちください。</p>
         </form>
         <div class="notice error" th:if="${error != null}">
             <strong th:text="${error.userMessage}">エラーが発生しました。</strong>
-            <p th:if="${error.retryable}">内容を確認して再度アップロードしてください。</p>
+            <p th:if="${error.retryable}" th:text="#{error.retryable}">内容を確認して再度アップロードしてください。</p>
         </div>
         <div class="result" th:if="${response != null}">
             <strong th:text="${response.message}">解析が完了しました。</strong>
             <div class="metrics">
-                <div class="metric"><span>総合スコア</span><strong th:text="${response.finalScore}">0</strong></div>
-                <div class="metric"><span>違反件数</span><strong th:text="${response.totalViolations}">0</strong></div>
+                <div class="metric"><span th:text="#{result.score.label}">総合スコア</span><strong th:text="${response.finalScore}">0</strong></div>
+                <div class="metric"><span th:text="#{result.violations.label}">違反件数</span><strong th:text="${response.totalViolations}">0</strong></div>
                 <div class="metric"><span>HIGH</span><strong th:text="${response.highCount}">0</strong></div>
                 <div class="metric"><span>MEDIUM</span><strong th:text="${response.mediumCount}">0</strong></div>
                 <div class="metric"><span>LOW</span><strong th:text="${response.lowCount}">0</strong></div>

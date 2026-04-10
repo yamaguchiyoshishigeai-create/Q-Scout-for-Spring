@@ -42,13 +42,13 @@ public class TransactionalMisuseRule extends AbstractTextRule {
         if (isController && hasTransactional) {
             for (int i = 0; i < lines.size(); i++) {
                 if (lines.get(i).contains("@Transactional")) {
-                    violations.add(violation(file, i + 1, "Controller should usually not manage transactions directly.", Severity.HIGH));
+                    violations.add(violation(file, i + 1, message("rule.R003.message.controllerTransactional", "Controller should usually not manage transactions directly."), Severity.HIGH));
                 }
             }
         }
 
         if (isService && usesRepository && !hasTransactional) {
-            violations.add(violation(file, 1, "Service-like class may be missing transactional boundary.", Severity.MEDIUM));
+            violations.add(violation(file, 1, message("rule.R003.message.serviceBoundary", "Service-like class may be missing transactional boundary."), Severity.MEDIUM));
         }
 
         return violations;

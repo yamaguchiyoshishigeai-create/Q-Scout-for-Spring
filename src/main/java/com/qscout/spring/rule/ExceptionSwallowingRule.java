@@ -40,7 +40,7 @@ public class ExceptionSwallowingRule extends AbstractTextRule {
                     continue;
                 }
                 if (empty || returnsNull || returnsEmptyString || cleanupOnly) {
-                    violations.add(violation(file, i + 1, "Caught exception appears to be swallowed without logging or rethrow.", Severity.HIGH));
+                    violations.add(violation(file, i + 1, message("rule.R004.message.swallowed", "Caught exception appears to be swallowed without logging or rethrow."), Severity.HIGH));
                 }
             }
         }

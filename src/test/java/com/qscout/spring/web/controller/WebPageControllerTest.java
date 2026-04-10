@@ -1,5 +1,6 @@
 package com.qscout.spring.web.controller;
 
+import com.qscout.spring.i18n.MessageSources;
 import com.qscout.spring.web.dto.DownloadLinkView;
 import com.qscout.spring.web.dto.ErrorViewModel;
 import com.qscout.spring.web.dto.WebAnalysisResponse;
@@ -18,7 +19,7 @@ class WebPageControllerTest {
     @Test
     void putsResponseIntoModelOnSuccess() {
         WebAnalysisService webAnalysisService = mock(WebAnalysisService.class);
-        WebPageController controller = new WebPageController(webAnalysisService);
+        WebPageController controller = new WebPageController(webAnalysisService, MessageSources.create());
         MockMultipartFile file = new MockMultipartFile("projectZip", "sample.zip", "application/zip", new byte[]{1});
         WebAnalysisResponse response = new WebAnalysisResponse(
                 "req-1", 80, 3, 1, 1, 1,
@@ -39,7 +40,7 @@ class WebPageControllerTest {
     @Test
     void mapsInputErrorToModel() {
         WebAnalysisService webAnalysisService = mock(WebAnalysisService.class);
-        WebPageController controller = new WebPageController(webAnalysisService);
+        WebPageController controller = new WebPageController(webAnalysisService, MessageSources.create());
         MockMultipartFile file = new MockMultipartFile("projectZip", "bad.zip", "application/zip", new byte[]{1});
         when(webAnalysisService.analyze(file)).thenThrow(new InvalidUploadException("bad input"));
 
@@ -54,7 +55,7 @@ class WebPageControllerTest {
     @Test
     void mapsTimeoutToModel() {
         WebAnalysisService webAnalysisService = mock(WebAnalysisService.class);
-        WebPageController controller = new WebPageController(webAnalysisService);
+        WebPageController controller = new WebPageController(webAnalysisService, MessageSources.create());
         MockMultipartFile file = new MockMultipartFile("projectZip", "slow.zip", "application/zip", new byte[]{1});
         when(webAnalysisService.analyze(file)).thenThrow(new AnalysisTimeoutException("timeout", new RuntimeException("slow")));
 

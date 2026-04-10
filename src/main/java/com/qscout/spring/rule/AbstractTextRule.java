@@ -4,7 +4,9 @@ import com.qscout.spring.domain.ProjectContext;
 import com.qscout.spring.domain.RuleResult;
 import com.qscout.spring.domain.Severity;
 import com.qscout.spring.domain.Violation;
+import com.qscout.spring.i18n.MessageSources;
 import com.qscout.spring.util.CodeSnippetExtractor;
+import org.springframework.context.MessageSource;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,6 +15,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 abstract class AbstractTextRule implements Rule {
+    private final MessageSource messageSource;
+
+    protected AbstractTextRule() {
+        this(MessageSources.create());
+    }
+
+    protected AbstractTextRule(MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
 
     @Override
     public RuleResult evaluate(ProjectContext projectContext) {
@@ -39,6 +50,10 @@ abstract class AbstractTextRule implements Rule {
                 message,
                 CodeSnippetExtractor.extract(file, lineNumber)
         );
+    }
+
+    protected String message(String key, String defaultMessage, Object... args) {
+        return messageSource.getMessage(key, args, defaultMessage, MessageSources.resolveLocale());
     }
 
     private List<String> readLines(Path file) {

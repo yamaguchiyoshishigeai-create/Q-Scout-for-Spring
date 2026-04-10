@@ -4,6 +4,8 @@ import com.qscout.spring.domain.ProjectContext;
 import com.qscout.spring.domain.RuleResult;
 import com.qscout.spring.domain.Severity;
 import com.qscout.spring.domain.Violation;
+import com.qscout.spring.i18n.MessageSources;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -17,6 +19,16 @@ import java.util.stream.Collectors;
 
 @Component
 public class MissingTestRule implements Rule {
+    private final MessageSource messageSource;
+
+    public MissingTestRule() {
+        this(MessageSources.create());
+    }
+
+    public MissingTestRule(MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
+
     @Override
     public String ruleId() {
         return "R005";
@@ -49,7 +61,7 @@ public class MissingTestRule implements Rule {
                         Severity.LOW,
                         mainFile,
                         1,
-                        "Test class not found for " + className + ".",
+                        message("rule.R005.message.missingTest", "Test class not found for {0}.", className),
                         ""
                 ));
             }
@@ -97,5 +109,9 @@ public class MissingTestRule implements Rule {
         } catch (IOException exception) {
             throw new IllegalStateException("Failed to inspect source file: " + file, exception);
         }
+    }
+
+    private String message(String key, String defaultMessage, Object... args) {
+        return messageSource.getMessage(key, args, defaultMessage, MessageSources.resolveLocale());
     }
 }

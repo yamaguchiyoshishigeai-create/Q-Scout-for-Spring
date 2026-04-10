@@ -69,11 +69,11 @@ class QScoutCliTest {
         DefaultScoreCalculator calculator = new DefaultScoreCalculator();
         ScoreSummary summary = calculator.calculate(analyzeSample());
 
-        assertEquals(55, summary.finalScore());
+        assertEquals(63, summary.finalScore());
         assertEquals(6, summary.totalViolations());
-        assertEquals(3, summary.highCount());
+        assertEquals(2, summary.highCount());
         assertEquals(3, summary.mediumCount());
-        assertEquals(0, summary.lowCount());
+        assertEquals(1, summary.lowCount());
     }
 
     @Test
@@ -85,7 +85,7 @@ class QScoutCliTest {
 
         assertTrue(Files.exists(summary.humanReportPath()));
         assertTrue(Files.exists(summary.aiReportPath()));
-        assertTrue(Files.readString(summary.humanReportPath()).contains("Q-Scout Report"));
+        assertTrue(Files.readString(summary.humanReportPath()).contains("Q-Scout 診断レポート"));
         assertTrue(Files.readString(summary.aiReportPath()).contains("Project Analysis Input"));
     }
 
@@ -117,4 +117,5 @@ class QScoutCliTest {
         return result;
     }
 }
+
 

@@ -7,6 +7,7 @@ import com.qscout.spring.domain.ProjectContext;
 import com.qscout.spring.domain.ReportArtifact;
 import com.qscout.spring.domain.RuleResult;
 import com.qscout.spring.domain.ScoreSummary;
+import com.qscout.spring.i18n.MessageSources;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.mock.web.MockMultipartFile;
@@ -33,7 +34,7 @@ class WebAnalysisServiceTest {
         TempWorkspaceService tempWorkspaceService = mock(TempWorkspaceService.class);
         ZipExtractionService zipExtractionService = mock(ZipExtractionService.class);
         SharedAnalysisService sharedAnalysisService = mock(SharedAnalysisService.class);
-        WebAnalysisService service = new WebAnalysisService(uploadValidationService, tempWorkspaceService, zipExtractionService, sharedAnalysisService);
+        WebAnalysisService service = new WebAnalysisService(uploadValidationService, tempWorkspaceService, zipExtractionService, sharedAnalysisService, MessageSources.create());
         MockMultipartFile file = new MockMultipartFile("projectZip", "sample.zip", "application/zip", new byte[]{1, 2, 3});
         TempWorkspaceService.WorkspaceContext workspace = new TempWorkspaceService.WorkspaceContext(
                 "req-123",
@@ -46,7 +47,7 @@ class WebAnalysisServiceTest {
         Path projectRoot = tempDir.resolve("project");
         ScoreSummary scoreSummary = new ScoreSummary(100, 85, 1, 2, 3, 6);
         SharedAnalysisService.SharedAnalysisResult result = new SharedAnalysisService.SharedAnalysisResult(
-                new AnalysisResult(new ProjectContext(projectRoot, projectRoot.resolve("pom.xml"), List.of(), List.of()), List.<RuleResult>of(), List.of()),
+                new AnalysisResult(new ProjectContext(projectRoot, projectRoot.resolve("pom.xml"), List.<Path>of(), List.<Path>of()), List.<RuleResult>of(), List.of()),
                 scoreSummary,
                 new ReportArtifact(tempDir.resolve("workspace/output/qscout-report.md"), tempDir.resolve("workspace/output/qscout-ai-input.md"))
         );
@@ -71,7 +72,7 @@ class WebAnalysisServiceTest {
         TempWorkspaceService tempWorkspaceService = mock(TempWorkspaceService.class);
         ZipExtractionService zipExtractionService = mock(ZipExtractionService.class);
         SharedAnalysisService sharedAnalysisService = mock(SharedAnalysisService.class);
-        WebAnalysisService service = new WebAnalysisService(uploadValidationService, tempWorkspaceService, zipExtractionService, sharedAnalysisService);
+        WebAnalysisService service = new WebAnalysisService(uploadValidationService, tempWorkspaceService, zipExtractionService, sharedAnalysisService, MessageSources.create());
         MockMultipartFile file = new MockMultipartFile("projectZip", "sample.zip", "application/zip", new byte[]{1, 2, 3});
         TempWorkspaceService.WorkspaceContext workspace = new TempWorkspaceService.WorkspaceContext(
                 "req-999",

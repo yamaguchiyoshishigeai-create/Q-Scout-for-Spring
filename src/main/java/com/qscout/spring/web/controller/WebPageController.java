@@ -1,5 +1,6 @@
 package com.qscout.spring.web.controller;
 
+import com.qscout.spring.i18n.MessageSources;
 import com.qscout.spring.web.dto.ErrorViewModel;
 import com.qscout.spring.web.dto.ExecutionLimitView;
 import com.qscout.spring.web.exception.AnalysisTimeoutException;
@@ -8,6 +9,7 @@ import com.qscout.spring.web.exception.InvalidUploadException;
 import com.qscout.spring.web.service.WebAnalysisService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,9 +22,11 @@ public class WebPageController {
     private static final Logger logger = LoggerFactory.getLogger(WebPageController.class);
 
     private final WebAnalysisService webAnalysisService;
+    private final MessageSource messageSource;
 
-    public WebPageController(WebAnalysisService webAnalysisService) {
+    public WebPageController(WebAnalysisService webAnalysisService, MessageSource messageSource) {
         this.webAnalysisService = webAnalysisService;
+        this.messageSource = messageSource;
     }
 
     @GetMapping("/")
@@ -44,16 +48,16 @@ public class WebPageController {
             model.addAttribute("error", new ErrorViewModel(exception.getMessage(), "TIMEOUT", true));
         } catch (RuntimeException exception) {
             logger.error("Unexpected web analysis error.", exception);
-            model.addAttribute("error", new ErrorViewModel(
-                    "解析中に予期しないエラーが発生しました。時間をおいて再試行してください。",
-                    "UNEXPECTED",
-                    true
-            ));
+            model.addAttribute("error", new ErrorViewModel(message("error.unexpected"), "UNEXPECTED", true));
         }
         return "index";
     }
 
     private void populateCommon(Model model) {
         model.addAttribute("limits", new ExecutionLimitView(20, 60, "zip"));
+    }
+
+    private String message(String key, Object... args) {
+        return messageSource.getMessage(key, args, MessageSources.resolveLocale());
     }
 }

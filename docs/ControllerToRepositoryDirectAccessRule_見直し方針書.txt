@@ -1,0 +1,394 @@
+# ControllerToRepositoryDirectAccessRule 見直し方針書
+提案名：ControllerToRepositoryDirectAccessRule 見直し方針書 v1.0
+
+## 1. 文書目的
+本方針書は、Q-Scout for Spring における ControllerToRepositoryDirectAccessRule の見直し方針を定義するものである。
+
+目的は以下の3点である。
+1. Controller → Repository 直接参照を一律 HIGH 扱いする現行運用を見直す
+2. 非許容ケースと条件付き許容ケースを区別できる判定基準を確立する
+3. 既存 CLI / Web / レポート資産を壊さず、最小改修で精度と説明性を向上させる
+
+---
+
+## 2. 背景
+
+### 2.1 現行ルールの位置づけ
+現行の ControllerToRepositoryDirectAccessRule は、Q-Scout の MVP 6ルールの1つであり、
+「Controller から Repository への直接参照候補を検出する」ことを目的としている。
+
+MVP 実装方針では以下が採用されている。
+- 候補検出重視
+- 誤検知ゼロよりも実用的な候補抽出を優先
+- 実装容易性と説明可能性を優先
+- 重大度は HIGH 固定
+
+この設計は MVP としては合理的だったが、実運用の評価材料が揃ったことで見直し余地が生じている。
+
+### 2.2 見直しの直接契機
+公開サンプル評価において以下が確認された。
+- spring-petclinic：Controller To Repository Direct Access が 14件、Score 0
+- bookstore：同ルール 0件、Score 100
+
+spring-petclinic の検出内容には以下の両方が含まれていた。
+- save を伴う書き込み系直参照
+- findAll / findById / ModelAttribute 用の単純参照系直参照
+
+この結果、問題度の異なるケースがすべて HIGH で並んでしまい、
+結果解釈と改善優先度付けが粗くなる問題が顕在化した。
+
+---
+
+## 3. 見直しの基本結論
+
+### 提案名
+直参照一律禁止から文脈付き重み付け方式への移行
+
+### 優先度
+最優先
+
+### 結論
+Controller → Repository 直接参照は、今後も検出対象として維持する。
+ただし、今後は「直参照の存在」だけでなく、「その直参照がどの文脈で使われているか」によって重みを分ける。
+
+すなわち、
+- 検出自体は継続する
+- severity を一律 HIGH から段階化する
+- メッセージも段階化する
+- 許容余地のある read-only ケースを、書き込み系ユースケースと区別する
+
+---
+
+## 4. ルールの設計思想
+
+### 4.1 なぜ Controller → Repository 直参照を問題視するのか
+本ルールが重視する本質は、
+「Controller に HTTP 層以外の責務が流入しやすくなること」
+である。
+
+主な問題は以下。
+1. 業務ロジックが Controller に入り込みやすい
+2. 永続化都合が画面層 / API 層へ漏れやすい
+3. Service 層に置くべきトランザクション境界や業務判断が分散しやすい
+4. テスト責務の分離が崩れやすい
+5. 将来変更時の影響範囲が広がりやすい
+
+### 4.2 ただし常に絶対悪ではない
+一方で、以下のようなケースは実務上または教育上、一定の許容余地がある。
+- 単純 read-only 一覧取得
+- マスタ参照
+- 補助的な ModelAttribute 参照
+- 教材 / PoC / 公式サンプル上の簡略化
+- 将来複雑化前提ではない極小構成の参照専用処理
+
+したがって、本ルールは「存在検出のみ」で終わるべきではなく、
+「問題度の重み付け」まで行うべき段階に入ったと判断する。
+
+---
+
+## 5. 新しい判定方針
+
+### 提案名
+二段階判定方式
+
+### 優先度
+最優先
+
+### 方針
+本ルールは今後、以下の二段階で判定する。
+
+#### 第1段階：直参照の存在検出
+以下に該当した場合、直参照候補として検出する。
+- クラスに Controller または RestController 系アノテーションが付いている
+- フィールドまたはコンストラクタ依存として Repository 型を持つ
+- メソッド内で Repository のメソッドを直接呼んでいる
+
+#### 第2段階：重み付け
+検出した直参照に対し、メソッド名・呼び出し文脈・周辺処理に応じて severity を決定する。
+
+---
+
+## 6. severity 判定基準
+
+### 6.1 HIGH（非許容）
+以下は原則として HIGH とする。
+
+1. save / delete / flush などの書き込み系直参照
+2. 取得後にエンティティ状態を変更して保存している
+3. 複数ステップのユースケース処理を Controller 内で実行している
+4. 実質的な業務ロジックや整合性処理を Controller が担っている
+5. 複数 Repository または複数依存先を横断する処理に発展している
+
+#### 代表例
+- owner.addPet(pet); owners.save(owner);
+- owner.addVisit(...); owners.save(owner);
+- owner.setId(...); owners.save(owner);
+
+#### 解釈
+これは単なる参照ではなく、ユースケース実行や永続化責務が Controller に流入している状態であり、
+Service 層への分離が強く推奨される。
+
+---
+
+### 6.2 MEDIUM（条件付き許容・改善推奨）
+以下は MEDIUM とする。
+
+1. findById / findBy... などの参照系直参照
+2. Optional 解決や not found 判定を Controller が直接行っている
+3. 参照自体は単純だが、将来の業務ロジック追加余地が高い
+4. 単純 read-only だが、Service 経由の方が責務分離上望ましいケース
+
+#### 代表例
+- owners.findById(...)
+- owners.findByLastNameStartingWith(...)
+- findById(...).orElseThrow(...)
+
+#### 解釈
+直ちに重大事故級ではないが、責務分離と将来変更耐性の観点では Service 化を検討すべき対象である。
+
+---
+
+### 6.3 LOW（限定的許容・情報提供寄り）
+以下は LOW とする。
+
+1. ModelAttribute 用の補助的参照
+2. 単純なマスタ一覧取得
+3. 表示補助専用の read-only 参照
+4. 教材・PoC 的構造で複雑化兆候が薄いもの
+
+#### 代表例
+- populatePetTypes() 内の types.findPetTypes()
+- 単純な findAll() / 固定ページング取得
+
+#### 解釈
+設計上は Service 経由の方が望ましいが、実務や教材文脈では直ちに高リスクとは限らない。
+利用者への気づき提供を主目的とする。
+
+---
+
+## 7. 許容除外候補の扱い
+
+### 提案名
+検出維持・スコア軽量化方式
+
+### 優先度
+高
+
+### 方針
+許容余地のあるケースを完全に未検出にするのではなく、
+「検出はするが severity を軽くする」方針を採用する。
+
+理由：
+1. 直参照という設計臭自体は利用者に通知価値がある
+2. 完全除外すると将来の複雑化兆候を見落とす
+3. MVP 既存思想の「候補検出」を維持できる
+4. ルールの存在意義を失わずに柔軟化できる
+
+例外的に、将来バージョンで ignore 対象を設ける余地はあるが、今回スコープでは導入しない。
+
+---
+
+## 8. メッセージ方針
+
+### 提案名
+severity 連動メッセージ方式
+
+### 優先度
+高
+
+### 方針
+メッセージは severity に応じて変える。
+
+#### HIGH 用
+Controller performs write or use-case-level repository access directly. Move this logic behind a service layer.
+
+#### MEDIUM 用
+Controller reads from repository directly. Prefer service mediation to preserve separation of concerns and future extensibility.
+
+#### LOW 用
+Controller performs a simple read-only repository access. This may be acceptable in limited cases, but service mediation is usually preferable.
+
+### 補足注記
+人間用レポートまたは将来の詳細解説では、以下の注記を付けられるようにする。
+- 教材・PoC・read-only 補助処理では条件付き許容の余地がある
+- 書き込みやユースケース処理は非許容寄り
+- 本ツールは「存在検出」だけでなく「改善優先度付け」を支援する
+
+---
+
+## 9. スコアリング方針への影響
+
+### 提案名
+重大度段階化スコア反映方針
+
+### 優先度
+最優先
+
+### 方針
+本ルールの severity を段階化した場合、既存の減点テーブルに従って自動的に差が付く。
+- HIGH: -10
+- MEDIUM: -5
+- LOW: -2
+
+これにより、
+- 書き込み系直参照
+- 参照系直参照
+- 補助的 read-only 直参照
+の問題度差が、自然に総合スコアへ反映される。
+
+---
+
+## 10. 既存サンプルの再解釈方針
+
+### 提案名
+サンプル運用再分類方針
+
+### 優先度
+高
+
+### 方針
+今後の回帰確認では、公開サンプルを以下の役割で使う。
+
+1. bookstore
+- 正常系ベースライン
+- このルールで 0件を維持できるか確認する
+
+2. spring-boot-monolith
+- 本ルールの主対象ではない
+- 構造揺さぶり系 / 他ルール確認用
+
+3. spring-petclinic
+- ControllerToRepositoryDirectAccessRule の境界検証用
+- HIGH / MEDIUM / LOW の混在が適切に出るかを確認する
+
+### 補足
+現状の spring-petclinic は 14件すべて HIGH だが、見直し後は
+- save 系は HIGH
+- findById / findAll / ModelAttribute 系は MEDIUM または LOW
+へ再分類されることが期待される。
+
+---
+
+## 11. 今回スコープで実施すること
+
+### 提案名
+最小改修スコープ
+
+### 優先度
+最優先
+
+### 実施対象
+1. ControllerToRepositoryDirectAccessRule の severity 段階化
+2. メソッド名ベースの read/write 判定導入
+3. 文脈に応じたメッセージ分岐
+4. 既存サンプルによる再検証
+5. ルールテストの追加・更新
+
+### 非対象
+1. 他ルールの同時見直し
+2. レポート全体の解説 UX 改修
+3. 静的な詳細解説ページ実装
+4. 設定ファイルによるカスタム閾値化
+5. 許容リスト / ignore 設定導入
+6. AI 自動要約統合
+
+---
+
+## 12. 実装の基本方針
+
+### 提案名
+既存コア温存型ルール改修
+
+### 優先度
+最優先
+
+### 方針
+- 既存 Rule インターフェースは変えない
+- ControllerToRepositoryDirectAccessRule の内部判定のみ見直す
+- DTO 変更は原則行わない
+- ReportGenerator 側は severity と message の既存表示をそのまま活用する
+- CLI / Web の入口や共通解析サービスには影響を広げない
+
+理由：
+- CLI資産を壊さない
+- Web公開構成を壊さない
+- 既存レポート構造を活かせる
+- 最小改修で効果が大きい
+
+---
+
+## 13. テスト方針
+
+### 提案名
+境界条件固定化テスト方針
+
+### 優先度
+最優先
+
+### 必須テストケース
+1. Controller から repository.findAll() → LOW または MEDIUM
+2. Controller から repository.findById() → MEDIUM
+3. Controller から repository.save() → HIGH
+4. Controller で取得後に状態変更して save() → HIGH
+5. ModelAttribute 用 read-only 参照 → LOW
+6. 従来通り、直参照未存在時は 0件
+
+### 推奨テスト
+- spring-petclinic 相当のパターン断片を使った回帰ケース
+- save 系と read-only 系が混在する Controller で、複数 severity が共存できるか
+
+---
+
+## 14. 実施順序
+
+### STEP 1
+実行担当：ChatGPT
+理由：本方針書により判定基準を確定する必要があるため
+
+- 判定区分の確定
+- severity 基準の確定
+- メッセージ方針の確定
+
+### STEP 2
+実行担当：ChatGPT
+理由：Codex が迷わず実装できる形に落とし込む必要があるため
+
+- Codex にそのまま渡せる実装指示書を作成
+
+### STEP 3
+実行担当：Codex
+理由：既存 Rule 実装・テスト改修・再実行を一括で進めやすいため
+
+- Rule 実装更新
+- テスト追加 / 修正
+- サンプル再実行
+- 結果確認
+
+### STEP 4
+実行担当：人間
+理由：最終的に severity 分類が実務感覚に合うか判断が必要なため
+
+- 結果レビュー
+- HIGH / MEDIUM / LOW の妥当性確認
+- 必要なら閾値や文言の微修正判断
+
+---
+
+## 15. 最終結論
+ControllerToRepositoryDirectAccessRule は、廃止すべきルールではない。
+むしろ、Q-Scout の「レイヤ分離」「Spring ベストプラクティス」「説明可能な品質評価」という価値に直結する重要ルールである。
+
+ただし、現行の「直参照 = 一律 HIGH」は粗すぎるため、今後は
+- 検出は維持
+- severity は段階化
+- メッセージは文脈化
+- read-only と write/use-case を区別
+する方針へ移行する。
+
+これにより、Q-Scout は
+- 過度に厳しすぎず
+- しかし設計劣化の兆候は見逃さず
+- 利用者にとって解釈しやすい
+ルール運用へ進化できる。
+
+以上を、ControllerToRepositoryDirectAccessRule の正式見直し方針とする。

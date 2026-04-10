@@ -1,7 +1,9 @@
 package com.qscout.spring.web.service;
 
+import com.qscout.spring.i18n.MessageSources;
 import com.qscout.spring.web.exception.InvalidProjectStructureException;
 import com.qscout.spring.web.exception.InvalidUploadException;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,11 +18,21 @@ import java.util.zip.ZipInputStream;
 
 @Service
 public class ZipExtractionService {
+    private final MessageSource messageSource;
+
+    public ZipExtractionService() {
+        this(MessageSources.create());
+    }
+
+    public ZipExtractionService(MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
+
     public void saveUpload(MultipartFile file, Path uploadZipPath) {
         try (InputStream inputStream = file.getInputStream()) {
             Files.copy(inputStream, uploadZipPath);
         } catch (IOException exception) {
-            throw new InvalidUploadException("アップロードファイルの保存に失敗しました。", exception);
+            throw new InvalidUploadException(message("error.invalidUpload.save"), exception);
         }
     }
 
@@ -31,7 +43,7 @@ public class ZipExtractionService {
             while ((entry = zipInputStream.getNextEntry()) != null) {
                 Path target = extractedDir.resolve(entry.getName()).normalize();
                 if (!target.startsWith(extractedDir.normalize())) {
-                    throw new InvalidUploadException("zip内に不正なパスが含まれています。");
+                    throw new InvalidUploadException(message("error.invalidUpload.path"));
                 }
                 if (entry.isDirectory()) {
                     Files.createDirectories(target);
@@ -45,7 +57,7 @@ public class ZipExtractionService {
                 zipInputStream.closeEntry();
             }
         } catch (IOException exception) {
-            throw new InvalidUploadException("zipファイルの解凍に失敗しました。破損していないか確認してください。", exception);
+            throw new InvalidUploadException(message("error.invalidUpload.unzip"), exception);
         }
     }
 
@@ -63,15 +75,19 @@ public class ZipExtractionService {
                     .map(Path::getParent)
                     .forEach(candidates::add);
         } catch (IOException exception) {
-            throw new InvalidProjectStructureException("プロジェクトルートの判定に失敗しました。");
+            throw new InvalidProjectStructureException(message("error.projectRoot.resolve"));
         }
 
         if (candidates.isEmpty()) {
-            throw new InvalidProjectStructureException("pom.xml が見つかりません。Spring Boot / Mavenプロジェクトをアップロードしてください。");
+            throw new InvalidProjectStructureException(message("error.projectRoot.missingPom"));
         }
         if (candidates.size() > 1) {
-            throw new InvalidProjectStructureException("pom.xml を持つ候補が複数見つかりました。単一プロジェクトのzipを指定してください。");
+            throw new InvalidProjectStructureException(message("error.projectRoot.multiplePom"));
         }
         return candidates.get(0).normalize();
+    }
+
+    private String message(String key, Object... args) {
+        return messageSource.getMessage(key, args, MessageSources.resolveLocale());
     }
 }

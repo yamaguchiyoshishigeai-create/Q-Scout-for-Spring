@@ -31,7 +31,7 @@ public class FieldInjectionRule extends AbstractTextRule {
         }
         for (int i = 0; i < lines.size(); i++) {
             if (lines.get(i).contains("@Autowired")) {
-                violations.add(violation(file, i + 1, "Field injection detected. Prefer constructor injection.", Severity.MEDIUM));
+                violations.add(violation(file, i + 1, message("rule.R002.message.fieldInjection", "Field injection detected. Prefer constructor injection."), Severity.MEDIUM));
             }
         }
         return violations;
