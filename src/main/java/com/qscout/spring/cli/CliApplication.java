@@ -7,6 +7,7 @@ import com.qscout.spring.infrastructure.AiMarkdownFileGenerator;
 import com.qscout.spring.infrastructure.DefaultProjectScanner;
 import com.qscout.spring.infrastructure.DefaultRuleEngine;
 import com.qscout.spring.infrastructure.DefaultScoreCalculator;
+import com.qscout.spring.infrastructure.InMemoryRuleExplanationCatalog;
 import com.qscout.spring.infrastructure.MarkdownReportGenerator;
 import com.qscout.spring.rule.ControllerToRepositoryDirectAccessRule;
 import com.qscout.spring.rule.ExceptionSwallowingRule;
@@ -23,16 +24,7 @@ public final class CliApplication {
     private final SharedAnalysisService sharedAnalysisService;
 
     public CliApplication() {
-        this(
-                new ArgumentParser(),
-                new SharedAnalysisService(
-                        new DefaultProjectScanner(),
-                        new DefaultRuleEngine(defaultRules()),
-                        new DefaultScoreCalculator(),
-                        new MarkdownReportGenerator(),
-                        new AiMarkdownFileGenerator()
-                )
-        );
+        this(new ArgumentParser(), createSharedAnalysisService());
     }
 
     public CliApplication(ArgumentParser argumentParser, SharedAnalysisService sharedAnalysisService) {
@@ -48,6 +40,17 @@ public final class CliApplication {
                 result.scoreSummary().totalViolations(),
                 result.reportArtifact().humanReportPath(),
                 result.reportArtifact().aiReportPath()
+        );
+    }
+
+    private static SharedAnalysisService createSharedAnalysisService() {
+        InMemoryRuleExplanationCatalog ruleExplanationCatalog = new InMemoryRuleExplanationCatalog();
+        return new SharedAnalysisService(
+                new DefaultProjectScanner(),
+                new DefaultRuleEngine(defaultRules()),
+                new DefaultScoreCalculator(),
+                new MarkdownReportGenerator(com.qscout.spring.i18n.MessageSources.create(), ruleExplanationCatalog),
+                new AiMarkdownFileGenerator(ruleExplanationCatalog)
         );
     }
 

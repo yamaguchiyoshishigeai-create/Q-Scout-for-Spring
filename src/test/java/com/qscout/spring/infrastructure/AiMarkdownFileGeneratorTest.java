@@ -2,6 +2,7 @@ package com.qscout.spring.infrastructure;
 
 import com.qscout.spring.domain.AnalysisResult;
 import com.qscout.spring.domain.ProjectContext;
+import com.qscout.spring.domain.RuleResult;
 import com.qscout.spring.domain.Severity;
 import com.qscout.spring.domain.Violation;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,7 @@ import java.util.Locale;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class AiMarkdownFileGeneratorTest {
-    private final AiMarkdownFileGenerator generator = new AiMarkdownFileGenerator();
+    private final AiMarkdownFileGenerator generator = new AiMarkdownFileGenerator(new InMemoryRuleExplanationCatalog());
 
     @TempDir
     Path tempDir;
@@ -32,6 +33,8 @@ class AiMarkdownFileGeneratorTest {
         assertThat(content).contains("## Project Summary");
         assertThat(content).contains("## Detected Issues");
         assertThat(content).contains("### Issue 1");
+        assertThat(content).contains("Rule meaning: An exception may be caught and then hidden without logging, wrapping, or rethrowing.");
+        assertThat(content).contains("Nuance: This rule flags caught exceptions that disappear without logging, wrapping, or rethrowing.");
         assertThat(content).contains("## Instructions");
     }
 
@@ -45,6 +48,7 @@ class AiMarkdownFileGeneratorTest {
 
             assertThat(content).contains("# Project Analysis Input");
             assertThat(content).contains("## Instructions");
+            assertThat(content).contains("Rule meaning:");
             assertThat(content).doesNotContain("Q-Scout 診断レポート");
             assertThat(content).doesNotContain("改善ヒント");
             assertThat(content).doesNotContain("違反は検出されませんでした。");
@@ -68,9 +72,21 @@ class AiMarkdownFileGeneratorTest {
         assertThat(content).doesNotContain("違反は検出されませんでした。");
     }
 
+    @Test
+    void keepsAiMarkdownCompactByAddingOnlyShortHints() throws IOException {
+        Path path = generator.generate(analysisResultWithViolation(), tempDir);
+        String content = Files.readString(path);
+
+        assertThat(content).contains("- Rule meaning:");
+        assertThat(content).contains("- Nuance:");
+        assertThat(content).doesNotContain("Why Q-Scout cares");
+        assertThat(content).doesNotContain("Conditionally Acceptable Cases");
+    }
+
     private AnalysisResult analysisResultWithViolation() {
         ProjectContext context = new ProjectContext(Path.of("project"), Path.of("project/pom.xml"), List.of(Path.of("Main.java")), List.of(Path.of("MainTest.java")));
         Violation violation = new Violation("R004", "Exception Swallowing", Severity.HIGH, Path.of("SampleService.java"), 20, "message", "20: return null;");
-        return new AnalysisResult(context, List.of(), List.of(violation));
+        RuleResult ruleResult = new RuleResult("R004", "Exception Swallowing", List.of(violation));
+        return new AnalysisResult(context, List.of(ruleResult), List.of(violation));
     }
 }
