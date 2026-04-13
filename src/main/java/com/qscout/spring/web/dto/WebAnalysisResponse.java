@@ -2,6 +2,8 @@ package com.qscout.spring.web.dto;
 
 public record WebAnalysisResponse(
         String requestId,
+        String originalFileName,
+        String executedAt,
         int finalScore,
         int totalViolations,
         int highCount,

@@ -24,9 +24,9 @@ class WebPageControllerTest {
         WebPageController controller = new WebPageController(webAnalysisService, MessageSources.create());
         MockMultipartFile file = new MockMultipartFile("projectZip", "sample.zip", "application/zip", new byte[]{1});
         WebAnalysisResponse response = new WebAnalysisResponse(
-                "req-1", 80, 3, 1, 1, 1,
-                new DownloadLinkView("human", "/download/req-1/human", "qscout-report.md"),
-                new DownloadLinkView("ai", "/download/req-1/ai", "qscout-ai-input.md"),
+                "req-1", "sample.zip", "2026-04-13 10:30", 80, 3, 1, 1, 1,
+                new DownloadLinkView("download", "/download/req-1/human", "qscout-report.md"),
+                new DownloadLinkView("download", "/download/req-1/ai", "qscout-ai-input.md"),
                 "ok", false, true
         );
         when(webAnalysisService.analyze(file)).thenReturn(response);
@@ -36,6 +36,18 @@ class WebPageControllerTest {
 
         assertThat(view).isEqualTo("index");
         assertThat(model.getAttribute("response")).isEqualTo(response);
+        assertThat(model.getAttribute("limits")).isNotNull();
+    }
+
+    @Test
+    void returnsHelpPage() {
+        WebAnalysisService webAnalysisService = mock(WebAnalysisService.class);
+        WebPageController controller = new WebPageController(webAnalysisService, MessageSources.create());
+
+        ConcurrentModel model = new ConcurrentModel();
+        String view = controller.showHelp(model);
+
+        assertThat(view).isEqualTo("help");
         assertThat(model.getAttribute("limits")).isNotNull();
     }
 

@@ -14,6 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Path;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -26,6 +29,7 @@ import java.util.concurrent.TimeoutException;
 public class WebAnalysisService {
     private static final Logger logger = LoggerFactory.getLogger(WebAnalysisService.class);
     private static final int MAX_EXECUTION_SECONDS = 60;
+    private static final DateTimeFormatter EXECUTED_AT_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     private final UploadValidationService uploadValidationService;
     private final TempWorkspaceService tempWorkspaceService;
@@ -59,6 +63,8 @@ public class WebAnalysisService {
             );
             return new WebAnalysisResponse(
                     workspace.requestId(),
+                    originalFileName(projectZip),
+                    formatExecutedAt(Instant.now()),
                     result.scoreSummary().finalScore(),
                     result.scoreSummary().totalViolations(),
                     result.scoreSummary().highCount(),
@@ -105,6 +111,21 @@ public class WebAnalysisService {
         } finally {
             executor.shutdownNow();
         }
+    }
+
+    private String originalFileName(MultipartFile projectZip) {
+        String originalName = projectZip != null ? projectZip.getOriginalFilename() : null;
+        if (originalName == null || originalName.isBlank()) {
+            return message("result.targetFile.unknown");
+        }
+        String normalized = originalName.replace('\\', '/');
+        String fileName = normalized.substring(normalized.lastIndexOf('/') + 1).trim();
+        return fileName.isEmpty() ? message("result.targetFile.unknown") : fileName;
+    }
+
+    private String formatExecutedAt(Instant executedAt) {
+        return EXECUTED_AT_FORMAT.withLocale(MessageSources.resolveLocale())
+                .format(executedAt.atZone(ZoneId.systemDefault()));
     }
 
     private String message(String key, Object... args) {

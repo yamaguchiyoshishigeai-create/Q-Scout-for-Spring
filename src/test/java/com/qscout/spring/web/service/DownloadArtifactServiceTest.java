@@ -38,6 +38,24 @@ class DownloadArtifactServiceTest {
     }
 
     @Test
+    void resolvesPreviewContent() throws IOException {
+        TempWorkspaceService tempWorkspaceService = mock(TempWorkspaceService.class);
+        DownloadArtifactService service = new DownloadArtifactService(tempWorkspaceService);
+        Path workspaceRoot = tempDir.resolve("request-preview");
+        Path outputDir = workspaceRoot.resolve("output");
+        Files.createDirectories(outputDir);
+        Files.writeString(outputDir.resolve("qscout-ai-input.md"), "# preview\ncontent");
+
+        when(tempWorkspaceService.resolveWorkspaceRoot("req-2")).thenReturn(workspaceRoot);
+
+        DownloadArtifactService.PreviewArtifact artifact = service.resolveForPreview("req-2", "ai");
+
+        verify(tempWorkspaceService).assertActive("req-2");
+        assertThat(artifact.fileName()).isEqualTo("qscout-ai-input.md");
+        assertThat(artifact.content()).contains("# preview");
+    }
+
+    @Test
     void rejectsUnknownKey() {
         DownloadArtifactService service = new DownloadArtifactService(mock(TempWorkspaceService.class));
 

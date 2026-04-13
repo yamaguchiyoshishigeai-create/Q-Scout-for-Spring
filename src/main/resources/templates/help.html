@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="#{help.page.title}">Usage & Specs</title>
+    <style>
+        :root {
+            --bg: linear-gradient(135deg, #f7f1e8 0%, #e6efe9 100%);
+            --panel: rgba(255, 253, 248, 0.94);
+            --ink: #1f2a2e;
+            --muted: #5d6a70;
+            --accent: #116466;
+            --accent-soft: rgba(215, 236, 233, 0.55);
+            --line: rgba(17, 100, 102, 0.16);
+        }
+        body { margin: 0; font-family: "Segoe UI", "Hiragino Sans", sans-serif; background: var(--bg); color: var(--ink); }
+        .shell { max-width: 960px; margin: 0 auto; padding: 32px 20px 64px; }
+        .topbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+        .top-links { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .pill { color: var(--accent); font-weight: 700; text-decoration: none; background: rgba(255,255,255,0.78); border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; }
+        .locale-switcher { display: inline-flex; gap: 12px; background: rgba(255,255,255,0.78); border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; }
+        .locale-switcher a { color: var(--accent); font-weight: 700; text-decoration: none; }
+        .hero, .section { background: var(--panel); border: 1px solid rgba(17, 100, 102, 0.12); border-radius: 20px; box-shadow: 0 18px 40px rgba(31, 42, 46, 0.08); padding: 28px; margin-bottom: 20px; }
+        h1 { margin: 0 0 12px; font-size: clamp(2rem, 4vw, 2.8rem); }
+        h2 { margin: 0 0 14px; font-size: 1.25rem; }
+        .lead, .section p { margin: 0; line-height: 1.8; color: var(--muted); }
+        .steps { display: grid; gap: 14px; margin-top: 18px; }
+        .step { background: var(--accent-soft); border-radius: 16px; padding: 16px; }
+        .step strong { display: block; margin-bottom: 8px; color: var(--ink); }
+        .support-table { width: 100%; border-collapse: collapse; background: white; border-radius: 16px; overflow: hidden; border: 1px solid var(--line); }
+        .support-table th, .support-table td { padding: 14px 16px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+        .support-table th { width: 34%; background: var(--accent-soft); font-weight: 700; }
+        .support-table tr:last-child th, .support-table tr:last-child td { border-bottom: 0; }
+        .unsupported-list { margin: 0; padding-left: 20px; line-height: 1.8; color: var(--muted); }
+    </style>
+</head>
+<body>
+<div class="shell">
+    <div class="topbar">
+        <div class="top-links">
+            <a class="pill" th:href="@{/(lang=${#locale.language})}" th:text="#{nav.home}">解析画面へ戻る</a>
+            <a class="pill" th:href="@{/help(lang=${#locale.language})}" th:text="#{nav.help}">使い方・仕様</a>
+        </div>
+        <nav class="locale-switcher">
+            <a th:href="@{/help(lang='ja')}" th:text="#{lang.ja}">日本語</a>
+            <a th:href="@{/help(lang='en')}" th:text="#{lang.en}">English</a>
+        </nav>
+    </div>
+
+    <section class="hero">
+        <h1 th:text="#{help.hero.title}">使い方・仕様</h1>
+        <p class="lead" th:text="#{help.hero.lead}">対応範囲、解析手順、成果物の確認方法をまとめた固定ページです。</p>
+    </section>
+
+    <section class="section">
+        <h2 th:text="#{help.section.steps}">利用の流れ</h2>
+        <div class="steps">
+            <div class="step">
+                <strong th:text="#{help.step.upload.title}">1. zipをアップロード</strong>
+                <p th:text="#{help.step.upload.body}">Spring Boot / Maven の単一モジュール zip をアップロードします。</p>
+            </div>
+            <div class="step">
+                <strong th:text="#{help.step.result.title}">2. 結果を確認</strong>
+                <p th:text="#{help.step.result.body}">結果画面でスコア、違反件数、解析対象ファイルを確認できます。</p>
+            </div>
+            <div class="step">
+                <strong th:text="#{help.step.preview.title}">3. Markdownをプレビュー</strong>
+                <p th:text="#{help.step.preview.body}">人間向けMarkdownとAI入力Markdownは、まずブラウザで内容確認してからダウンロードできます。</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2 th:text="#{page.home.section.supported}">現在の対応範囲</h2>
+        <table class="support-table">
+            <tbody>
+            <tr><th scope="row" th:text="#{page.home.support.java}">Java</th><td th:text="#{page.home.support.java.value}">17 想定</td></tr>
+            <tr><th scope="row" th:text="#{page.home.support.framework}">フレームワーク</th><td th:text="#{page.home.support.framework.value}">Spring Boot</td></tr>
+            <tr><th scope="row" th:text="#{page.home.support.build}">ビルドツール</th><td th:text="#{page.home.support.build.value}">Maven</td></tr>
+            <tr><th scope="row" th:text="#{page.home.support.repository}">リポジトリ構成</th><td th:text="#{page.home.support.repository.value}">単一リポジトリ</td></tr>
+            <tr><th scope="row" th:text="#{page.home.support.module}">モジュール構成</th><td th:text="#{page.home.support.module.value}">単一モジュール</td></tr>
+            <tr><th scope="row" th:text="#{page.home.support.input}">入力形式</th><td th:text="#{page.home.support.input.value}">zip</td></tr>
+            <tr><th scope="row" th:text="#{page.home.support.required}">必須ファイル</th><td th:text="#{page.home.support.required.value}">ルートに pom.xml</td></tr>
+            <tr><th scope="row" th:text="#{page.home.support.source}">ソース条件</th><td th:text="#{page.home.support.source.value}">Java ソースコードを含むこと</td></tr>
+            <tr><th scope="row" th:text="#{page.home.support.maxSize}">最大サイズ</th><td th:text="#{page.home.support.maxSize.value}">20MB</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="section">
+        <h2 th:text="#{help.section.outputs}">成果物</h2>
+        <div class="steps">
+            <div class="step">
+                <strong th:text="#{help.output.human.title}">人間向けMarkdown</strong>
+                <p th:text="#{help.output.human.body}">診断結果を人が読みやすい形でまとめたレポートです。</p>
+            </div>
+            <div class="step">
+                <strong th:text="#{help.output.ai.title}">AI入力Markdown</strong>
+                <p th:text="#{help.output.ai.body}">AIに渡しやすい入力整形版です。プレビュー画面で全文確認できます。</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2 th:text="#{page.home.section.unsupported}">現時点で非対応</h2>
+        <ul class="unsupported-list">
+            <li th:text="#{page.home.unsupported.gradle}">Gradle プロジェクト</li>
+            <li th:text="#{page.home.unsupported.multimodule}">マルチモジュール構成</li>
+            <li th:text="#{page.home.unsupported.springFramework}">Spring Framework 単体構成</li>
+            <li th:text="#{page.home.unsupported.kotlin}">Kotlin 主体プロジェクト</li>
+            <li th:text="#{page.home.unsupported.multirepo}">マルチリポジトリ横断分析</li>
+        </ul>
+    </section>
+</div>
+</body>
+</html>

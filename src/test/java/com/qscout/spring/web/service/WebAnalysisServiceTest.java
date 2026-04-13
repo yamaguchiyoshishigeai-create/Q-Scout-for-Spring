@@ -62,8 +62,43 @@ class WebAnalysisServiceTest {
         verify(zipExtractionService).saveUpload(file, workspace.uploadZipPath());
         verify(zipExtractionService).extract(workspace.uploadZipPath(), workspace.extractedDir());
         assertThat(response.requestId()).isEqualTo("req-123");
+        assertThat(response.originalFileName()).isEqualTo("sample.zip");
+        assertThat(response.executedAt()).isNotBlank();
         assertThat(response.finalScore()).isEqualTo(85);
         assertThat(response.humanDownloadLink().url()).isEqualTo("/download/req-123/human");
+    }
+
+    @Test
+    void fallsBackWhenOriginalFileNameIsMissing() {
+        UploadValidationService uploadValidationService = mock(UploadValidationService.class);
+        TempWorkspaceService tempWorkspaceService = mock(TempWorkspaceService.class);
+        ZipExtractionService zipExtractionService = mock(ZipExtractionService.class);
+        SharedAnalysisService sharedAnalysisService = mock(SharedAnalysisService.class);
+        WebAnalysisService service = new WebAnalysisService(uploadValidationService, tempWorkspaceService, zipExtractionService, sharedAnalysisService, MessageSources.create());
+        MockMultipartFile file = new MockMultipartFile("projectZip", "", "application/zip", new byte[]{1, 2, 3});
+        TempWorkspaceService.WorkspaceContext workspace = new TempWorkspaceService.WorkspaceContext(
+                "req-124",
+                tempDir.resolve("workspace2"),
+                tempDir.resolve("workspace2/upload.zip"),
+                tempDir.resolve("workspace2/extracted"),
+                tempDir.resolve("workspace2/output"),
+                Instant.now()
+        );
+        Path projectRoot = tempDir.resolve("project2");
+        ScoreSummary scoreSummary = new ScoreSummary(100, 85, 1, 2, 3, 6);
+        SharedAnalysisService.SharedAnalysisResult result = new SharedAnalysisService.SharedAnalysisResult(
+                new AnalysisResult(new ProjectContext(projectRoot, projectRoot.resolve("pom.xml"), List.<Path>of(), List.<Path>of()), List.<RuleResult>of(), List.of()),
+                scoreSummary,
+                new ReportArtifact(tempDir.resolve("workspace2/output/qscout-report.md"), tempDir.resolve("workspace2/output/qscout-ai-input.md"))
+        );
+
+        when(tempWorkspaceService.createWorkspace()).thenReturn(workspace);
+        when(zipExtractionService.resolveProjectRoot(workspace.extractedDir())).thenReturn(projectRoot);
+        when(sharedAnalysisService.execute(any(AnalysisRequest.class))).thenReturn(result);
+
+        var response = service.analyze(file);
+
+        assertThat(response.originalFileName()).isEqualTo("不明なzipファイル");
     }
 
     @Test

@@ -48,6 +48,7 @@ class WebFlowTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("pom.xml を含む Spring Boot / Maven / 単一モジュールの zip を選択してください")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("解析を実行する")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("解析中です。しばらくお待ちください。")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("使い方・仕様")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("日本語")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("English")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("アップロードに失敗しました")))
@@ -67,11 +68,27 @@ class WebFlowTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Choose a zip archive that contains a single-module Spring Boot / Maven project with pom.xml")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Run Analysis")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Analysis is running. Please wait a moment.")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Usage &amp; Specs")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("English")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Upload failed")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Close")))
                 .andExpect(content().string(not(org.hamcrest.Matchers.containsString("現在の対応範囲"))))
                 .andExpect(content().string(not(org.hamcrest.Matchers.containsString("解析を実行する"))));
+    }
+
+    @Test
+    void helpPageIsLocalized() throws Exception {
+        mockMvc.perform(get("/help"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("使い方・仕様")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("利用の流れ")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("解析画面へ戻る")));
+
+        mockMvc.perform(get("/help").param("lang", "en"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Usage &amp; Specs")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("How It Works")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Back to Analyzer")));
     }
 
     @Test
@@ -103,6 +120,7 @@ class WebFlowTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("<html lang=\"en\"")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Current Support Scope")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Run Analysis")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Usage &amp; Specs")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Upload failed")));
     }
 
@@ -188,7 +206,7 @@ class WebFlowTest {
     }
 
     @Test
-    void analyzesZipAndAllowsDownloadsInJapaneseByDefault() throws Exception {
+    void analyzesZipAndShowsContextPreviewAndDownloadLinksInJapanese() throws Exception {
         MockMultipartFile zip = new MockMultipartFile(
                 "projectZip",
                 "sample-project.zip",
@@ -199,14 +217,23 @@ class WebFlowTest {
         MvcResult result = mockMvc.perform(multipart("/analyze").file(zip))
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("解析が完了しました。")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("対象ファイル：")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("sample-project.zip")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("実行時刻：")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("総合スコア")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("違反件数")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("人間向けMarkdown")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("AI入力Markdown")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("プレビュー")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("ダウンロード")))
                 .andReturn();
 
+        String requestId = extractRequestId(result);
         String html = result.getResponse().getContentAsString();
-        Matcher matcher = DOWNLOAD_PATTERN.matcher(html);
-        assertThat(matcher.find()).isTrue();
-        String requestId = matcher.group(1);
+        assertThat(html).contains("/preview/" + requestId + "/human?lang=ja");
+        assertThat(html).contains("/preview/" + requestId + "/ai?lang=ja");
+        assertThat(html).contains("/download/" + requestId + "/human");
+        assertThat(html).contains("/download/" + requestId + "/ai");
 
         MvcResult humanReport = mockMvc.perform(get("/download/{requestId}/human", requestId))
                 .andExpect(status().isOk())
@@ -230,7 +257,39 @@ class WebFlowTest {
     }
 
     @Test
-    void generatesEnglishReportAfterLocaleSwitch() throws Exception {
+    void previewPagesAreAvailableAndIncludeDownloadLinks() throws Exception {
+        MockMultipartFile zip = new MockMultipartFile(
+                "projectZip",
+                "sample-project.zip",
+                "application/zip",
+                zipDirectory(Path.of("samples/sample-project").toAbsolutePath().normalize())
+        );
+
+        MvcResult analyzeResult = mockMvc.perform(multipart("/analyze").file(zip))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String requestId = extractRequestId(analyzeResult);
+
+        mockMvc.perform(get("/preview/{requestId}/human", requestId))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("人間向けMarkdownプレビュー")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("qscout-report.md")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("このMarkdownをダウンロード")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("/download/" + requestId + "/human")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Q-Scout 診断レポート")));
+
+        mockMvc.perform(get("/preview/{requestId}/ai", requestId))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("AI入力Markdownプレビュー")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("qscout-ai-input.md")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("このMarkdownをダウンロード")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("/download/" + requestId + "/ai")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("# Project Analysis Input")));
+    }
+
+    @Test
+    void generatesEnglishReportAndPreviewAfterLocaleSwitch() throws Exception {
         MockHttpSession session = (MockHttpSession) mockMvc.perform(get("/").param("lang", "en"))
                 .andReturn()
                 .getRequest()
@@ -246,13 +305,14 @@ class WebFlowTest {
         MvcResult result = mockMvc.perform(multipart("/analyze").file(zip).session(session))
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Analysis completed.")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Target file:")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Executed at:")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Usage &amp; Specs")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Overall Score")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Violations")))
                 .andReturn();
 
-        Matcher matcher = DOWNLOAD_PATTERN.matcher(result.getResponse().getContentAsString());
-        assertThat(matcher.find()).isTrue();
-        String requestId = matcher.group(1);
+        String requestId = extractRequestId(result);
 
         MvcResult humanReport = mockMvc.perform(get("/download/{requestId}/human", requestId).session(session))
                 .andExpect(status().isOk())
@@ -275,12 +335,25 @@ class WebFlowTest {
         assertThat(aiContent).contains("## Instructions");
         assertThat(aiContent).doesNotContain("Q-Scout Report");
         assertThat(aiContent).doesNotContain("Q-Scout 診断レポート");
+
+        mockMvc.perform(get("/preview/{requestId}/human", requestId).session(session))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Human-readable Markdown Preview")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Download This Markdown")));
     }
 
     @Test
     void rejectsInvalidFileKey() throws Exception {
         mockMvc.perform(get("/download/{requestId}/{fileKey}", "00000000-0000-0000-0000-000000000000", "bad"))
                 .andExpect(status().isNotFound());
+        mockMvc.perform(get("/preview/{requestId}/{fileKey}", "00000000-0000-0000-0000-000000000000", "bad"))
+                .andExpect(status().isNotFound());
+    }
+
+    private String extractRequestId(MvcResult result) throws Exception {
+        Matcher matcher = DOWNLOAD_PATTERN.matcher(result.getResponse().getContentAsString());
+        assertThat(matcher.find()).isTrue();
+        return matcher.group(1);
     }
 
     private MockMultipartFile oversizedZip() {
@@ -314,3 +387,4 @@ class WebFlowTest {
         }
     }
 }
+

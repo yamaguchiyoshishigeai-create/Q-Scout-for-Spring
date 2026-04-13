@@ -24,7 +24,9 @@
         .hero, .panel, .section { background: rgba(255, 253, 248, 0.92); border: 1px solid rgba(17, 100, 102, 0.12); border-radius: 20px; box-shadow: 0 18px 40px rgba(31, 42, 46, 0.08); backdrop-filter: blur(8px); }
         .hero, .section, .panel { padding: 28px; }
         .hero, .section { margin-bottom: 20px; }
-        .topbar { display: flex; justify-content: flex-end; margin-bottom: 12px; }
+        .topbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+        .top-links { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .top-link { color: var(--accent); font-weight: 700; text-decoration: none; background: rgba(255,255,255,0.75); border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; }
         .locale-switcher { display: inline-flex; gap: 12px; background: rgba(255,255,255,0.75); border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; }
         .locale-switcher a { color: var(--accent); font-weight: 700; text-decoration: none; }
         h1 { margin: 0 0 14px; font-size: clamp(2rem, 4vw, 3rem); }
@@ -47,10 +49,17 @@
         .notice, .result { margin-top: 24px; border-radius: 16px; padding: 18px; }
         .notice.error { background: var(--error-bg); border: 1px solid var(--error-border); }
         .result { background: var(--success-bg); border: 1px solid var(--success-border); }
+        .result-summary { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; color: var(--muted); }
+        .result-summary p { margin: 0; }
+        .result-summary strong { color: var(--ink); margin-left: 6px; }
         .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 18px 0; }
         .metric { background: white; border-radius: 14px; padding: 14px; }
         .metric strong { display: block; font-size: 1.6rem; margin-top: 6px; }
-        .downloads a { display: inline-block; margin-right: 12px; margin-top: 10px; color: var(--accent); font-weight: 700; }
+        .downloads { display: grid; gap: 12px; }
+        .artifact-card { background: rgba(255,255,255,0.75); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
+        .artifact-card strong { display: block; margin-bottom: 10px; }
+        .artifact-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+        .artifact-actions a { color: var(--accent); font-weight: 700; text-decoration: none; }
         #running { display: none; margin-top: 18px; color: var(--muted); }
         .modal-overlay { display: none; position: fixed; inset: 0; z-index: 1000; align-items: center; justify-content: center; padding: 20px; background: var(--modal-backdrop); }
         .modal-overlay.is-visible { display: flex; }
@@ -72,6 +81,9 @@
 <body>
 <div class="shell">
     <div class="topbar">
+        <div class="top-links">
+            <a class="top-link" th:href="@{/help(lang=${#locale.language})}" th:text="#{nav.help}">使い方・仕様</a>
+        </div>
         <nav class="locale-switcher">
             <a th:href="@{/(lang='ja')}" th:text="#{lang.ja}">日本語</a>
             <a th:href="@{/(lang='en')}" th:text="#{lang.en}">English</a>
@@ -134,6 +146,10 @@
         </div>
         <div class="result" th:if="${response != null}">
             <strong th:text="${response.message}">解析が完了しました。</strong>
+            <div class="result-summary">
+                <p><span th:text="#{result.targetFile.label}">対象ファイル</span><strong th:text="${response.originalFileName}">bookstore.zip</strong></p>
+                <p><span th:text="#{result.executedAt.label}">実行時刻</span><strong th:text="${response.executedAt}">2026-04-10 15:00</strong></p>
+            </div>
             <div class="metrics">
                 <div class="metric"><span th:text="#{result.score.label}">総合スコア</span><strong th:text="${response.finalScore}">0</strong></div>
                 <div class="metric"><span th:text="#{result.violations.label}">違反件数</span><strong th:text="${response.totalViolations}">0</strong></div>
@@ -142,8 +158,20 @@
                 <div class="metric"><span>LOW</span><strong th:text="${response.lowCount}">0</strong></div>
             </div>
             <div class="downloads">
-                <a th:href="${response.humanDownloadLink.url}" th:text="${response.humanDownloadLink.label}">人間向けMarkdown</a>
-                <a th:href="${response.aiDownloadLink.url}" th:text="${response.aiDownloadLink.label}">AI入力Markdown</a>
+                <div class="artifact-card">
+                    <strong th:text="#{result.artifact.human}">人間向けMarkdown</strong>
+                    <div class="artifact-actions">
+                        <a target="_blank" rel="noopener" th:href="@{/preview/{requestId}/{fileKey}(requestId=${response.requestId},fileKey='human',lang=${#locale.language})}" th:text="#{result.preview.human}">プレビュー</a>
+                        <a th:href="@{/download/{requestId}/{fileKey}(requestId=${response.requestId},fileKey='human')}" th:text="#{result.download.human}">ダウンロード</a>
+                    </div>
+                </div>
+                <div class="artifact-card">
+                    <strong th:text="#{result.artifact.ai}">AI入力Markdown</strong>
+                    <div class="artifact-actions">
+                        <a target="_blank" rel="noopener" th:href="@{/preview/{requestId}/{fileKey}(requestId=${response.requestId},fileKey='ai',lang=${#locale.language})}" th:text="#{result.preview.ai}">プレビュー</a>
+                        <a th:href="@{/download/{requestId}/{fileKey}(requestId=${response.requestId},fileKey='ai')}" th:text="#{result.download.ai}">ダウンロード</a>
+                    </div>
+                </div>
             </div>
         </div>
     </section>

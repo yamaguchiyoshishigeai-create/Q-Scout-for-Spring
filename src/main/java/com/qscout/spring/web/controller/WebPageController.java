@@ -37,6 +37,12 @@ public class WebPageController {
         return "index";
     }
 
+    @GetMapping("/help")
+    public String showHelp(Model model) {
+        populateCommon(model);
+        return "help";
+    }
+
     @PostMapping("/analyze")
     public String analyze(@RequestParam(value = "projectZip", required = false) MultipartFile file, Model model) {
         populateCommon(model);
