@@ -228,7 +228,7 @@ class WebFlowTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("高")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("中")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("低")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("人間向けMarkdown")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("ユーザー向けMarkdown")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("AI入力Markdown")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("プレビュー")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("ダウンロード")))
@@ -249,8 +249,11 @@ class WebFlowTest {
         assertThat(humanContent).contains("## このレポートの読み方");
         assertThat(humanContent).contains("## ルール別サマリ");
         assertThat(humanContent).contains("## 違反一覧");
+        assertThat(humanContent).contains("## 今回の検査対象ルール");
         assertThat(humanContent).contains("## 改善ヒント");
         assertThat(humanContent).contains("総合スコア");
+        assertThat(humanContent).contains("[詳細解説を見る](/help/rules/controller-to-repository-direct-access?lang=ja)");
+        assertThat(humanContent).doesNotContain("詳細解説キー:");
 
         MvcResult aiReport = mockMvc.perform(get("/download/{requestId}/ai", requestId))
                 .andExpect(status().isOk())
@@ -279,11 +282,15 @@ class WebFlowTest {
 
         mockMvc.perform(get("/preview/{requestId}/human", requestId))
                 .andExpect(status().isOk())
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("人間向けMarkdownプレビュー")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("ユーザー向けMarkdownプレビュー")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("qscout-report.md")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("このMarkdownをダウンロード")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("/download/" + requestId + "/human")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Q-Scout 診断レポート")));
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Q-Scout 診断レポート")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("href=\"/help/rules/controller-to-repository-direct-access?lang=ja\"")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("href=\"/help/rules/exception-swallowing?lang=ja\"")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("今回の検査対象ルール")))
+                .andExpect(content().string(not(org.hamcrest.Matchers.containsString("詳細解説キー:"))));
 
         mockMvc.perform(get("/preview/{requestId}/ai", requestId))
                 .andExpect(status().isOk())
@@ -334,8 +341,11 @@ class WebFlowTest {
         assertThat(humanContent).contains("## How To Read This Report");
         assertThat(humanContent).contains("## Rule Summary");
         assertThat(humanContent).contains("## Violations");
+        assertThat(humanContent).contains("## Checked Rules");
         assertThat(humanContent).contains("## Improvement Hints");
         assertThat(humanContent).contains("Overall Score");
+        assertThat(humanContent).contains("[View detailed explanation](/help/rules/controller-to-repository-direct-access?lang=en)");
+        assertThat(humanContent).doesNotContain("Detail key:");
         assertThat(humanContent).doesNotContain("Q-Scout 診断レポート");
 
         MvcResult aiReport = mockMvc.perform(get("/download/{requestId}/ai", requestId).session(session))
@@ -351,9 +361,30 @@ class WebFlowTest {
         mockMvc.perform(get("/preview/{requestId}/human", requestId).session(session))
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Human-readable Markdown Preview")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Download This Markdown")));
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Download This Markdown")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("href=\"/help/rules/controller-to-repository-direct-access?lang=en\"")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Checked Rules")))
+                .andExpect(content().string(not(org.hamcrest.Matchers.containsString("Detail key:"))));
     }
 
+
+    @Test
+    void ruleHelpPagesAreLocalizedAndResolvable() throws Exception {
+        mockMvc.perform(get("/help/rules/controller-to-repository-direct-access"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Controller から Repository への直接アクセス")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("このルールが検出すること")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Q-Scout が重視する理由")));
+
+        mockMvc.perform(get("/help/rules/controller-to-repository-direct-access").param("lang", "en"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Controller To Repository Direct Access")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("What it detects")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Why Q-Scout cares")));
+
+        mockMvc.perform(get("/help/rules/not-a-rule"))
+                .andExpect(status().isNotFound());
+    }
     @Test
     void rejectsInvalidFileKey() throws Exception {
         mockMvc.perform(get("/download/{requestId}/{fileKey}", "00000000-0000-0000-0000-000000000000", "bad"))
@@ -399,3 +430,4 @@ class WebFlowTest {
         }
     }
 }
+

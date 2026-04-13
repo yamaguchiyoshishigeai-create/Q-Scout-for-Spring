@@ -176,7 +176,7 @@
             </div>
             <div class="downloads">
                 <div class="artifact-card">
-                    <strong th:text="#{result.artifact.human}">人間向けMarkdown</strong>
+                    <strong th:text="#{result.artifact.human}">ユーザー向けMarkdown</strong>
                     <div class="artifact-actions">
                         <a target="_blank" rel="noopener" th:href="@{/preview/{requestId}/{fileKey}(requestId=${response.requestId},fileKey='human',lang=${#locale.language})}" th:text="#{result.preview.human}">プレビュー</a>
                         <a th:href="@{/download/{requestId}/{fileKey}(requestId=${response.requestId},fileKey='human')}" th:text="#{result.download.human}">ダウンロード</a>

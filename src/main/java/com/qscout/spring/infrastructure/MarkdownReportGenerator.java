@@ -35,6 +35,13 @@ public class MarkdownReportGenerator implements ReportGenerator {
     public Path generate(AnalysisResult analysisResult, ScoreSummary scoreSummary, Path outputDirectory) {
         Locale locale = MessageSources.resolveLocale();
         Map<String, RuleExplanation> explanations = ruleExplanationCatalog.findAll(locale);
+        List<RuleResult> violatedRules = analysisResult.ruleResults().stream()
+                .filter(ruleResult -> !ruleResult.violations().isEmpty())
+                .toList();
+        List<RuleResult> checkedRulesWithoutViolations = analysisResult.ruleResults().stream()
+                .filter(ruleResult -> ruleResult.violations().isEmpty())
+                .toList();
+
         StringBuilder builder = new StringBuilder();
         builder.append("# ").append(message(locale, "report.title")).append(System.lineSeparator()).append(System.lineSeparator());
         builder.append("- ").append(message(locale, "report.target")).append(": ").append(analysisResult.projectContext().projectRootPath()).append(System.lineSeparator());
@@ -51,17 +58,21 @@ public class MarkdownReportGenerator implements ReportGenerator {
         builder.append("- ").append(message(locale, "report.guide.4")).append(System.lineSeparator()).append(System.lineSeparator());
 
         builder.append("## ").append(message(locale, "report.section.summary")).append(System.lineSeparator()).append(System.lineSeparator());
-        for (RuleResult ruleResult : analysisResult.ruleResults()) {
-            String localizedName = ruleName(locale, ruleResult.ruleId(), ruleResult.ruleName());
-            RuleExplanation explanation = explanations.getOrDefault(ruleResult.ruleId(), RuleExplanation.fallback(ruleResult.ruleId(), localizedName));
-            builder.append("### ").append(localizedName)
-                    .append(" (").append(ruleResult.violations().size()).append(")")
-                    .append(System.lineSeparator()).append(System.lineSeparator());
-            appendLabeledLine(builder, message(locale, "report.summary.meaning"), explanation.shortSummary());
-            appendLabeledLine(builder, message(locale, "report.summary.why"), explanation.whyItMatters());
-            appendLabeledLine(builder, message(locale, "report.summary.readingHint"), explanation.reportShortGuidance());
-            appendLabeledLine(builder, message(locale, "report.summary.details"), explanation.detailPageKey());
-            builder.append(System.lineSeparator());
+        if (violatedRules.isEmpty()) {
+            builder.append("- ").append(message(locale, "report.noViolations")).append(System.lineSeparator()).append(System.lineSeparator());
+        } else {
+            for (RuleResult ruleResult : violatedRules) {
+                String localizedName = ruleName(locale, ruleResult.ruleId(), ruleResult.ruleName());
+                RuleExplanation explanation = explanations.getOrDefault(ruleResult.ruleId(), RuleExplanation.fallback(ruleResult.ruleId(), localizedName));
+                builder.append("### ").append(localizedName)
+                        .append(" (").append(ruleResult.violations().size()).append(")")
+                        .append(System.lineSeparator()).append(System.lineSeparator());
+                appendLabeledLine(builder, message(locale, "report.summary.meaning"), explanation.shortSummary());
+                appendLabeledLine(builder, message(locale, "report.summary.why"), explanation.whyItMatters());
+                appendLabeledLine(builder, message(locale, "report.summary.readingHint"), explanation.reportShortGuidance());
+                appendLabeledLine(builder, message(locale, "report.summary.details"), ruleExplanationLink(locale, explanation));
+                builder.append(System.lineSeparator());
+            }
         }
 
         builder.append("## ").append(message(locale, "report.section.violations")).append(System.lineSeparator()).append(System.lineSeparator());
@@ -70,16 +81,28 @@ public class MarkdownReportGenerator implements ReportGenerator {
             builder.append(message(locale, "report.noViolations.note")).append(System.lineSeparator()).append(System.lineSeparator());
         }
 
-        for (RuleResult ruleResult : analysisResult.ruleResults()) {
-            if (ruleResult.violations().isEmpty()) {
-                continue;
-            }
+        for (RuleResult ruleResult : violatedRules) {
             String localizedName = ruleName(locale, ruleResult.ruleId(), ruleResult.ruleName());
             RuleExplanation explanation = explanations.getOrDefault(ruleResult.ruleId(), RuleExplanation.fallback(ruleResult.ruleId(), localizedName));
             builder.append("### ").append(localizedName).append(System.lineSeparator()).append(System.lineSeparator());
             appendInterpretationGuide(builder, locale, explanation);
             builder.append(System.lineSeparator());
             appendViolations(builder, locale, ruleResult.violations());
+        }
+
+        if (!checkedRulesWithoutViolations.isEmpty()) {
+            builder.append("## ").append(message(locale, "report.section.checkedRules")).append(System.lineSeparator()).append(System.lineSeparator());
+            for (RuleResult ruleResult : checkedRulesWithoutViolations) {
+                String localizedName = ruleName(locale, ruleResult.ruleId(), ruleResult.ruleName());
+                RuleExplanation explanation = explanations.getOrDefault(ruleResult.ruleId(), RuleExplanation.fallback(ruleResult.ruleId(), localizedName));
+                String detailLink = ruleExplanationLink(locale, explanation);
+                builder.append("- ").append(localizedName).append(" (0)");
+                if (!detailLink.isBlank()) {
+                    builder.append(" ").append(detailLink);
+                }
+                builder.append(System.lineSeparator());
+            }
+            builder.append(System.lineSeparator());
         }
 
         builder.append("## ").append(message(locale, "report.section.improvementHints")).append(System.lineSeparator()).append(System.lineSeparator());
@@ -104,7 +127,7 @@ public class MarkdownReportGenerator implements ReportGenerator {
         appendLabeledLine(builder, message(locale, "report.ruleGuide.improvement"), explanation.reportGuide().quickImprovementDirection());
         appendLabeledLine(builder, message(locale, "report.ruleGuide.nuance"), explanation.reportGuide().nuanceNote());
         appendLabeledLine(builder, message(locale, "report.ruleGuide.whyQScoutCares"), explanation.whyQScoutCares());
-        appendLabeledLine(builder, message(locale, "report.ruleGuide.details"), explanation.detailPageKey());
+        appendLabeledLine(builder, message(locale, "report.ruleGuide.details"), ruleExplanationLink(locale, explanation));
     }
 
     private void appendViolations(StringBuilder builder, Locale locale, List<Violation> violations) {
@@ -129,6 +152,22 @@ public class MarkdownReportGenerator implements ReportGenerator {
             return;
         }
         builder.append("- ").append(label).append(": ").append(value).append(System.lineSeparator());
+    }
+
+    private String ruleExplanationLink(Locale locale, RuleExplanation explanation) {
+        String slug = detailPageSlug(explanation.detailPageKey());
+        if (slug.isBlank()) {
+            return "";
+        }
+        return "[" + message(locale, "report.link.ruleExplanation") + "](/help/rules/" + slug + "?lang=" + locale.getLanguage() + ")";
+    }
+
+    private String detailPageSlug(String detailPageKey) {
+        if (detailPageKey == null || detailPageKey.isBlank()) {
+            return "";
+        }
+        int slashIndex = detailPageKey.lastIndexOf('/');
+        return slashIndex >= 0 ? detailPageKey.substring(slashIndex + 1) : detailPageKey;
     }
 
     private String localizeViolationMessage(Locale locale, Violation violation) {

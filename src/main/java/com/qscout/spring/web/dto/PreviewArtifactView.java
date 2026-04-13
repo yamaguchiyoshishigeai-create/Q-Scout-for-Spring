@@ -5,6 +5,7 @@ public record PreviewArtifactView(
         String fileKey,
         String fileName,
         String content,
-        String downloadUrl
+        String downloadUrl,
+        String renderedHtml
 ) {
 }
