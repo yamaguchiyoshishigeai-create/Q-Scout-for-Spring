@@ -206,7 +206,7 @@ class WebFlowTest {
     }
 
     @Test
-    void analyzesZipAndShowsContextPreviewAndDownloadLinksInJapanese() throws Exception {
+    void analyzesZipAndShowsReadableJapaneseSummary() throws Exception {
         MockMultipartFile zip = new MockMultipartFile(
                 "projectZip",
                 "sample-project.zip",
@@ -221,7 +221,13 @@ class WebFlowTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("sample-project.zip")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("実行時刻：")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("総合スコア")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString(">63/100<")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("100点満点")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("違反件数")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("内訳：")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("高")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("中")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("低")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("人間向けMarkdown")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("AI入力Markdown")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("プレビュー")))
@@ -289,7 +295,7 @@ class WebFlowTest {
     }
 
     @Test
-    void generatesEnglishReportAndPreviewAfterLocaleSwitch() throws Exception {
+    void generatesEnglishReportAndReadableSummaryAfterLocaleSwitch() throws Exception {
         MockHttpSession session = (MockHttpSession) mockMvc.perform(get("/").param("lang", "en"))
                 .andReturn()
                 .getRequest()
@@ -309,7 +315,13 @@ class WebFlowTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Executed at:")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Usage &amp; Specs")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Overall Score")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString(">63/100<")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Out of 100")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Violations")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Breakdown:")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("High")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Medium")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Low")))
                 .andReturn();
 
         String requestId = extractRequestId(result);
@@ -387,4 +399,3 @@ class WebFlowTest {
         }
     }
 }
-

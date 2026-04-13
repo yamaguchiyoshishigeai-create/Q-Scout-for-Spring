@@ -52,9 +52,11 @@
         .result-summary { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; color: var(--muted); }
         .result-summary p { margin: 0; }
         .result-summary strong { color: var(--ink); margin-left: 6px; }
-        .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 18px 0; }
+        .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
         .metric { background: white; border-radius: 14px; padding: 14px; }
         .metric strong { display: block; font-size: 1.6rem; margin-top: 6px; }
+        .metric-sub { margin-top: 8px; color: var(--muted); font-size: 0.95rem; line-height: 1.6; }
+        .metric-sub span { font-weight: 700; color: var(--ink); }
         .downloads { display: grid; gap: 12px; }
         .artifact-card { background: rgba(255,255,255,0.75); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
         .artifact-card strong { display: block; margin-bottom: 10px; }
@@ -151,11 +153,26 @@
                 <p><span th:text="#{result.executedAt.label}">実行時刻</span><strong th:text="${response.executedAt}">2026-04-10 15:00</strong></p>
             </div>
             <div class="metrics">
-                <div class="metric"><span th:text="#{result.score.label}">総合スコア</span><strong th:text="${response.finalScore}">0</strong></div>
-                <div class="metric"><span th:text="#{result.violations.label}">違反件数</span><strong th:text="${response.totalViolations}">0</strong></div>
-                <div class="metric"><span>HIGH</span><strong th:text="${response.highCount}">0</strong></div>
-                <div class="metric"><span>MEDIUM</span><strong th:text="${response.mediumCount}">0</strong></div>
-                <div class="metric"><span>LOW</span><strong th:text="${response.lowCount}">0</strong></div>
+                <div class="metric">
+                    <span th:text="#{result.score.label}">総合スコア</span>
+                    <strong th:text="${response.finalScore} + '/100'">0/100</strong>
+                    <div class="metric-sub" th:text="#{result.score.maxLabel}">100点満点</div>
+                </div>
+                <div class="metric">
+                    <span th:text="#{result.violations.label}">違反件数</span>
+                    <strong th:text="${response.totalViolations}">0</strong>
+                    <div class="metric-sub">
+                        <span th:text="#{result.violations.breakdown}">内訳</span>
+                        <span th:text="#{result.severity.high.short}">高</span>
+                        <span th:text="${response.highCount}">0</span>
+                        <span>/</span>
+                        <span th:text="#{result.severity.medium.short}">中</span>
+                        <span th:text="${response.mediumCount}">0</span>
+                        <span>/</span>
+                        <span th:text="#{result.severity.low.short}">低</span>
+                        <span th:text="${response.lowCount}">0</span>
+                    </div>
+                </div>
             </div>
             <div class="downloads">
                 <div class="artifact-card">
