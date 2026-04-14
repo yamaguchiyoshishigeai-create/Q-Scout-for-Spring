@@ -45,11 +45,21 @@ class WebFlowTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("<title>Q-Scout for Spring</title>")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("はじめに")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("診断を実行")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("このシステムは、Spring Boot / Maven プロジェクトの品質診断システムです。")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Web版では、20MB以下のZIPファイルをアップロードして診断を実行できます。")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("解析結果は、ユーザー向けレポートとAI向け入力の2種類で確認・ダウンロードできます。")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("pom.xml を含む Spring Boot / Maven / 単一モジュールの zip を選択してください")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("ZIP 作成の目安")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("プロジェクト直下に pom.xml が見える形で ZIP 化してください")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("解析を実行する")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("解析中です。しばらくお待ちください。")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("成果物サンプル")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("/images/result-summary-sample.svg")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("結果サマリの見本")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("ユーザー向けMarkdownのサンプルを見る")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("AI入力Markdownのサンプルを見る")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("ユーザー向けMarkdown")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("AI入力Markdown")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("使い方・仕様")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("日本語")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("English")))
@@ -67,11 +77,21 @@ class WebFlowTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("<title>Q-Scout for Spring</title>")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Getting Started")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Run Diagnosis")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("This system analyzes the quality of Spring Boot / Maven projects.")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("In the web app, you can upload a ZIP file up to 20MB and run the diagnosis.")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("The output is available in two forms: a human-readable report and AI-ready input.")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Choose a zip archive that contains a single-module Spring Boot / Maven project with pom.xml")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("ZIP guidance")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Create the ZIP so pom.xml is visible at the project root")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Run Analysis")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Analysis is running. Please wait a moment.")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Artifact Sample")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("/images/result-summary-sample.svg")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Result Summary Sample")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("See the human report sample")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("See the AI input sample")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Human-readable Markdown")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("AI input Markdown")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Usage &amp; Specs")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("English")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Upload failed")))
@@ -98,7 +118,6 @@ class WebFlowTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Prefer a single-module archive where pom.xml is visible at the top level when the ZIP is opened.")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Back to Analyzer")));
     }
-
     @Test
     void switchesBackToJapaneseWithLangParameter() throws Exception {
         MockHttpSession session = (MockHttpSession) mockMvc.perform(get("/").param("lang", "en"))
@@ -128,6 +147,10 @@ class WebFlowTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("<html lang=\"en\"")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Getting Started")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Run Analysis")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Artifact Sample")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Result Summary Sample")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Human-readable Markdown")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("AI input Markdown")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Usage &amp; Specs")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Upload failed")));
     }
@@ -328,6 +351,12 @@ class WebFlowTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Analysis completed.")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Target file:")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Executed at:")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Artifact Sample")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Result Summary Sample")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Open the human report preview")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Open the AI input preview")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Human-readable Markdown")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("AI input Markdown")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Usage &amp; Specs")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Overall Score")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString(">63/100<")))
@@ -438,6 +467,11 @@ class WebFlowTest {
         }
     }
 }
+
+
+
+
+
 
 
 

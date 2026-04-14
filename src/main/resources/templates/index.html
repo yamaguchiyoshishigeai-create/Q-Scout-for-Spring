@@ -61,14 +61,61 @@
         .sublead, .section-copy, .detail-list li, .support-compact li, .unsupported-list li, .artifact-copy, .empty-state, .summary-list p, .about-card p { color: var(--muted); line-height: 1.7; }
         .sublead, .section-copy { margin: 0; }
         .hero-grid, .intro-grid, .about-grid, .artifact-grid, .summary-grid, .support-grid { display: grid; gap: 14px; }
-        .hero-grid { grid-template-columns: minmax(0, 1.6fr) minmax(280px, 0.95fr); margin-top: 24px; }
-        .intro-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 20px; }
+        .hero-grid { gap: 18px; margin-top: 24px; }
+        .intro-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch; }
         .support-grid, .summary-grid, .artifact-grid, .about-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         .mini-card, .support-card, .summary-card, .artifact-card, .about-card, .limit-card, .sample-card { background: rgba(255,255,255,0.76); border: 1px solid var(--line); border-radius: 18px; padding: 16px; }
         .mini-card strong, .support-card strong, .summary-card strong, .artifact-card strong, .about-card strong, .sample-card strong { display: block; margin-bottom: 8px; color: var(--ink); }
+        .mini-card { height: 100%; }
         .detail-list, .support-compact, .unsupported-list { margin: 0; padding-left: 20px; }
         .detail-list li, .support-compact li, .unsupported-list li { margin-bottom: 6px; }
-        .sample-card pre { margin: 10px 0 0; padding: 14px; border-radius: 14px; background: #f7faf7; border: 1px solid var(--line); overflow-x: auto; color: #234245; font-size: 0.93rem; line-height: 1.55; }
+        .lead-strong { font-size: 1.12rem; font-weight: 800; line-height: 1.7; }
+        .intro-actions { margin-top: 2px; }
+        .sample-card { padding: 20px; }
+        .sample-layout { display: grid; gap: 16px; margin-top: 14px; }
+        .sample-visual {
+            margin: 0;
+            overflow: hidden;
+            border-radius: 18px;
+            border: 1px solid var(--line);
+            background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(239, 247, 243, 0.92));
+        }
+        .sample-visual img { display: block; width: 100%; height: auto; aspect-ratio: 41 / 26; object-fit: cover; }
+        .sample-caption { padding: 14px 16px 16px; }
+        .sample-caption strong { margin-bottom: 6px; }
+        .sample-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+        .sample-link-card {
+            display: grid;
+            gap: 12px;
+            padding: 14px;
+            border-radius: 16px;
+            border: 1px solid var(--line);
+            background: #f7faf7;
+            align-content: start;
+            height: 100%;
+        }
+        .sample-link-thumb {
+            height: 88px;
+            border-radius: 14px;
+            border: 1px solid rgba(17, 100, 102, 0.14);
+            background:
+                linear-gradient(180deg, rgba(17,100,102,0.12), rgba(17,100,102,0.02)),
+                linear-gradient(135deg, #fefcf8 0%, #eef6f1 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .sample-link-thumb::before,
+        .sample-link-thumb::after {
+            content: "";
+            position: absolute;
+            left: 14px;
+            right: 14px;
+            border-radius: 999px;
+            background: rgba(17, 100, 102, 0.16);
+        }
+        .sample-link-thumb::before { top: 22px; height: 10px; width: 56%; }
+        .sample-link-thumb::after { top: 44px; height: 8px; width: 76%; }
+        .sample-link-card .cta-link { width: fit-content; }
         .cta-row, .artifact-actions, .section-actions { display: flex; gap: 12px; flex-wrap: wrap; }
         .section-tag { display: inline-flex; align-items: center; border-radius: 999px; padding: 8px 12px; background: var(--accent-soft); color: var(--accent); font-size: 0.92rem; font-weight: 700; }
         .limits { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 20px 0 24px; }
@@ -103,7 +150,7 @@
             .layout { grid-template-columns: 1fr; }
             .sidebar { position: static; padding: 16px; }
             .sidebar-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-            .hero-grid, .intro-grid, .support-grid, .summary-grid, .artifact-grid, .about-grid, .limits { grid-template-columns: 1fr; }
+            .hero-grid, .intro-grid, .support-grid, .summary-grid, .artifact-grid, .about-grid, .limits, .sample-links { grid-template-columns: 1fr; }
         }
         @media (max-width: 640px) {
             .shell { padding: 22px 14px 48px; }
@@ -112,6 +159,9 @@
             .topbar { align-items: stretch; }
             .locale-switcher, .top-links { width: 100%; justify-content: center; }
             .nav-link, .top-link, .cta-link, .info-link { text-align: center; }
+            .sample-card { padding: 18px; }
+            .sample-layout { gap: 14px; }
+            .sample-link-card .cta-link { width: 100%; }
             .modal-card { padding: 22px; }
         }
     </style>
@@ -148,26 +198,51 @@
                 <div class="section-header">
                     <div>
                         <h1 th:text="#{page.home.hero.title}">Q-Scout for Spring</h1>
-                        <p class="lead" th:text="#{page.home.hero.lead}">Spring Boot / Maven プロジェクトの zip をアップロードすると、既存 CLI 資産を利用して品質診断を同期実行し、結果と Markdown レポートをその場で確認できます。</p>
-                        <p class="sublead" th:text="#{page.home.hero.sublead}">現在は Web MVP として、現行対応範囲のプロジェクトを対象に提供しています。</p>
+                        <p class="lead lead-strong" th:text="#{page.home.hero.lead}">このシステムは、Spring Boot / Maven プロジェクトの品質診断システムです。</p>
+                        <p class="sublead" th:text="#{page.home.hero.sublead}">Web版では、20MB以下のZIPファイルをアップロードして診断を実行できます。</p>
+                        <p class="sublead" th:text="#{page.home.hero.detail}">解析結果は、ユーザー向けレポートとAI向け入力の2種類で確認・ダウンロードできます。</p>
                     </div>
                     <span class="section-tag" th:text="#{page.home.hero.tag}">CLI-powered Web MVP</span>
                 </div>
                 <div class="hero-grid">
-                    <div>
-                        <div class="intro-grid">
-                            <article class="mini-card"><strong th:text="#{page.home.intro.value.title}">このツールで得られるもの</strong><ul class="detail-list"><li th:text="#{page.home.intro.value.score}">Spring向けの総合スコアと違反件数を確認できます。</li><li th:text="#{page.home.intro.value.human}">ユーザー向けMarkdownでレビュー共有用レポートを得られます。</li><li th:text="#{page.home.intro.value.ai}">AI入力Markdownで次の改善相談にそのままつなげられます。</li></ul></article>
-                            <article class="mini-card"><strong th:text="#{page.home.intro.flow.title}">入口画面でできること</strong><ul class="detail-list"><li th:text="#{page.home.intro.flow.run}">説明を読んでそのまま診断を実行できます。</li><li th:text="#{page.home.intro.flow.summary}">結果サマリから品質状況をすぐ把握できます。</li><li th:text="#{page.home.intro.flow.artifacts}">必要な成果物だけを選んでプレビュー・ダウンロードできます。</li></ul></article>
-                        </div>
-                        <div class="cta-row" style="margin-top: 18px;"><a class="cta-link" href="#run-analysis" th:text="#{page.home.intro.cta.primary}">診断を実行する</a><a class="cta-link" th:href="@{/help(lang=${#locale.language})}" th:text="#{page.home.intro.cta.secondary}">使い方・仕様を見る</a></div>
+                    <div class="intro-grid">
+                        <article class="mini-card"><strong th:text="#{page.home.intro.value.title}">このツールで得られるもの</strong><ul class="detail-list"><li th:text="#{page.home.intro.value.score}">Spring向けの総合スコアと違反件数を確認できます。</li><li th:text="#{page.home.intro.value.human}">ユーザー向けMarkdownでレビュー共有用レポートを得られます。</li><li th:text="#{page.home.intro.value.ai}">AI入力Markdownで次の改善相談にそのままつなげられます。</li></ul></article>
+                        <article class="mini-card"><strong th:text="#{page.home.intro.flow.title}">入口画面でできること</strong><ul class="detail-list"><li th:text="#{page.home.intro.flow.run}">説明を読んでそのまま診断を実行できます。</li><li th:text="#{page.home.intro.flow.summary}">結果サマリから品質状況をすぐ把握できます。</li><li th:text="#{page.home.intro.flow.artifacts}">必要な成果物だけを選んでプレビュー・ダウンロードできます。</li></ul></article>
                     </div>
-                    <article class="sample-card"><strong th:text="#{page.home.sample.title}">成果物サンプル</strong><p class="artifact-copy" th:text="#{page.home.sample.copy}">出力は全文埋め込みではなく、要点を短く確認できるサンプルに留めています。</p><pre th:text="#{page.home.sample.code}"># Q-Scout Report
-- Overall Score: 84/100
-- HIGH=1 / MEDIUM=2 / LOW=3
-
-## Next Step
-- Review the human Markdown
-- Reuse the AI Markdown as input</pre></article>
+                    <div class="cta-row intro-actions"><a class="cta-link" href="#run-analysis" th:text="#{page.home.intro.cta.primary}">診断を実行する</a><a class="cta-link" th:href="@{/help(lang=${#locale.language})}" th:text="#{page.home.intro.cta.secondary}">使い方・仕様を見る</a></div>
+                    <article class="sample-card">
+                        <strong th:text="#{page.home.sample.title}">成果物サンプル</strong>
+                        <p class="artifact-copy" th:text="#{page.home.sample.copy}">診断後に返る結果を、まず画像でひと目で確認できます。</p>
+                        <div class="sample-layout">
+                            <figure class="sample-visual">
+                                <img th:src="@{/images/result-summary-sample.svg}" th:alt="#{page.home.sample.summary.alt}" src="/images/result-summary-sample.svg" alt="結果サマリーのサンプル画像">
+                                <figcaption class="sample-caption">
+                                    <strong th:text="#{page.home.sample.summary.title}">結果サマリーの見本</strong>
+                                    <p class="artifact-copy" th:text="#{page.home.sample.summary.copy}">総合スコア、違反件数、重大度内訳が返るイメージを先に確認できます。</p>
+                                </figcaption>
+                            </figure>
+                            <div class="sample-links">
+                                <article class="sample-link-card">
+                                    <div class="sample-link-thumb" aria-hidden="true"></div>
+                                    <div>
+                                        <strong th:text="#{page.home.sample.human.title}">ユーザー向けMarkdown</strong>
+                                        <p class="artifact-copy" th:text="#{page.home.sample.human.copy}">レビュー共有に使うレポートは、preview で全文を確認できます。</p>
+                                    </div>
+                                    <a class="cta-link" th:if="${response == null}" href="#artifacts" th:text="#{page.home.sample.human.cta}">ユーザー向けMarkdownのサンプルを見る</a>
+                                    <a class="cta-link" th:if="${response != null}" target="_blank" rel="noopener" th:href="@{/preview/{requestId}/{fileKey}(requestId=${response.requestId},fileKey='human',lang=${#locale.language})}" th:text="#{page.home.sample.human.ctaReady}">ユーザー向けレポートをpreviewで見る</a>
+                                </article>
+                                <article class="sample-link-card">
+                                    <div class="sample-link-thumb" aria-hidden="true"></div>
+                                    <div>
+                                        <strong th:text="#{page.home.sample.ai.title}">AI入力Markdown</strong>
+                                        <p class="artifact-copy" th:text="#{page.home.sample.ai.copy}">AIに渡す入力は、preview でそのまま使う形を確認できます。</p>
+                                    </div>
+                                    <a class="cta-link" th:if="${response == null}" href="#artifacts" th:text="#{page.home.sample.ai.cta}">AI入力Markdownのサンプルを見る</a>
+                                    <a class="cta-link" th:if="${response != null}" target="_blank" rel="noopener" th:href="@{/preview/{requestId}/{fileKey}(requestId=${response.requestId},fileKey='ai',lang=${#locale.language})}" th:text="#{page.home.sample.ai.ctaReady}">AI入力をpreviewで見る</a>
+                                </article>
+                            </div>
+                        </div>
+                    </article>
                 </div>
             </section>
 
@@ -246,3 +321,4 @@
 </script>
 </body>
 </html>
+

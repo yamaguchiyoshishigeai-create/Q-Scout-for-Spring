@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 520" role="img" aria-labelledby="title desc">
+  <title id="title">Q-Scout result summary sample</title>
+  <desc id="desc">A sample dashboard showing overall score, violation count, severity breakdown, and next actions.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fdf8f0"/>
+      <stop offset="100%" stop-color="#eef7f2"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f4faf7"/>
+    </linearGradient>
+  </defs>
+  <rect width="820" height="520" rx="30" fill="url(#bg)"/>
+  <rect x="32" y="32" width="756" height="456" rx="26" fill="#fffdf8" stroke="#d9e9e3"/>
+  <text x="64" y="86" font-family="'Segoe UI', 'Hiragino Sans', sans-serif" font-size="26" font-weight="700" fill="#1f2a2e">Result Summary</text>
+  <text x="64" y="118" font-family="'Segoe UI', 'Hiragino Sans', sans-serif" font-size="14" fill="#5d6a70">bookstore.zip</text>
+
+  <rect x="64" y="150" width="232" height="132" rx="20" fill="url(#panel)" stroke="#d4e5df"/>
+  <text x="88" y="188" font-family="'Segoe UI', 'Hiragino Sans', sans-serif" font-size="16" font-weight="700" fill="#116466">Overall Score</text>
+  <text x="88" y="246" font-family="'Segoe UI', 'Hiragino Sans', sans-serif" font-size="52" font-weight="800" fill="#1f2a2e">84/100</text>
+  <text x="88" y="274" font-family="'Segoe UI', 'Hiragino Sans', sans-serif" font-size="14" fill="#5d6a70">Spring project health at a glance</text>
+
+  <rect x="320" y="150" width="212" height="132" rx="20" fill="url(#panel)" stroke="#d4e5df"/>
+  <text x="344" y="188" font-family="'Segoe UI', 'Hiragino Sans', sans-serif" font-size="16" font-weight="700" fill="#116466">Violations</text>
+  <text x="344" y="246" font-family="'Segoe UI', 'Hiragino Sans', sans-serif" font-size="52" font-weight="800" fill="#1f2a2e">6</text>
+  <text x="344" y="274" font-family="'Segoe UI', 'Hiragino Sans', sans-serif" font-size="14" fill="#5d6a70">High 1 / Medium 2 / Low 3</text>
+
+  <rect x="556" y="150" width="168" height="132" rx="20" fill="url(#panel)" stroke="#d4e5df"/>
+  <text x="580" y="188" font-family="'Segoe UI', 'Hiragino Sans', sans-serif" font-size="16" font-weight="700" fill="#116466">Outputs</text>
+  <rect x="580" y="206" width="120" height="28" rx="14" fill="#dcefeb"/>
+  <text x="594" y="225" font-family="'Segoe UI', 'Hiragino Sans', sans-serif" font-size="13" font-weight="700" fill="#116466">Human Report</text>
+  <rect x="580" y="244" width="108" height="28" rx="14" fill="#dcefeb"/>
+  <text x="594" y="263" font-family="'Segoe UI', 'Hiragino Sans', sans-serif" font-size="13" font-weight="700" fill="#116466">AI Input</text>
+
+  <rect x="64" y="312" width="660" height="132" rx="20" fill="url(#panel)" stroke="#d4e5df"/>
+  <text x="88" y="348" font-family="'Segoe UI', 'Hiragino Sans', sans-serif" font-size="16" font-weight="700" fill="#116466">Severity Breakdown</text>
+  <rect x="88" y="372" width="360" height="14" rx="7" fill="#ebf3f1"/>
+  <rect x="88" y="372" width="82" height="14" rx="7" fill="#d36b6b"/>
+  <rect x="170" y="372" width="132" height="14" rx="7" fill="#e1ad57"/>
+  <rect x="302" y="372" width="146" height="14" rx="7" fill="#77ad86"/>
+  <text x="88" y="414" font-family="'Segoe UI', 'Hiragino Sans', sans-serif" font-size="14" fill="#5d6a70">High</text>
+  <text x="132" y="414" font-family="'Segoe UI', 'Hiragino Sans', sans-serif" font-size="14" font-weight="700" fill="#1f2a2e">1</text>
+  <text x="180" y="414" font-family="'Segoe UI', 'Hiragino Sans', sans-serif" font-size="14" fill="#5d6a70">Medium</text>
+  <text x="246" y="414" font-family="'Segoe UI', 'Hiragino Sans', sans-serif" font-size="14" font-weight="700" fill="#1f2a2e">2</text>
+  <text x="294" y="414" font-family="'Segoe UI', 'Hiragino Sans', sans-serif" font-size="14" fill="#5d6a70">Low</text>
+  <text x="324" y="414" font-family="'Segoe UI', 'Hiragino Sans', sans-serif" font-size="14" font-weight="700" fill="#1f2a2e">3</text>
+
+  <rect x="500" y="346" width="192" height="32" rx="16" fill="#116466"/>
+  <text x="536" y="367" font-family="'Segoe UI', 'Hiragino Sans', sans-serif" font-size="14" font-weight="700" fill="#ffffff">Preview Artifacts</text>
+  <rect x="500" y="390" width="128" height="10" rx="5" fill="#d8e9e3"/>
+  <rect x="500" y="410" width="168" height="10" rx="5" fill="#d8e9e3"/>
+</svg>
