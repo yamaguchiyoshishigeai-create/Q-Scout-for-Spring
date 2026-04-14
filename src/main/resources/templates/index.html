@@ -7,7 +7,8 @@
     <style>
         :root {
             --bg: linear-gradient(135deg, #f7f1e8 0%, #e6efe9 100%);
-            --panel: #fffdf8;
+            --panel: rgba(255, 253, 248, 0.92);
+            --panel-strong: #fffdf8;
             --ink: #1f2a2e;
             --muted: #5d6a70;
             --accent: #116466;
@@ -19,66 +20,98 @@
             --success-border: #4d8b63;
             --modal-backdrop: rgba(31, 42, 46, 0.45);
         }
+        * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
         body { margin: 0; font-family: "Segoe UI", "Hiragino Sans", sans-serif; background: var(--bg); color: var(--ink); }
-        .shell { max-width: 960px; margin: 0 auto; padding: 32px 20px 64px; }
-        .hero, .panel, .section { background: rgba(255, 253, 248, 0.92); border: 1px solid rgba(17, 100, 102, 0.12); border-radius: 20px; box-shadow: 0 18px 40px rgba(31, 42, 46, 0.08); backdrop-filter: blur(8px); }
-        .hero, .section, .panel { padding: 28px; }
-        .hero, .section { margin-bottom: 20px; }
-        .topbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+        a { color: inherit; }
+        .shell { max-width: 1200px; margin: 0 auto; padding: 28px 20px 64px; }
+        .topbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
         .top-links { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-        .top-link { color: var(--accent); font-weight: 700; text-decoration: none; background: rgba(255,255,255,0.75); border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; }
-        .locale-switcher { display: inline-flex; gap: 12px; background: rgba(255,255,255,0.75); border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; }
+        .top-link, .cta-link, .artifact-actions a, .info-link, .nav-link {
+            color: var(--accent);
+            font-weight: 700;
+            text-decoration: none;
+        }
+        .top-link, .cta-link, .info-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.78);
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            padding: 10px 16px;
+        }
+        .locale-switcher { display: inline-flex; gap: 12px; background: rgba(255,255,255,0.78); border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; }
         .locale-switcher a { color: var(--accent); font-weight: 700; text-decoration: none; }
-        h1 { margin: 0 0 14px; font-size: clamp(2rem, 4vw, 3rem); }
-        h2 { margin: 0 0 14px; font-size: 1.25rem; }
-        .lead { margin: 0 0 12px; color: var(--ink); line-height: 1.85; font-size: 1.03rem; }
-        .sublead { margin: 0; color: var(--muted); line-height: 1.7; }
-        .section-copy { margin: 0 0 16px; color: var(--muted); line-height: 1.7; }
-        .support-table { width: 100%; border-collapse: collapse; background: white; border-radius: 16px; overflow: hidden; border: 1px solid var(--line); }
-        .support-table th, .support-table td { padding: 14px 16px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
-        .support-table th { width: 34%; background: var(--accent-soft); font-weight: 700; }
-        .support-table tr:last-child th, .support-table tr:last-child td { border-bottom: 0; }
-        .unsupported-list { margin: 0; padding-left: 20px; line-height: 1.8; }
-        .note { margin: 14px 0 0; color: var(--muted); font-size: 0.96rem; line-height: 1.7; }
+        .layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 20px; align-items: start; }
+        .sidebar, .section, .hero { background: var(--panel); border: 1px solid rgba(17, 100, 102, 0.12); border-radius: 24px; box-shadow: 0 18px 40px rgba(31, 42, 46, 0.08); backdrop-filter: blur(8px); }
+        .sidebar { position: sticky; top: 20px; padding: 18px; }
+        .sidebar-title { margin: 0 0 6px; font-size: 1rem; }
+        .sidebar-copy { margin: 0 0 16px; color: var(--muted); line-height: 1.6; font-size: 0.95rem; }
+        .sidebar-nav { display: grid; gap: 10px; }
+        .nav-link { display: block; background: rgba(255,255,255,0.72); border: 1px solid var(--line); border-radius: 18px; padding: 12px 14px; }
+        .nav-link small { display: block; margin-top: 4px; color: var(--muted); font-weight: 500; line-height: 1.45; }
+        .content { display: grid; gap: 20px; }
+        .hero, .section { padding: 28px; }
+        .section-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 18px; flex-wrap: wrap; }
+        .eyebrow { display: inline-flex; margin-bottom: 12px; color: var(--accent); font-size: 0.84rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+        h1 { margin: 0 0 14px; font-size: clamp(2rem, 4vw, 3.2rem); line-height: 1.1; }
+        h2 { margin: 0; font-size: 1.35rem; }
+        .lead { margin: 0 0 12px; color: var(--ink); line-height: 1.85; font-size: 1.03rem; max-width: 760px; }
+        .sublead, .section-copy, .detail-list li, .support-compact li, .unsupported-list li, .artifact-copy, .empty-state, .summary-list p, .about-card p { color: var(--muted); line-height: 1.7; }
+        .sublead, .section-copy { margin: 0; }
+        .hero-grid, .intro-grid, .about-grid, .artifact-grid, .summary-grid, .support-grid { display: grid; gap: 14px; }
+        .hero-grid { grid-template-columns: minmax(0, 1.6fr) minmax(280px, 0.95fr); margin-top: 24px; }
+        .intro-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 20px; }
+        .support-grid, .summary-grid, .artifact-grid, .about-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .mini-card, .support-card, .summary-card, .artifact-card, .about-card, .limit-card, .sample-card { background: rgba(255,255,255,0.76); border: 1px solid var(--line); border-radius: 18px; padding: 16px; }
+        .mini-card strong, .support-card strong, .summary-card strong, .artifact-card strong, .about-card strong, .sample-card strong { display: block; margin-bottom: 8px; color: var(--ink); }
+        .detail-list, .support-compact, .unsupported-list { margin: 0; padding-left: 20px; }
+        .detail-list li, .support-compact li, .unsupported-list li { margin-bottom: 6px; }
+        .sample-card pre { margin: 10px 0 0; padding: 14px; border-radius: 14px; background: #f7faf7; border: 1px solid var(--line); overflow-x: auto; color: #234245; font-size: 0.93rem; line-height: 1.55; }
+        .cta-row, .artifact-actions, .section-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+        .section-tag { display: inline-flex; align-items: center; border-radius: 999px; padding: 8px 12px; background: var(--accent-soft); color: var(--accent); font-size: 0.92rem; font-weight: 700; }
+        .limits { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 20px 0 24px; }
+        .limit-card { background: var(--accent-soft); }
+        .limit-card div { color: var(--muted); margin-bottom: 6px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; }
+        input[type="file"] { width: 100%; padding: 14px; background: white; border: 1px solid #c9d7d8; border-radius: 12px; }
+        button { margin-top: 16px; border: 0; border-radius: 999px; padding: 14px 24px; background: var(--accent); color: white; font-size: 1rem; font-weight: 700; cursor: pointer; }
+        button[disabled] { opacity: 0.7; cursor: wait; }
         .upload-guidance { margin: 18px 0 0; padding: 16px 18px; background: rgba(255,255,255,0.78); border: 1px solid var(--line); border-radius: 16px; }
         .upload-guidance strong { display: block; margin-bottom: 8px; }
         .upload-guidance ul { margin: 0; padding-left: 20px; color: var(--muted); line-height: 1.8; }
-        .limits { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 20px 0 24px; }
-        .limit-card { background: var(--accent-soft); border-radius: 14px; padding: 14px; }
-        label { display: block; margin-bottom: 8px; font-weight: 600; }
-        input[type="file"] { width: 100%; padding: 14px; background: white; border: 1px solid #c9d7d8; border-radius: 12px; box-sizing: border-box; }
-        button { margin-top: 16px; border: 0; border-radius: 999px; padding: 14px 24px; background: var(--accent); color: white; font-size: 1rem; font-weight: 700; cursor: pointer; }
-        button[disabled] { opacity: 0.7; cursor: wait; }
-        .notice, .result { margin-top: 24px; border-radius: 16px; padding: 18px; }
+        .notice, .result-banner { margin-top: 20px; border-radius: 16px; padding: 18px; }
         .notice.error { background: var(--error-bg); border: 1px solid var(--error-border); }
-        .result { background: var(--success-bg); border: 1px solid var(--success-border); }
-        .result-summary { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; color: var(--muted); }
-        .result-summary p { margin: 0; }
-        .result-summary strong { color: var(--ink); margin-left: 6px; }
-        .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
-        .metric { background: white; border-radius: 14px; padding: 14px; }
-        .metric strong { display: block; font-size: 1.6rem; margin-top: 6px; }
-        .metric-sub { margin-top: 8px; color: var(--muted); font-size: 0.95rem; line-height: 1.6; }
+        .result-banner { background: var(--success-bg); border: 1px solid var(--success-border); }
+        .summary-list { display: grid; gap: 8px; margin-top: 12px; }
+        .summary-list p { margin: 0; }
+        .summary-list strong { color: var(--ink); margin-left: 6px; }
+        .metric-value { display: block; font-size: 1.8rem; margin-top: 6px; color: var(--ink); }
+        .metric-sub { margin-top: 8px; font-size: 0.95rem; }
         .metric-sub span { font-weight: 700; color: var(--ink); }
-        .downloads { display: grid; gap: 12px; }
-        .artifact-card { background: rgba(255,255,255,0.75); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
-        .artifact-card strong { display: block; margin-bottom: 10px; }
-        .artifact-actions { display: flex; gap: 12px; flex-wrap: wrap; }
-        .artifact-actions a { color: var(--accent); font-weight: 700; text-decoration: none; }
+        .empty-state { background: rgba(255,255,255,0.7); border: 1px dashed rgba(17, 100, 102, 0.28); border-radius: 18px; padding: 18px; }
+        .info-link { margin-top: 14px; }
         #running { display: none; margin-top: 18px; color: var(--muted); }
         .modal-overlay { display: none; position: fixed; inset: 0; z-index: 1000; align-items: center; justify-content: center; padding: 20px; background: var(--modal-backdrop); }
         .modal-overlay.is-visible { display: flex; }
-        .modal-card { width: min(100%, 440px); background: var(--panel); border: 1px solid var(--line); border-radius: 20px; box-shadow: 0 24px 56px rgba(31, 42, 46, 0.2); padding: 24px; }
+        .modal-card { width: min(100%, 440px); background: var(--panel-strong); border: 1px solid var(--line); border-radius: 20px; box-shadow: 0 24px 56px rgba(31, 42, 46, 0.2); padding: 24px; }
         .modal-card h3 { margin: 0 0 12px; font-size: 1.2rem; }
         .modal-card p { margin: 0 0 12px; line-height: 1.7; color: var(--muted); }
         .modal-card button { margin-top: 8px; }
+        @media (max-width: 980px) {
+            .layout { grid-template-columns: 1fr; }
+            .sidebar { position: static; padding: 16px; }
+            .sidebar-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .hero-grid, .intro-grid, .support-grid, .summary-grid, .artifact-grid, .about-grid, .limits { grid-template-columns: 1fr; }
+        }
         @media (max-width: 640px) {
-            .hero, .section, .panel { padding: 22px; }
-            .support-table, .support-table tbody, .support-table tr, .support-table th, .support-table td { display: block; width: 100%; }
-            .support-table tr { border-bottom: 1px solid var(--line); }
-            .support-table tr:last-child { border-bottom: 0; }
-            .support-table th, .support-table td { border-bottom: 0; padding-bottom: 8px; }
-            .support-table td { padding-top: 0; padding-bottom: 14px; }
+            .shell { padding: 22px 14px 48px; }
+            .hero, .section { padding: 22px; border-radius: 20px; }
+            .sidebar-nav { grid-template-columns: 1fr; }
+            .topbar { align-items: stretch; }
+            .locale-switcher, .top-links { width: 100%; justify-content: center; }
+            .nav-link, .top-link, .cta-link, .info-link { text-align: center; }
             .modal-card { padding: 22px; }
         }
     </style>
@@ -95,117 +128,93 @@
         </nav>
     </div>
 
-    <section class="hero">
-        <h1 th:text="#{page.home.hero.title}">Q-Scout for Spring</h1>
-        <p class="lead" th:text="#{page.home.hero.lead}">Spring Boot / Maven プロジェクトの zip をアップロードすると、既存 CLI 資産を利用して品質診断を同期実行し、結果と Markdown レポートをその場で確認できます。</p>
-        <p class="sublead" th:text="#{page.home.hero.sublead}">現在は Web MVP として、現行対応範囲のプロジェクトを対象に提供しています。</p>
-    </section>
+    <div class="layout">
+        <aside class="sidebar">
+            <h2 class="sidebar-title" th:text="#{page.home.sidebar.title}">Top Navigation</h2>
+            <p class="sidebar-copy" th:text="#{page.home.sidebar.copy}">Move between overview, analysis, results, and artifacts from here.</p>
+            <nav class="sidebar-nav" aria-label="Section navigation">
+                <a class="nav-link" href="#intro"><span th:text="#{page.home.nav.intro}">はじめに</span><small th:text="#{page.home.nav.intro.desc}">ツール概要と得られる成果物</small></a>
+                <a class="nav-link" href="#run-analysis"><span th:text="#{page.home.nav.run}">診断を実行</span><small th:text="#{page.home.nav.run.desc}">ZIPアップロードと実行条件</small></a>
+                <a class="nav-link" href="#result-summary"><span th:text="#{page.home.nav.summary}">結果サマリ</span><small th:text="#{page.home.nav.summary.desc}">スコアと違反件数を見る場所</small></a>
+                <a class="nav-link" href="#artifacts"><span th:text="#{page.home.nav.artifacts}">成果物</span><small th:text="#{page.home.nav.artifacts.desc}">Markdownプレビューとダウンロード</small></a>
+                <a class="nav-link" th:href="@{/help(lang=${#locale.language})}"><span th:text="#{page.home.nav.help}">使い方・仕様</span><small th:text="#{page.home.nav.help.desc}">対応範囲とZIP作成の詳細</small></a>
+                <a class="nav-link" href="#about-tool"><span th:text="#{page.home.nav.about}">このツールについて</span><small th:text="#{page.home.nav.about.desc}">プロダクトの狙いと構成</small></a>
+            </nav>
+        </aside>
 
-    <section class="section">
-        <h2 th:text="#{page.home.section.supported}">現在の対応範囲</h2>
-        <table class="support-table">
-            <tbody>
-            <tr><th scope="row" th:text="#{page.home.support.java}">Java</th><td th:text="#{page.home.support.java.value}">17 想定</td></tr>
-            <tr><th scope="row" th:text="#{page.home.support.framework}">フレームワーク</th><td th:text="#{page.home.support.framework.value}">Spring Boot</td></tr>
-            <tr><th scope="row" th:text="#{page.home.support.build}">ビルドツール</th><td th:text="#{page.home.support.build.value}">Maven</td></tr>
-            <tr><th scope="row" th:text="#{page.home.support.repository}">リポジトリ構成</th><td th:text="#{page.home.support.repository.value}">単一リポジトリ</td></tr>
-            <tr><th scope="row" th:text="#{page.home.support.module}">モジュール構成</th><td th:text="#{page.home.support.module.value}">単一モジュール</td></tr>
-            <tr><th scope="row" th:text="#{page.home.support.input}">入力形式</th><td th:text="#{page.home.support.input.value}">zip</td></tr>
-            <tr><th scope="row" th:text="#{page.home.support.required}">必須ファイル</th><td th:text="#{page.home.support.required.value}">ルートに pom.xml</td></tr>
-            <tr><th scope="row" th:text="#{page.home.support.source}">ソース条件</th><td th:text="#{page.home.support.source.value}">Java ソースコードを含むこと</td></tr>
-            <tr><th scope="row" th:text="#{page.home.support.maxSize}">最大サイズ</th><td th:text="#{page.home.support.maxSize.value}">20MB</td></tr>
-            </tbody>
-        </table>
-    </section>
+        <main class="content">
+            <section class="hero" id="intro">
+                <span class="eyebrow" th:text="#{page.home.hero.eyebrow}">Spring Quality Diagnosis Hub</span>
+                <div class="section-header">
+                    <div>
+                        <h1 th:text="#{page.home.hero.title}">Q-Scout for Spring</h1>
+                        <p class="lead" th:text="#{page.home.hero.lead}">Spring Boot / Maven プロジェクトの zip をアップロードすると、既存 CLI 資産を利用して品質診断を同期実行し、結果と Markdown レポートをその場で確認できます。</p>
+                        <p class="sublead" th:text="#{page.home.hero.sublead}">現在は Web MVP として、現行対応範囲のプロジェクトを対象に提供しています。</p>
+                    </div>
+                    <span class="section-tag" th:text="#{page.home.hero.tag}">CLI-powered Web MVP</span>
+                </div>
+                <div class="hero-grid">
+                    <div>
+                        <div class="intro-grid">
+                            <article class="mini-card"><strong th:text="#{page.home.intro.value.title}">このツールで得られるもの</strong><ul class="detail-list"><li th:text="#{page.home.intro.value.score}">Spring向けの総合スコアと違反件数を確認できます。</li><li th:text="#{page.home.intro.value.human}">ユーザー向けMarkdownでレビュー共有用レポートを得られます。</li><li th:text="#{page.home.intro.value.ai}">AI入力Markdownで次の改善相談にそのままつなげられます。</li></ul></article>
+                            <article class="mini-card"><strong th:text="#{page.home.intro.flow.title}">入口画面でできること</strong><ul class="detail-list"><li th:text="#{page.home.intro.flow.run}">説明を読んでそのまま診断を実行できます。</li><li th:text="#{page.home.intro.flow.summary}">結果サマリから品質状況をすぐ把握できます。</li><li th:text="#{page.home.intro.flow.artifacts}">必要な成果物だけを選んでプレビュー・ダウンロードできます。</li></ul></article>
+                        </div>
+                        <div class="cta-row" style="margin-top: 18px;"><a class="cta-link" href="#run-analysis" th:text="#{page.home.intro.cta.primary}">診断を実行する</a><a class="cta-link" th:href="@{/help(lang=${#locale.language})}" th:text="#{page.home.intro.cta.secondary}">使い方・仕様を見る</a></div>
+                    </div>
+                    <article class="sample-card"><strong th:text="#{page.home.sample.title}">成果物サンプル</strong><p class="artifact-copy" th:text="#{page.home.sample.copy}">出力は全文埋め込みではなく、要点を短く確認できるサンプルに留めています。</p><pre th:text="#{page.home.sample.code}"># Q-Scout Report
+- Overall Score: 84/100
+- HIGH=1 / MEDIUM=2 / LOW=3
 
-    <section class="section">
-        <h2 th:text="#{page.home.section.unsupported}">現時点で非対応</h2>
-        <ul class="unsupported-list">
-            <li th:text="#{page.home.unsupported.gradle}">Gradle プロジェクト</li>
-            <li th:text="#{page.home.unsupported.multimodule}">マルチモジュール構成</li>
-            <li th:text="#{page.home.unsupported.springFramework}">Spring Framework 単体構成</li>
-            <li th:text="#{page.home.unsupported.kotlin}">Kotlin 主体プロジェクト</li>
-            <li th:text="#{page.home.unsupported.multirepo}">マルチリポジトリ横断分析</li>
-        </ul>
-        <p class="note" th:text="#{page.home.unsupported.note}">対応範囲外の構成では、正しく判定できない場合があります。</p>
-    </section>
+## Next Step
+- Review the human Markdown
+- Reuse the AI Markdown as input</pre></article>
+                </div>
+            </section>
 
-    <section class="panel">
-        <h2 th:text="#{page.home.section.upload}">プロジェクト zip をアップロード</h2>
-        <p class="section-copy" th:text="#{form.upload.description}">zip 形式の Spring Boot / Maven プロジェクトを選択してください。</p>
-        <form method="post" th:action="@{/analyze}" enctype="multipart/form-data" id="analyzeForm"
-              th:attr="data-max-upload-bytes=${limits.maxUploadSizeMb * 1024 * 1024},data-upload-too-large-title=#{error.upload.tooLarge.title},data-upload-too-large-body=#{error.upload.tooLarge.body},data-upload-too-large-retry=#{error.upload.tooLarge.retry}">
-            <div class="limits">
-                <div class="limit-card"><div th:text="#{form.upload.limit.type}">対応形式</div><strong th:text="${limits.allowedFileType}">zip</strong></div>
-                <div class="limit-card"><div th:text="#{form.upload.limit.size}">最大サイズ</div><strong><span th:text="${limits.maxUploadSizeMb}">20</span>MB</strong></div>
-                <div class="limit-card"><div th:text="#{form.upload.limit.timeout}">実行制限</div><strong><span th:text="${limits.maxExecutionSeconds}">60</span><span th:text="${#locale.language == 'ja' ? '秒' : 's'}">秒</span></strong></div>
-            </div>
-            <label for="projectZip" th:text="#{form.upload.label}">pom.xml を含む Spring Boot / Maven / 単一モジュールの zip を選択してください</label>
-            <input id="projectZip" type="file" name="projectZip" accept=".zip,application/zip">
-            <div class="upload-guidance">
-                <strong th:text="#{form.upload.guidance.title}">ZIP 作成の目安</strong>
-                <ul>
-                    <li th:text="#{form.upload.guidance.root}">プロジェクト直下に pom.xml が見える形で ZIP 化してください</li>
-                    <li th:text="#{form.upload.guidance.exclude}">.git、target、大容量データ、Docker 関連はできるだけ除外してください</li>
-                    <li th:text="#{form.upload.guidance.retry}">解凍エラーが出る場合は、標準 ZIP 形式で再圧縮して再試行してください</li>
-                </ul>
-            </div>
-            <button id="submitButton" type="submit" th:text="#{form.upload.button}">解析を実行する</button>
-            <p id="running" th:text="#{form.upload.running}">解析中です。しばらくお待ちください。</p>
-        </form>
-        <div class="notice error" th:if="${error != null}">
-            <strong th:text="${error.userMessage}">エラーが発生しました。</strong>
-            <p th:if="${error.retryable}" th:text="#{error.retryable}">内容を確認して再度アップロードしてください。</p>
-        </div>
-        <div class="result" th:if="${response != null}">
-            <strong th:text="${response.message}">解析が完了しました。</strong>
-            <div class="result-summary">
-                <p><span th:text="#{result.targetFile.label}">対象ファイル</span><strong th:text="${response.originalFileName}">bookstore.zip</strong></p>
-                <p><span th:text="#{result.executedAt.label}">実行時刻</span><strong th:text="${response.executedAt}">2026-04-10 15:00</strong></p>
-            </div>
-            <div class="metrics">
-                <div class="metric">
-                    <span th:text="#{result.score.label}">総合スコア</span>
-                    <strong th:text="${response.finalScore} + '/100'">0/100</strong>
-                    <div class="metric-sub" th:text="#{result.score.maxLabel}">100点満点</div>
-                </div>
-                <div class="metric">
-                    <span th:text="#{result.violations.label}">違反件数</span>
-                    <strong th:text="${response.totalViolations}">0</strong>
-                    <div class="metric-sub">
-                        <span th:text="#{result.violations.breakdown}">内訳</span>
-                        <span th:text="#{result.severity.high.short}">高</span>
-                        <span th:text="${response.highCount}">0</span>
-                        <span>/</span>
-                        <span th:text="#{result.severity.medium.short}">中</span>
-                        <span th:text="${response.mediumCount}">0</span>
-                        <span>/</span>
-                        <span th:text="#{result.severity.low.short}">低</span>
-                        <span th:text="${response.lowCount}">0</span>
-                    </div>
-                </div>
-            </div>
-            <div class="downloads">
-                <div class="artifact-card">
-                    <strong th:text="#{result.artifact.human}">ユーザー向けMarkdown</strong>
-                    <div class="artifact-actions">
-                        <a target="_blank" rel="noopener" th:href="@{/preview/{requestId}/{fileKey}(requestId=${response.requestId},fileKey='human',lang=${#locale.language})}" th:text="#{result.preview.human}">プレビュー</a>
-                        <a th:href="@{/download/{requestId}/{fileKey}(requestId=${response.requestId},fileKey='human')}" th:text="#{result.download.human}">ダウンロード</a>
-                    </div>
-                </div>
-                <div class="artifact-card">
-                    <strong th:text="#{result.artifact.ai}">AI入力Markdown</strong>
-                    <div class="artifact-actions">
-                        <a target="_blank" rel="noopener" th:href="@{/preview/{requestId}/{fileKey}(requestId=${response.requestId},fileKey='ai',lang=${#locale.language})}" th:text="#{result.preview.ai}">プレビュー</a>
-                        <a th:href="@{/download/{requestId}/{fileKey}(requestId=${response.requestId},fileKey='ai')}" th:text="#{result.download.ai}">ダウンロード</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+            <section class="section" id="run-analysis">
+                <div class="section-header"><div><span class="eyebrow" th:text="#{page.home.section.run.eyebrow}">Run Diagnosis</span><h2 th:text="#{page.home.section.run.title}">診断を実行</h2></div><span class="section-tag" th:text="#{page.home.section.run.tag}">zip / 20MB / 60s</span></div>
+                <p class="section-copy" th:text="#{page.home.section.run.copy}">アップロードフォームと基本条件をこのセクションに集約し、詳細な対応範囲は help ページにまとめています。</p>
+                <div class="support-grid" style="margin-bottom: 18px;"><article class="support-card"><strong th:text="#{page.home.section.run.support.title}">対応プロジェクトの要点</strong><ul class="support-compact"><li th:text="#{page.home.support.framework.short}">Spring Boot / Maven の単一モジュール</li><li th:text="#{page.home.support.required.short}">ZIP直下で pom.xml を確認できる構成</li><li th:text="#{page.home.support.source.short}">Java ソースコードを含むこと</li></ul></article><article class="support-card"><strong th:text="#{page.home.section.run.unsupported.title}">現時点で対象外</strong><ul class="unsupported-list"><li th:text="#{page.home.unsupported.gradle}">Gradle プロジェクト</li><li th:text="#{page.home.unsupported.multimodule}">マルチモジュール構成</li><li th:text="#{page.home.unsupported.kotlin}">Kotlin 主体プロジェクト</li></ul><a class="info-link" th:href="@{/help(lang=${#locale.language})}" th:text="#{page.home.section.run.helpLink}">使い方・仕様で詳細を見る</a></article></div>
+                <form method="post" th:action="@{/analyze}" enctype="multipart/form-data" id="analyzeForm" th:attr="data-max-upload-bytes=${limits.maxUploadSizeMb * 1024 * 1024},data-upload-too-large-title=#{error.upload.tooLarge.title},data-upload-too-large-body=#{error.upload.tooLarge.body},data-upload-too-large-retry=#{error.upload.tooLarge.retry}">
+                    <div class="limits"><div class="limit-card"><div th:text="#{form.upload.limit.type}">対応形式</div><strong th:text="${limits.allowedFileType}">zip</strong></div><div class="limit-card"><div th:text="#{form.upload.limit.size}">最大サイズ</div><strong><span th:text="${limits.maxUploadSizeMb}">20</span>MB</strong></div><div class="limit-card"><div th:text="#{form.upload.limit.timeout}">実行制限</div><strong><span th:text="${limits.maxExecutionSeconds}">60</span><span th:text="${#locale.language == 'ja' ? '秒' : 's'}">秒</span></strong></div></div>
+                    <p class="section-copy" th:text="#{form.upload.description}">zip 形式の Spring Boot / Maven プロジェクトを選択してください。</p>
+                    <label for="projectZip" th:text="#{form.upload.label}">pom.xml を含む Spring Boot / Maven / 単一モジュールの zip を選択してください</label>
+                    <input id="projectZip" type="file" name="projectZip" accept=".zip,application/zip">
+                    <div class="upload-guidance"><strong th:text="#{form.upload.guidance.title}">ZIP 作成の目安</strong><ul><li th:text="#{form.upload.guidance.root}">プロジェクト直下に pom.xml が見える形で ZIP 化してください</li><li th:text="#{form.upload.guidance.exclude}">.git、target、大容量データ、Docker 関連はできるだけ除外してください</li><li th:text="#{form.upload.guidance.retry}">解凍エラーが出る場合は、標準 ZIP 形式で再圧縮して再試行してください</li></ul></div>
+                    <button id="submitButton" type="submit" th:text="#{form.upload.button}">解析を実行する</button>
+                    <p id="running" th:text="#{form.upload.running}">解析中です。しばらくお待ちください。</p>
+                </form>
+                <div class="notice error" th:if="${error != null}"><strong th:text="${error.userMessage}">エラーが発生しました。</strong><p th:if="${error.retryable}" th:text="#{error.retryable}">内容を確認して再度アップロードしてください。</p></div>
+            </section>
+
+            <section class="section" id="result-summary">
+                <div class="section-header"><div><span class="eyebrow" th:text="#{page.home.section.summary.eyebrow}">Results</span><h2 th:text="#{page.home.section.summary.title}">結果サマリ</h2></div><span class="section-tag" th:text="#{page.home.section.summary.tag}">Score / Violations / Artifacts</span></div>
+                <p class="section-copy" th:text="#{page.home.section.summary.copy}">解析後はここで対象ファイル、実行時刻、総合スコア、重大度内訳をまとめて確認できます。</p>
+                <div th:if="${response != null}"><div class="result-banner"><strong th:text="${response.message}">解析が完了しました。</strong><div class="summary-list"><p><span th:text="#{result.targetFile.label}">対象ファイル</span><strong th:text="${response.originalFileName}">bookstore.zip</strong></p><p><span th:text="#{result.executedAt.label}">実行時刻</span><strong th:text="${response.executedAt}">2026-04-10 15:00</strong></p></div></div><div class="summary-grid" style="margin-top: 18px;"><article class="summary-card"><strong th:text="#{result.score.label}">総合スコア</strong><span class="metric-value" th:text="${response.finalScore} + '/100'">0/100</span><p class="metric-sub" th:text="#{result.score.maxLabel}">100点満点</p></article><article class="summary-card"><strong th:text="#{result.violations.label}">違反件数</strong><span class="metric-value" th:text="${response.totalViolations}">0</span><p class="metric-sub"><span th:text="#{result.violations.breakdown}">内訳</span><span th:text="#{result.severity.high.short}">高</span><span th:text="${response.highCount}">0</span><span>/</span><span th:text="#{result.severity.medium.short}">中</span><span th:text="${response.mediumCount}">0</span><span>/</span><span th:text="#{result.severity.low.short}">低</span><span th:text="${response.lowCount}">0</span></p></article></div><div class="section-actions" style="margin-top: 18px;"><a class="cta-link" href="#artifacts" th:text="#{page.home.section.summary.cta}">成果物を見る</a></div></div>
+                <div class="empty-state" th:if="${response == null}"><strong th:text="#{page.home.section.summary.empty.title}">結果はここに表示されます</strong><p th:text="#{page.home.section.summary.empty.body}">診断実行後に、対象ファイル・実行時刻・総合スコア・HIGH / MEDIUM / LOW の内訳がこのセクションにまとまります。</p></div>
+            </section>
+
+            <section class="section" id="artifacts">
+                <div class="section-header"><div><span class="eyebrow" th:text="#{page.home.section.artifacts.eyebrow}">Artifacts</span><h2 th:text="#{page.home.section.artifacts.title}">成果物</h2></div><span class="section-tag" th:text="#{page.home.section.artifacts.tag}">Preview or Download</span></div>
+                <p class="section-copy" th:text="#{page.home.section.artifacts.copy}">診断結果は用途ごとに2種類の Markdown として整理されます。トップでは役割を確認し、全文は既存 preview ページで確認します。</p>
+                <div class="artifact-grid"><article class="artifact-card"><strong th:text="#{page.home.artifact.human.title}">ユーザー向けMarkdown</strong><p class="artifact-copy" th:text="#{page.home.artifact.human.copy}">レビュー共有や振り返り用に、スコアと指摘を人が読みやすい形で確認するためのレポートです。</p><div class="artifact-actions" th:if="${response != null}"><a target="_blank" rel="noopener" th:href="@{/preview/{requestId}/{fileKey}(requestId=${response.requestId},fileKey='human',lang=${#locale.language})}" th:text="#{result.preview.human}">プレビュー</a><a th:href="@{/download/{requestId}/{fileKey}(requestId=${response.requestId},fileKey='human')}" th:text="#{result.download.human}">ダウンロード</a></div><p class="artifact-copy" th:if="${response == null}" th:text="#{page.home.artifact.waiting}">診断後にプレビューとダウンロードが利用可能になります。</p></article><article class="artifact-card"><strong th:text="#{page.home.artifact.ai.title}">AI入力Markdown</strong><p class="artifact-copy" th:text="#{page.home.artifact.ai.copy}">AIに改善相談するときの入力として使いやすいように、内容をそのまま渡しやすく整形した Markdown です。</p><div class="artifact-actions" th:if="${response != null}"><a target="_blank" rel="noopener" th:href="@{/preview/{requestId}/{fileKey}(requestId=${response.requestId},fileKey='ai',lang=${#locale.language})}" th:text="#{result.preview.ai}">プレビュー</a><a th:href="@{/download/{requestId}/{fileKey}(requestId=${response.requestId},fileKey='ai')}" th:text="#{result.download.ai}">ダウンロード</a></div><p class="artifact-copy" th:if="${response == null}" th:text="#{page.home.artifact.waiting}">診断後にプレビューとダウンロードが利用可能になります。</p></article></div>
+            </section>
+
+            <section class="section" id="usage-specs">
+                <div class="section-header"><div><span class="eyebrow" th:text="#{page.home.section.help.eyebrow}">Guide</span><h2 th:text="#{page.home.section.help.title}">使い方・仕様</h2></div></div>
+                <p class="section-copy" th:text="#{page.home.section.help.copy}">対応範囲、推奨 ZIP 作成方法、成果物の見方は既存の help ページに整理しています。トップでは導線を残し、詳細説明は help を主役にしています。</p>
+                <div class="section-actions"><a class="cta-link" th:href="@{/help(lang=${#locale.language})}" th:text="#{page.home.section.help.cta}">使い方・仕様ページへ</a></div>
+            </section>
+
+            <section class="section" id="about-tool">
+                <div class="section-header"><div><span class="eyebrow" th:text="#{page.home.section.about.eyebrow}">About</span><h2 th:text="#{page.home.section.about.title}">このツールについて</h2></div></div>
+                <p class="section-copy" th:text="#{page.home.section.about.copy}">ポートフォリオ閲覧者や初回利用者が短時間で理解できるよう、プロダクトの狙いと技術的特徴を短く整理しています。</p>
+                <div class="about-grid"><article class="about-card"><strong th:text="#{page.home.about.users.title}">対象ユーザー</strong><p th:text="#{page.home.about.users.copy}">Spring 開発者、レビュー観点を整えたいテックリード、品質可視化を進めたい開発チームに向けたツールです。</p></article><article class="about-card"><strong th:text="#{page.home.about.highlights.title}">技術的見どころ</strong><p th:text="#{page.home.about.highlights.copy}">CLI 資産を活かした分析基盤を Web MVP で包み、AI 非依存の診断コアと Markdown 分離設計を両立しています。</p></article><article class="about-card"><strong th:text="#{page.home.about.core.title}">AI非依存コア</strong><p th:text="#{page.home.about.core.copy}">ルールベース診断とスコアリングだけで価値が成立し、AI 連携は後段の活用を広げるオプションとして扱えます。</p></article><article class="about-card"><strong th:text="#{page.home.about.outputs.title}">成果物分離</strong><p th:text="#{page.home.about.outputs.copy}">人が読む Markdown と AI に渡す Markdown を分けることで、レビュー共有と改善相談を同じ解析結果からつなげられます。</p></article></div>
+            </section>
+        </main>
+    </div>
 </div>
-<div id="uploadErrorModal" class="modal-overlay" th:classappend="${uploadErrorModal != null} ? ' is-visible' : ''"
-     th:attr="data-open=${uploadErrorModal != null},data-server-title=${uploadErrorModal != null ? uploadErrorModal.title() : ''},data-server-body=${uploadErrorModal != null ? uploadErrorModal.body() : ''},data-server-retry=${uploadErrorModal != null ? uploadErrorModal.retry() : ''},data-close-label=#{dialog.close}">
+<div id="uploadErrorModal" class="modal-overlay" th:classappend="${uploadErrorModal != null} ? ' is-visible' : ''" th:attr="data-open=${uploadErrorModal != null},data-server-title=${uploadErrorModal != null ? uploadErrorModal.title() : ''},data-server-body=${uploadErrorModal != null ? uploadErrorModal.body() : ''},data-server-retry=${uploadErrorModal != null ? uploadErrorModal.retry() : ''},data-close-label=#{dialog.close}">
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="uploadErrorTitle">
         <h3 id="uploadErrorTitle" th:text="${uploadErrorModal != null ? uploadErrorModal.title() : #messages.msg('error.upload.tooLarge.title')}">アップロードに失敗しました</h3>
         <p id="uploadErrorBody" th:text="${uploadErrorModal != null ? uploadErrorModal.body() : #messages.msg('error.upload.tooLarge.body')}">アップロードしたzipファイルが上限サイズ20MBを超えています。</p>
@@ -224,70 +233,16 @@
     const modalRetry = document.getElementById('uploadErrorRetry');
     const modalClose = document.getElementById('uploadErrorClose');
     const maxUploadBytes = Number(form.dataset.maxUploadBytes || 0);
-
-    function showUploadError(title, body, retry) {
-        modalTitle.textContent = title;
-        modalBody.textContent = body;
-        modalRetry.textContent = retry;
-        modal.classList.add('is-visible');
-        button.disabled = false;
-        running.style.display = 'none';
-    }
-
-    function hideUploadError() {
-        modal.classList.remove('is-visible');
-    }
-
-    function isTooLarge(file) {
-        return Boolean(file) && maxUploadBytes > 0 && file.size > maxUploadBytes;
-    }
-
-    function handleTooLargeFile() {
-        showUploadError(
-            form.dataset.uploadTooLargeTitle,
-            form.dataset.uploadTooLargeBody,
-            form.dataset.uploadTooLargeRetry
-        );
-        fileInput.value = '';
-    }
-
-    fileInput.addEventListener('change', function () {
-        const file = fileInput.files[0];
-        if (isTooLarge(file)) {
-            handleTooLargeFile();
-        }
-    });
-
-    form.addEventListener('submit', function (event) {
-        const file = fileInput.files[0];
-        if (isTooLarge(file)) {
-            event.preventDefault();
-            handleTooLargeFile();
-            return;
-        }
-        button.disabled = true;
-        running.style.display = 'block';
-    });
-
+    function showUploadError(title, body, retry) { modalTitle.textContent = title; modalBody.textContent = body; modalRetry.textContent = retry; modal.classList.add('is-visible'); button.disabled = false; running.style.display = 'none'; }
+    function hideUploadError() { modal.classList.remove('is-visible'); }
+    function isTooLarge(file) { return Boolean(file) && maxUploadBytes > 0 && file.size > maxUploadBytes; }
+    function handleTooLargeFile() { showUploadError(form.dataset.uploadTooLargeTitle, form.dataset.uploadTooLargeBody, form.dataset.uploadTooLargeRetry); fileInput.value = ''; }
+    fileInput.addEventListener('change', function () { const file = fileInput.files[0]; if (isTooLarge(file)) { handleTooLargeFile(); } });
+    form.addEventListener('submit', function (event) { const file = fileInput.files[0]; if (isTooLarge(file)) { event.preventDefault(); handleTooLargeFile(); return; } button.disabled = true; running.style.display = 'block'; });
     modalClose.addEventListener('click', hideUploadError);
-    modal.addEventListener('click', function (event) {
-        if (event.target === modal) {
-            hideUploadError();
-        }
-    });
-    document.addEventListener('keydown', function (event) {
-        if (event.key === 'Escape') {
-            hideUploadError();
-        }
-    });
-
-    if (modal.dataset.open === 'true') {
-        showUploadError(
-            modal.dataset.serverTitle || form.dataset.uploadTooLargeTitle,
-            modal.dataset.serverBody || form.dataset.uploadTooLargeBody,
-            modal.dataset.serverRetry || form.dataset.uploadTooLargeRetry
-        );
-    }
+    modal.addEventListener('click', function (event) { if (event.target === modal) { hideUploadError(); } });
+    document.addEventListener('keydown', function (event) { if (event.key === 'Escape') { hideUploadError(); } });
+    if (modal.dataset.open === 'true') { showUploadError(modal.dataset.serverTitle || form.dataset.uploadTooLargeTitle, modal.dataset.serverBody || form.dataset.uploadTooLargeBody, modal.dataset.serverRetry || form.dataset.uploadTooLargeRetry); }
 </script>
 </body>
 </html>

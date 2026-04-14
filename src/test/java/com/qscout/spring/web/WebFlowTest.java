@@ -43,8 +43,8 @@ class WebFlowTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("<html lang=\"ja\"")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("<title>Q-Scout for Spring</title>")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("現在の対応範囲")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("プロジェクト zip をアップロード")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("はじめに")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("診断を実行")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("pom.xml を含む Spring Boot / Maven / 単一モジュールの zip を選択してください")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("ZIP 作成の目安")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("プロジェクト直下に pom.xml が見える形で ZIP 化してください")))
@@ -65,8 +65,8 @@ class WebFlowTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("<html lang=\"en\"")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("<title>Q-Scout for Spring</title>")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Current Support Scope")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Upload Project Zip")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Getting Started")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Run Diagnosis")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Choose a zip archive that contains a single-module Spring Boot / Maven project with pom.xml")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("ZIP guidance")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Create the ZIP so pom.xml is visible at the project root")))
@@ -109,7 +109,7 @@ class WebFlowTest {
         mockMvc.perform(get("/").param("lang", "ja").session(session))
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("<html lang=\"ja\"")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("現在の対応範囲")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("はじめに")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("解析を実行する")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("アップロードに失敗しました")))
                 .andExpect(content().string(not(org.hamcrest.Matchers.containsString("Current Support Scope"))));
@@ -126,7 +126,7 @@ class WebFlowTest {
         mockMvc.perform(get("/").session(session))
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("<html lang=\"en\"")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Current Support Scope")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Getting Started")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Run Analysis")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Usage &amp; Specs")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Upload failed")));
@@ -438,5 +438,6 @@ class WebFlowTest {
         }
     }
 }
+
 
 
