@@ -46,6 +46,8 @@ class WebFlowTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("現在の対応範囲")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("プロジェクト zip をアップロード")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("pom.xml を含む Spring Boot / Maven / 単一モジュールの zip を選択してください")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("ZIP 作成の目安")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("プロジェクト直下に pom.xml が見える形で ZIP 化してください")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("解析を実行する")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("解析中です。しばらくお待ちください。")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("使い方・仕様")))
@@ -66,6 +68,8 @@ class WebFlowTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Current Support Scope")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Upload Project Zip")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Choose a zip archive that contains a single-module Spring Boot / Maven project with pom.xml")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("ZIP guidance")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Create the ZIP so pom.xml is visible at the project root")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Run Analysis")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Analysis is running. Please wait a moment.")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Usage &amp; Specs")))
@@ -82,12 +86,16 @@ class WebFlowTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("使い方・仕様")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("利用の流れ")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("推奨 ZIP 作成方法")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("ZIP を開いた最上位で pom.xml が確認できる単一モジュール構成を推奨します。")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("解析画面へ戻る")));
 
         mockMvc.perform(get("/help").param("lang", "en"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Usage &amp; Specs")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("How It Works")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Recommended ZIP Packaging")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Prefer a single-module archive where pom.xml is visible at the top level when the ZIP is opened.")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Back to Analyzer")));
     }
 
@@ -430,4 +438,5 @@ class WebFlowTest {
         }
     }
 }
+
 

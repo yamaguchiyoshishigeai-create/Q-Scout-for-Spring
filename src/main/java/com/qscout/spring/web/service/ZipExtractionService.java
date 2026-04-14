@@ -41,7 +41,8 @@ public class ZipExtractionService {
              ZipInputStream zipInputStream = new ZipInputStream(inputStream)) {
             ZipEntry entry;
             while ((entry = zipInputStream.getNextEntry()) != null) {
-                Path target = extractedDir.resolve(entry.getName()).normalize();
+                String entryName = normalizeEntryName(entry.getName());
+                Path target = extractedDir.resolve(entryName).normalize();
                 if (!target.startsWith(extractedDir.normalize())) {
                     throw new InvalidUploadException(message("error.invalidUpload.path"));
                 }
@@ -85,6 +86,14 @@ public class ZipExtractionService {
             throw new InvalidProjectStructureException(message("error.projectRoot.multiplePom"));
         }
         return candidates.get(0).normalize();
+    }
+
+    private String normalizeEntryName(String entryName) {
+        String normalized = entryName.replace('\\', '/');
+        while (normalized.startsWith("/")) {
+            normalized = normalized.substring(1);
+        }
+        return normalized;
     }
 
     private String message(String key, Object... args) {

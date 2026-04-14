@@ -112,6 +112,12 @@ run-self-analysis.bat
 powershell -ExecutionPolicy Bypass -File .\scripts\run-sample-evaluation-under-samples.ps1
 ```
 
+Web 検査用に軽量 ZIP を作る場合:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\create-inspection-zip.ps1
+```
+
 出力先を任意のディレクトリに変更する場合:
 
 ```bat

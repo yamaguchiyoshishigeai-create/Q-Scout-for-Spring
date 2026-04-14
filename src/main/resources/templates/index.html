@@ -40,6 +40,9 @@
         .support-table tr:last-child th, .support-table tr:last-child td { border-bottom: 0; }
         .unsupported-list { margin: 0; padding-left: 20px; line-height: 1.8; }
         .note { margin: 14px 0 0; color: var(--muted); font-size: 0.96rem; line-height: 1.7; }
+        .upload-guidance { margin: 18px 0 0; padding: 16px 18px; background: rgba(255,255,255,0.78); border: 1px solid var(--line); border-radius: 16px; }
+        .upload-guidance strong { display: block; margin-bottom: 8px; }
+        .upload-guidance ul { margin: 0; padding-left: 20px; color: var(--muted); line-height: 1.8; }
         .limits { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 20px 0 24px; }
         .limit-card { background: var(--accent-soft); border-radius: 14px; padding: 14px; }
         label { display: block; margin-bottom: 8px; font-weight: 600; }
@@ -139,6 +142,14 @@
             </div>
             <label for="projectZip" th:text="#{form.upload.label}">pom.xml を含む Spring Boot / Maven / 単一モジュールの zip を選択してください</label>
             <input id="projectZip" type="file" name="projectZip" accept=".zip,application/zip">
+            <div class="upload-guidance">
+                <strong th:text="#{form.upload.guidance.title}">ZIP 作成の目安</strong>
+                <ul>
+                    <li th:text="#{form.upload.guidance.root}">プロジェクト直下に pom.xml が見える形で ZIP 化してください</li>
+                    <li th:text="#{form.upload.guidance.exclude}">.git、target、大容量データ、Docker 関連はできるだけ除外してください</li>
+                    <li th:text="#{form.upload.guidance.retry}">解凍エラーが出る場合は、標準 ZIP 形式で再圧縮して再試行してください</li>
+                </ul>
+            </div>
             <button id="submitButton" type="submit" th:text="#{form.upload.button}">解析を実行する</button>
             <p id="running" th:text="#{form.upload.running}">解析中です。しばらくお待ちください。</p>
         </form>
