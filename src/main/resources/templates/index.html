@@ -73,49 +73,6 @@
         .intro-actions { margin-top: 2px; }
         .sample-card { padding: 20px; }
         .sample-layout { display: grid; gap: 16px; margin-top: 14px; }
-        .sample-visual {
-            margin: 0;
-            overflow: hidden;
-            border-radius: 18px;
-            border: 1px solid var(--line);
-            background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(239, 247, 243, 0.92));
-        }
-        .sample-visual img { display: block; width: 100%; height: auto; aspect-ratio: 41 / 26; object-fit: cover; }
-        .sample-caption { padding: 14px 16px 16px; }
-        .sample-caption strong { margin-bottom: 6px; }
-        .sample-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-        .sample-link-card {
-            display: grid;
-            gap: 12px;
-            padding: 14px;
-            border-radius: 16px;
-            border: 1px solid var(--line);
-            background: #f7faf7;
-            align-content: start;
-            height: 100%;
-        }
-        .sample-link-thumb {
-            height: 88px;
-            border-radius: 14px;
-            border: 1px solid rgba(17, 100, 102, 0.14);
-            background:
-                linear-gradient(180deg, rgba(17,100,102,0.12), rgba(17,100,102,0.02)),
-                linear-gradient(135deg, #fefcf8 0%, #eef6f1 100%);
-            position: relative;
-            overflow: hidden;
-        }
-        .sample-link-thumb::before,
-        .sample-link-thumb::after {
-            content: "";
-            position: absolute;
-            left: 14px;
-            right: 14px;
-            border-radius: 999px;
-            background: rgba(17, 100, 102, 0.16);
-        }
-        .sample-link-thumb::before { top: 22px; height: 10px; width: 56%; }
-        .sample-link-thumb::after { top: 44px; height: 8px; width: 76%; }
-        .sample-link-card .cta-link { width: fit-content; }
         .cta-row, .artifact-actions, .section-actions { display: flex; gap: 12px; flex-wrap: wrap; }
         .section-tag { display: inline-flex; align-items: center; border-radius: 999px; padding: 8px 12px; background: var(--accent-soft); color: var(--accent); font-size: 0.92rem; font-weight: 700; }
         .limits { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 20px 0 24px; }
@@ -137,6 +94,160 @@
         .metric-value { display: block; font-size: 1.8rem; margin-top: 6px; color: var(--ink); }
         .metric-sub { margin-top: 8px; font-size: 0.95rem; }
         .metric-sub span { font-weight: 700; color: var(--ink); }
+        .result-dashboard { display: grid; gap: 18px; margin-top: 18px; }
+        .result-overview {
+            display: grid;
+            gap: 14px;
+            padding: 20px;
+            border-radius: 22px;
+            border: 1px solid rgba(77, 139, 99, 0.45);
+            background: linear-gradient(135deg, rgba(237, 248, 241, 0.98), rgba(227, 241, 236, 0.95));
+        }
+        .result-overview strong { font-size: 1.05rem; }
+        .result-overview-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+        .result-meta {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+        .result-meta-card,
+        .breakdown-card,
+        .artifact-prompt {
+            padding: 16px;
+            border-radius: 18px;
+            border: 1px solid var(--line);
+            background: rgba(255,255,255,0.72);
+        }
+        .result-meta-label,
+        .breakdown-card small,
+        .artifact-prompt small {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--muted);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .result-meta-value {
+            display: block;
+            color: var(--ink);
+            font-size: 1.08rem;
+            font-weight: 700;
+            line-height: 1.55;
+            word-break: break-word;
+        }
+        .summary-card {
+            padding: 22px;
+            border-radius: 22px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(242, 249, 246, 0.9));
+        }
+        .summary-card strong {
+            margin-bottom: 10px;
+            color: var(--accent);
+            font-size: 0.96rem;
+        }
+        .metric-value {
+            font-size: clamp(2.6rem, 5vw, 4rem);
+            line-height: 1;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-top: 2px;
+        }
+        .metric-sub {
+            margin-top: 12px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+        .metric-breakdown-inline {
+            display: inline-flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+        .metric-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 10px;
+            border-radius: 999px;
+            background: rgba(17, 100, 102, 0.08);
+            color: var(--ink);
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+        .metric-pill.is-high { background: rgba(211, 107, 107, 0.16); }
+        .metric-pill.is-medium { background: rgba(225, 173, 87, 0.2); }
+        .metric-pill.is-low { background: rgba(119, 173, 134, 0.18); }
+        .result-lower {
+            display: grid;
+            grid-template-columns: minmax(0, 1.35fr) minmax(260px, 0.9fr);
+            gap: 14px;
+            align-items: stretch;
+        }
+        .breakdown-card {
+            display: grid;
+            gap: 14px;
+            padding: 18px;
+            border-radius: 22px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(242, 249, 246, 0.9));
+        }
+        .breakdown-card strong,
+        .artifact-prompt strong {
+            margin-bottom: 0;
+            font-size: 1rem;
+        }
+        .severity-bar {
+            display: flex;
+            gap: 4px;
+            align-items: stretch;
+        }
+        .severity-bar span {
+            display: block;
+            flex: 1 1 0;
+            min-height: 14px;
+            border-radius: 999px;
+            background: #dceae5;
+        }
+        .severity-bar .high { background: #d36b6b; }
+        .severity-bar .medium { background: #e1ad57; }
+        .severity-bar .low { background: #77ad86; }
+        .severity-list {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
+        .severity-item {
+            padding: 12px;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.78);
+            border: 1px solid rgba(17, 100, 102, 0.1);
+        }
+        .severity-item small {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+        .severity-item strong {
+            font-size: 1.2rem;
+        }
+        .artifact-prompt {
+            display: grid;
+            gap: 14px;
+            padding: 18px;
+            border-radius: 22px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(242, 249, 246, 0.9));
+        }
+        .artifact-prompt .cta-link { width: fit-content; }
+        .sample-note {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 999px;
+            padding: 7px 11px;
+            background: rgba(17, 100, 102, 0.1);
+            color: var(--accent);
+            font-size: 0.84rem;
+            font-weight: 800;
+        }
         .empty-state { background: rgba(255,255,255,0.7); border: 1px dashed rgba(17, 100, 102, 0.28); border-radius: 18px; padding: 18px; }
         .info-link { margin-top: 14px; }
         #running { display: none; margin-top: 18px; color: var(--muted); }
@@ -150,7 +261,7 @@
             .layout { grid-template-columns: 1fr; }
             .sidebar { position: static; padding: 16px; }
             .sidebar-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-            .hero-grid, .intro-grid, .support-grid, .summary-grid, .artifact-grid, .about-grid, .limits, .sample-links { grid-template-columns: 1fr; }
+            .hero-grid, .intro-grid, .support-grid, .summary-grid, .artifact-grid, .about-grid, .limits, .result-meta, .result-lower, .severity-list { grid-template-columns: 1fr; }
         }
         @media (max-width: 640px) {
             .shell { padding: 22px 14px 48px; }
@@ -161,7 +272,8 @@
             .nav-link, .top-link, .cta-link, .info-link { text-align: center; }
             .sample-card { padding: 18px; }
             .sample-layout { gap: 14px; }
-            .sample-link-card .cta-link { width: 100%; }
+            .result-overview, .summary-card, .breakdown-card, .artifact-prompt { padding: 18px; }
+            .artifact-prompt .cta-link { width: 100%; }
             .modal-card { padding: 22px; }
         }
     </style>
@@ -214,33 +326,9 @@
                         <strong th:text="#{page.home.sample.title}">成果物サンプル</strong>
                         <p class="artifact-copy" th:text="#{page.home.sample.copy}">診断後に返る結果を、まず画像でひと目で確認できます。</p>
                         <div class="sample-layout">
-                            <figure class="sample-visual">
-                                <img th:src="@{/images/result-summary-sample.svg}" th:alt="#{page.home.sample.summary.alt}" src="/images/result-summary-sample.svg" alt="結果サマリーのサンプル画像">
-                                <figcaption class="sample-caption">
-                                    <strong th:text="#{page.home.sample.summary.title}">結果サマリーの見本</strong>
-                                    <p class="artifact-copy" th:text="#{page.home.sample.summary.copy}">総合スコア、違反件数、重大度内訳が返るイメージを先に確認できます。</p>
-                                </figcaption>
-                            </figure>
-                            <div class="sample-links">
-                                <article class="sample-link-card">
-                                    <div class="sample-link-thumb" aria-hidden="true"></div>
-                                    <div>
-                                        <strong th:text="#{page.home.sample.human.title}">ユーザー向けMarkdown</strong>
-                                        <p class="artifact-copy" th:text="#{page.home.sample.human.copy}">レビュー共有に使うレポートは、preview で全文を確認できます。</p>
-                                    </div>
-                                    <a class="cta-link" th:if="${response == null}" href="#artifacts" th:text="#{page.home.sample.human.cta}">ユーザー向けMarkdownのサンプルを見る</a>
-                                    <a class="cta-link" th:if="${response != null}" target="_blank" rel="noopener" th:href="@{/preview/{requestId}/{fileKey}(requestId=${response.requestId},fileKey='human',lang=${#locale.language})}" th:text="#{page.home.sample.human.ctaReady}">ユーザー向けレポートをpreviewで見る</a>
-                                </article>
-                                <article class="sample-link-card">
-                                    <div class="sample-link-thumb" aria-hidden="true"></div>
-                                    <div>
-                                        <strong th:text="#{page.home.sample.ai.title}">AI入力Markdown</strong>
-                                        <p class="artifact-copy" th:text="#{page.home.sample.ai.copy}">AIに渡す入力は、preview でそのまま使う形を確認できます。</p>
-                                    </div>
-                                    <a class="cta-link" th:if="${response == null}" href="#artifacts" th:text="#{page.home.sample.ai.cta}">AI入力Markdownのサンプルを見る</a>
-                                    <a class="cta-link" th:if="${response != null}" target="_blank" rel="noopener" th:href="@{/preview/{requestId}/{fileKey}(requestId=${response.requestId},fileKey='ai',lang=${#locale.language})}" th:text="#{page.home.sample.ai.ctaReady}">AI入力をpreviewで見る</a>
-                                </article>
-                            </div>
+                            <th:block th:with="summaryDisplay=${sampleSummary}">
+                                <div th:replace="~{fragments/summary :: summaryDashboard}"></div>
+                            </th:block>
                         </div>
                     </article>
                 </div>
@@ -265,7 +353,9 @@
             <section class="section" id="result-summary">
                 <div class="section-header"><div><span class="eyebrow" th:text="#{page.home.section.summary.eyebrow}">Results</span><h2 th:text="#{page.home.section.summary.title}">結果サマリ</h2></div><span class="section-tag" th:text="#{page.home.section.summary.tag}">Score / Violations / Artifacts</span></div>
                 <p class="section-copy" th:text="#{page.home.section.summary.copy}">解析後はここで対象ファイル、実行時刻、総合スコア、重大度内訳をまとめて確認できます。</p>
-                <div th:if="${response != null}"><div class="result-banner"><strong th:text="${response.message}">解析が完了しました。</strong><div class="summary-list"><p><span th:text="#{result.targetFile.label}">対象ファイル</span><strong th:text="${response.originalFileName}">bookstore.zip</strong></p><p><span th:text="#{result.executedAt.label}">実行時刻</span><strong th:text="${response.executedAt}">2026-04-10 15:00</strong></p></div></div><div class="summary-grid" style="margin-top: 18px;"><article class="summary-card"><strong th:text="#{result.score.label}">総合スコア</strong><span class="metric-value" th:text="${response.finalScore} + '/100'">0/100</span><p class="metric-sub" th:text="#{result.score.maxLabel}">100点満点</p></article><article class="summary-card"><strong th:text="#{result.violations.label}">違反件数</strong><span class="metric-value" th:text="${response.totalViolations}">0</span><p class="metric-sub"><span th:text="#{result.violations.breakdown}">内訳</span><span th:text="#{result.severity.high.short}">高</span><span th:text="${response.highCount}">0</span><span>/</span><span th:text="#{result.severity.medium.short}">中</span><span th:text="${response.mediumCount}">0</span><span>/</span><span th:text="#{result.severity.low.short}">低</span><span th:text="${response.lowCount}">0</span></p></article></div><div class="section-actions" style="margin-top: 18px;"><a class="cta-link" href="#artifacts" th:text="#{page.home.section.summary.cta}">成果物を見る</a></div></div>
+                <th:block th:if="${resultSummary != null}" th:with="summaryDisplay=${resultSummary}">
+                    <div th:replace="~{fragments/summary :: summaryDashboard}"></div>
+                </th:block>
                 <div class="empty-state" th:if="${response == null}"><strong th:text="#{page.home.section.summary.empty.title}">結果はここに表示されます</strong><p th:text="#{page.home.section.summary.empty.body}">診断実行後に、対象ファイル・実行時刻・総合スコア・HIGH / MEDIUM / LOW の内訳がこのセクションにまとまります。</p></div>
             </section>
 

@@ -3,6 +3,7 @@ package com.qscout.spring.web.controller;
 import com.qscout.spring.i18n.MessageSources;
 import com.qscout.spring.web.dto.DownloadLinkView;
 import com.qscout.spring.web.dto.ErrorViewModel;
+import com.qscout.spring.web.dto.SummaryDisplayView;
 import com.qscout.spring.web.dto.UploadErrorModalView;
 import com.qscout.spring.web.dto.WebAnalysisResponse;
 import com.qscout.spring.web.exception.AnalysisTimeoutException;
@@ -36,6 +37,8 @@ class WebPageControllerTest {
 
         assertThat(view).isEqualTo("index");
         assertThat(model.getAttribute("response")).isEqualTo(response);
+        assertThat(model.getAttribute("resultSummary")).isEqualTo(new SummaryDisplayView(response, false, "#artifacts"));
+        assertThat(model.getAttribute("sampleSummary")).isNotNull();
         assertThat(model.getAttribute("limits")).isNotNull();
     }
 
@@ -48,6 +51,8 @@ class WebPageControllerTest {
         String view = controller.showHelp(model);
 
         assertThat(view).isEqualTo("help");
+        assertThat(model.getAttribute("sampleSummary")).isNotNull();
+        assertThat(model.getAttribute("resultSummary")).isNull();
         assertThat(model.getAttribute("limits")).isNotNull();
     }
 

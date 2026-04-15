@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<th:block th:fragment="summaryDashboard">
+    <div class="result-dashboard" th:if="${summaryDisplay != null}">
+        <div class="result-overview">
+            <div class="result-overview-head">
+                <strong th:text="${summaryDisplay.response.message}">解析が完了しました。</strong>
+                <span class="sample-note" th:if="${summaryDisplay.sample}" th:text="#{page.home.sample.summary.badge}">Sample</span>
+            </div>
+            <div class="result-meta">
+                <div class="result-meta-card">
+                    <span class="result-meta-label" th:text="#{result.targetFile.label}">対象ファイル</span>
+                    <span class="result-meta-value" th:text="${summaryDisplay.response.originalFileName}">bookstore.zip</span>
+                </div>
+                <div class="result-meta-card">
+                    <span class="result-meta-label" th:text="#{result.executedAt.label}">実行時刻</span>
+                    <span class="result-meta-value" th:text="${summaryDisplay.response.executedAt}">2026-04-10 15:00</span>
+                </div>
+            </div>
+        </div>
+        <div class="summary-grid">
+            <article class="summary-card">
+                <strong th:text="#{result.score.label}">総合スコア</strong>
+                <span class="metric-value" th:text="${summaryDisplay.response.finalScore} + '/100'">0/100</span>
+                <p class="metric-sub" th:text="#{result.score.maxLabel}">100点満点</p>
+            </article>
+            <article class="summary-card">
+                <strong th:text="#{result.violations.label}">違反件数</strong>
+                <span class="metric-value" th:text="${summaryDisplay.response.totalViolations}">0</span>
+                <p class="metric-sub"><span th:text="#{result.violations.breakdown}">内訳</span></p>
+                <div class="metric-breakdown-inline">
+                    <span class="metric-pill is-high"><span th:text="#{result.severity.high.short}">高</span><span th:text="${summaryDisplay.response.highCount}">0</span></span>
+                    <span class="metric-pill is-medium"><span th:text="#{result.severity.medium.short}">中</span><span th:text="${summaryDisplay.response.mediumCount}">0</span></span>
+                    <span class="metric-pill is-low"><span th:text="#{result.severity.low.short}">低</span><span th:text="${summaryDisplay.response.lowCount}">0</span></span>
+                </div>
+            </article>
+        </div>
+        <div class="result-lower">
+            <article class="breakdown-card">
+                <div>
+                    <strong th:text="#{result.violations.breakdown}">内訳</strong>
+                    <small th:text="${summaryDisplay.sample} ? #{page.home.sample.summary.copy} : #{page.home.section.summary.copy}">解析後はここで対象ファイル、実行時刻、総合スコア、重大度内訳をまとめて確認できます。</small>
+                </div>
+                <div class="severity-bar" aria-hidden="true">
+                    <span class="high" th:style="'flex-grow:' + ${summaryDisplay.response.totalViolations > 0 ? summaryDisplay.response.highCount : 1}"></span>
+                    <span class="medium" th:style="'flex-grow:' + ${summaryDisplay.response.totalViolations > 0 ? summaryDisplay.response.mediumCount : 1}"></span>
+                    <span class="low" th:style="'flex-grow:' + ${summaryDisplay.response.totalViolations > 0 ? summaryDisplay.response.lowCount : 1}"></span>
+                </div>
+                <div class="severity-list">
+                    <div class="severity-item">
+                        <small th:text="#{result.severity.high.short}">高</small>
+                        <strong th:text="${summaryDisplay.response.highCount}">0</strong>
+                    </div>
+                    <div class="severity-item">
+                        <small th:text="#{result.severity.medium.short}">中</small>
+                        <strong th:text="${summaryDisplay.response.mediumCount}">0</strong>
+                    </div>
+                    <div class="severity-item">
+                        <small th:text="#{result.severity.low.short}">低</small>
+                        <strong th:text="${summaryDisplay.response.lowCount}">0</strong>
+                    </div>
+                </div>
+            </article>
+            <article class="artifact-prompt">
+                <div>
+                    <strong th:text="#{page.home.nav.artifacts}">成果物</strong>
+                    <small th:text="${summaryDisplay.sample} ? #{page.home.sample.summary.artifacts} : #{page.home.section.artifacts.copy}">診断結果は用途ごとに2種類の Markdown として整理されます。トップでは役割を確認し、全文は既存 preview ページで確認します。</small>
+                </div>
+                <div class="metric-breakdown-inline">
+                    <span class="metric-pill" th:text="#{result.artifact.human}">ユーザー向けMarkdown</span>
+                    <span class="metric-pill" th:text="#{result.artifact.ai}">AI入力Markdown</span>
+                </div>
+                <a class="cta-link" th:href="${summaryDisplay.artifactHref}" th:text="${summaryDisplay.sample} ? #{page.home.sample.summary.cta} : #{page.home.section.summary.cta}">成果物を見る</a>
+            </article>
+        </div>
+    </div>
+</th:block>
+</body>
+</html>

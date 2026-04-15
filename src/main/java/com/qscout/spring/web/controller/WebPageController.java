@@ -3,7 +3,10 @@ package com.qscout.spring.web.controller;
 import com.qscout.spring.i18n.MessageSources;
 import com.qscout.spring.web.dto.ErrorViewModel;
 import com.qscout.spring.web.dto.ExecutionLimitView;
+import com.qscout.spring.web.dto.DownloadLinkView;
+import com.qscout.spring.web.dto.SummaryDisplayView;
 import com.qscout.spring.web.dto.UploadErrorModalView;
+import com.qscout.spring.web.dto.WebAnalysisResponse;
 import com.qscout.spring.web.exception.AnalysisTimeoutException;
 import com.qscout.spring.web.exception.InvalidProjectStructureException;
 import com.qscout.spring.web.exception.InvalidUploadException;
@@ -47,7 +50,9 @@ public class WebPageController {
     public String analyze(@RequestParam(value = "projectZip", required = false) MultipartFile file, Model model) {
         populateCommon(model);
         try {
-            model.addAttribute("response", webAnalysisService.analyze(file));
+            WebAnalysisResponse response = webAnalysisService.analyze(file);
+            model.addAttribute("response", response);
+            model.addAttribute("resultSummary", new SummaryDisplayView(response, false, "#artifacts"));
         } catch (UploadTooLargeException exception) {
             logger.warn("Upload exceeded size limit during controller validation. filename={}", file != null ? file.getOriginalFilename() : null, exception);
             model.addAttribute("uploadErrorModal", new UploadErrorModalView(
@@ -70,6 +75,26 @@ public class WebPageController {
 
     private void populateCommon(Model model) {
         model.addAttribute("limits", new ExecutionLimitView(20, 60, "zip"));
+        model.addAttribute("resultSummary", null);
+        model.addAttribute("sampleSummary", new SummaryDisplayView(
+                new WebAnalysisResponse(
+                        "sample-request",
+                        "bookstore.zip",
+                        "2026-04-10 15:00",
+                        84,
+                        6,
+                        1,
+                        2,
+                        3,
+                        new DownloadLinkView(message("result.download.human"), "#artifacts", "qscout-report.md"),
+                        new DownloadLinkView(message("result.download.ai"), "#artifacts", "qscout-ai-input.md"),
+                        message("page.home.sample.summary.message"),
+                        false,
+                        true
+                ),
+                true,
+                "#artifacts"
+        ));
     }
 
     private String message(String key, Object... args) {
