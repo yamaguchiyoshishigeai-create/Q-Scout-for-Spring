@@ -4,61 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="#{preview.page.title}">Markdown Preview</title>
-    <style>
-        :root {
-            --bg: linear-gradient(135deg, #f7f1e8 0%, #e6efe9 100%);
-            --panel: rgba(255, 253, 248, 0.94);
-            --ink: #1f2a2e;
-            --muted: #5d6a70;
-            --accent: #116466;
-            --line: rgba(17, 100, 102, 0.16);
-        }
-        body { margin: 0; font-family: "Segoe UI", "Hiragino Sans", sans-serif; background: var(--bg); color: var(--ink); }
-        .shell { max-width: 1080px; margin: 0 auto; padding: 32px 20px 64px; }
-        .topbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
-        .top-links, .actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-        .pill { color: var(--accent); font-weight: 700; text-decoration: none; background: rgba(255,255,255,0.78); border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; }
-        .locale-switcher { display: inline-flex; gap: 12px; background: rgba(255,255,255,0.78); border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; }
-        .locale-switcher a { color: var(--accent); font-weight: 700; text-decoration: none; }
-        .panel { background: var(--panel); border: 1px solid rgba(17, 100, 102, 0.12); border-radius: 20px; box-shadow: 0 18px 40px rgba(31, 42, 46, 0.08); padding: 28px; }
-        .eyebrow { margin: 0 0 8px; color: var(--accent); font-weight: 700; }
-        h1 { margin: 0 0 8px; font-size: clamp(1.8rem, 4vw, 2.6rem); }
-        .meta, .description { margin: 0 0 14px; color: var(--muted); line-height: 1.7; }
-        pre { margin: 0; padding: 20px; border-radius: 16px; border: 1px solid var(--line); background: #fcfbf7; overflow: auto; white-space: pre-wrap; word-break: break-word; line-height: 1.7; font-family: "Cascadia Code", Consolas, monospace; font-size: 0.95rem; }
-        .markdown-body { margin-top: 18px; line-height: 1.8; color: var(--ink); }
-        .markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4 { margin: 1.5rem 0 0.65rem; }
-        .markdown-body h1:first-child, .markdown-body h2:first-child { margin-top: 0; }
-        .markdown-body p { margin: 0 0 1rem; }
-        .markdown-body ul { margin: 0 0 1rem 1.2rem; padding: 0; }
-        .markdown-body li { margin-bottom: 0.45rem; }
-        .markdown-body a { color: var(--accent); font-weight: 700; }
-        .markdown-body pre { margin: 0 0 1rem; }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <link rel="stylesheet" th:href="@{/css/preview.css}">
 </head>
 <body>
-<div class="shell">
-    <div class="topbar">
-        <div class="top-links">
-            <a class="pill" th:href="@{/(lang=${#locale.language})}" th:text="#{nav.home}">解析画面へ戻る</a>
-            <a class="pill" th:href="@{/help(lang=${#locale.language})}" th:text="#{nav.help}">使い方・仕様</a>
+<div class="page-shell page-shell--medium">
+    <div class="page-header">
+        <div class="page-header__links">
+            <a class="pill-link" th:href="@{/(lang=${#locale.language})}" th:text="#{nav.home}">解析画面へ戻る</a>
+            <a class="pill-link" th:href="@{/help(lang=${#locale.language})}" th:text="#{nav.help}">使い方・仕様</a>
         </div>
-        <nav class="locale-switcher">
+        <nav class="lang-switcher">
             <a th:href="@{/preview/{requestId}/{fileKey}(requestId=${preview.requestId},fileKey=${preview.fileKey},lang='ja')}" th:text="#{lang.ja}">日本語</a>
             <a th:href="@{/preview/{requestId}/{fileKey}(requestId=${preview.requestId},fileKey=${preview.fileKey},lang='en')}" th:text="#{lang.en}">English</a>
         </nav>
     </div>
 
-    <section class="panel">
-        <p class="eyebrow" th:text="${preview.fileKey == 'human'} ? #{preview.section.human} : #{preview.section.ai}">ユーザー向けMarkdownプレビュー</p>
-        <h1 th:text="#{preview.page.title}">Markdown Preview</h1>
-        <p class="meta"><span th:text="#{preview.fileName.label}">ファイル</span><strong th:text="${preview.fileName}">qscout-report.md</strong></p>
-        <p class="description" th:text="#{preview.page.description}">内容を確認してからダウンロードできます。</p>
-        <div class="actions">
-            <a class="pill" th:href="${preview.downloadUrl}" th:text="#{preview.download.button}">ダウンロード</a>
-            <a class="pill" th:href="@{/(lang=${#locale.language})}" th:text="#{preview.back.home}">解析画面へ戻る</a>
+    <section class="content-panel preview-hero" data-figma-section="preview-panel">
+        <p class="section-eyebrow" th:text="${preview.fileKey == 'human'} ? #{preview.section.human} : #{preview.section.ai}">ユーザー向けMarkdownプレビュー</p>
+        <h1 class="page-title" th:text="#{preview.page.title}">Markdown Preview</h1>
+        <p class="page-copy preview-meta"><span th:text="#{preview.fileName.label}">ファイル</span><strong class="preview-file-name" th:text="${preview.fileName}">qscout-report.md</strong></p>
+        <p class="page-copy preview-description" th:text="#{preview.page.description}">内容を確認してからダウンロードできます。</p>
+        <div class="page-actions">
+            <a class="pill-link" th:href="${preview.downloadUrl}" th:text="#{preview.download.button}">ダウンロード</a>
+            <a class="pill-link" th:href="@{/(lang=${#locale.language})}" th:text="#{preview.back.home}">解析画面へ戻る</a>
         </div>
         <div class="markdown-body" th:if="${preview.renderedHtml != null}" th:utext="${preview.renderedHtml}"></div>
-        <pre th:if="${preview.renderedHtml == null}" th:text="${preview.content}"># preview</pre>
+        <pre class="code-preview" th:if="${preview.renderedHtml == null}" th:text="${preview.content}"># preview</pre>
     </section>
 </div>
 </body>

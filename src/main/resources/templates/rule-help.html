@@ -4,84 +4,59 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${rule.displayName} + ' | Q-Scout for Spring'">Rule Explanation</title>
-    <style>
-        :root {
-            --bg: linear-gradient(135deg, #f7f1e8 0%, #e6efe9 100%);
-            --panel: rgba(255, 253, 248, 0.94);
-            --ink: #1f2a2e;
-            --muted: #5d6a70;
-            --accent: #116466;
-            --accent-soft: rgba(215, 236, 233, 0.55);
-            --line: rgba(17, 100, 102, 0.16);
-        }
-        body { margin: 0; font-family: "Segoe UI", "Hiragino Sans", sans-serif; background: var(--bg); color: var(--ink); }
-        .shell { max-width: 960px; margin: 0 auto; padding: 32px 20px 64px; }
-        .topbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
-        .top-links { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-        .pill { color: var(--accent); font-weight: 700; text-decoration: none; background: rgba(255,255,255,0.78); border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; }
-        .locale-switcher { display: inline-flex; gap: 12px; background: rgba(255,255,255,0.78); border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; }
-        .locale-switcher a { color: var(--accent); font-weight: 700; text-decoration: none; }
-        .hero, .section { background: var(--panel); border: 1px solid rgba(17, 100, 102, 0.12); border-radius: 20px; box-shadow: 0 18px 40px rgba(31, 42, 46, 0.08); padding: 28px; margin-bottom: 20px; }
-        .eyebrow { margin: 0 0 8px; color: var(--accent); font-weight: 700; }
-        h1 { margin: 0 0 10px; font-size: clamp(2rem, 4vw, 2.8rem); }
-        h2 { margin: 0 0 14px; font-size: 1.25rem; }
-        p, li { margin: 0; line-height: 1.85; color: var(--muted); }
-        .meta { margin: 0 0 18px; color: var(--muted); }
-        .notes { list-style: none; padding: 0; display: grid; gap: 10px; }
-        .notes li { background: var(--accent-soft); border-radius: 14px; padding: 14px 16px; }
-        .notes strong { color: var(--ink); }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <link rel="stylesheet" th:href="@{/css/rule-help.css}">
 </head>
 <body>
-<div class="shell">
-    <div class="topbar">
-        <div class="top-links">
-            <a class="pill" th:href="@{/(lang=${#locale.language})}" th:text="#{help.rule.backToHome}">解析画面へ戻る</a>
-            <a class="pill" th:href="@{/help(lang=${#locale.language})}" th:text="#{help.rule.backToHelp}">使い方・仕様へ戻る</a>
+<div class="page-shell page-shell--narrow">
+    <div class="page-header">
+        <div class="page-header__links">
+            <a class="pill-link" th:href="@{/(lang=${#locale.language})}" th:text="#{help.rule.backToHome}">解析画面へ戻る</a>
+            <a class="pill-link" th:href="@{/help(lang=${#locale.language})}" th:text="#{help.rule.backToHelp}">使い方・仕様へ戻る</a>
         </div>
-        <nav class="locale-switcher">
+        <nav class="lang-switcher">
             <a th:href="@{/help/rules/{slug}(slug=${rule.slug},lang='ja')}" th:text="#{lang.ja}">日本語</a>
             <a th:href="@{/help/rules/{slug}(slug=${rule.slug},lang='en')}" th:text="#{lang.en}">English</a>
         </nav>
     </div>
 
-    <section class="hero">
-        <p class="eyebrow" th:text="${rule.ruleId}">R001</p>
-        <h1 th:text="${rule.displayName}">Controller To Repository Direct Access</h1>
-        <p class="meta" th:text="${rule.shortSummary}">Summary</p>
+    <section class="hero-panel rule-hero" data-figma-section="rule-hero">
+        <p class="section-eyebrow" th:text="${rule.ruleId}">R001</p>
+        <h1 class="page-title" th:text="${rule.displayName}">Controller To Repository Direct Access</h1>
+        <p class="page-copy rule-meta" th:text="${rule.shortSummary}">Summary</p>
     </section>
 
-    <section class="section">
+    <section class="content-panel" data-figma-section="rule-meaning">
         <h2 th:text="#{help.rule.section.meaning}">What it detects</h2>
-        <p th:text="${rule.shortSummary}">Meaning</p>
+        <p class="page-copy" th:text="${rule.shortSummary}">Meaning</p>
     </section>
 
-    <section class="section">
+    <section class="content-panel" data-figma-section="rule-why">
         <h2 th:text="#{help.rule.section.whyItMatters}">Why it matters</h2>
-        <p th:text="${rule.whyItMatters}">Why it matters</p>
+        <p class="page-copy" th:text="${rule.whyItMatters}">Why it matters</p>
     </section>
 
-    <section class="section">
+    <section class="content-panel" data-figma-section="rule-how-to-read">
         <h2 th:text="#{help.rule.section.howToRead}">How to read it</h2>
-        <p th:text="${rule.interpretationHint}">Interpretation hint</p>
-        <ul class="notes">
+        <p class="page-copy" th:text="${rule.interpretationHint}">Interpretation hint</p>
+        <ul class="notes-list">
             <li><strong th:text="#{help.rule.label.severityReading}">Severity reading</strong> <span th:text="${rule.severityReadingHint}">Severity hint</span></li>
             <li><strong th:text="#{help.rule.label.firstCheck}">First check</strong> <span th:text="${rule.firstCheckPoint}">First check point</span></li>
             <li><strong th:text="#{help.rule.label.improvementDirection}">Improvement direction</strong> <span th:text="${rule.quickImprovementDirection}">Improvement direction</span></li>
         </ul>
     </section>
 
-    <section class="section">
+    <section class="content-panel" data-figma-section="rule-allowed-cases">
         <h2 th:text="#{help.rule.section.allowedCases}">Conditional allowances</h2>
-        <p th:text="${rule.conditionalAllowance}">Allowed cases</p>
-        <ul class="notes">
+        <p class="page-copy" th:text="${rule.conditionalAllowance}">Allowed cases</p>
+        <ul class="notes-list">
             <li><strong th:text="#{help.rule.label.nuance}">Nuance</strong> <span th:text="${rule.nuanceNote}">Nuance note</span></li>
         </ul>
     </section>
 
-    <section class="section">
+    <section class="content-panel" data-figma-section="rule-why-qscout-cares">
         <h2 th:text="#{help.rule.section.whyQScoutCares}">Why Q-Scout cares</h2>
-        <p th:text="${rule.whyQScoutCares}">Why Q-Scout cares</p>
+        <p class="page-copy" th:text="${rule.whyQScoutCares}">Why Q-Scout cares</p>
     </section>
 </div>
 </body>

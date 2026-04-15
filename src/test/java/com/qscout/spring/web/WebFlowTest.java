@@ -230,7 +230,9 @@ class WebFlowTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("data-max-upload-bytes=\"20971520\"")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("id=\"uploadErrorModal\"")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("handleTooLargeFile")));
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("data-upload-too-large-title=\"アップロードに失敗しました\"")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("<script src=\"/js/app.js\"></script>")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("<script src=\"/js/home.js\"></script>")));
     }
 
     @Test

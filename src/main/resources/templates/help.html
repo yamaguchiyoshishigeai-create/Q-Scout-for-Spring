@@ -4,75 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="#{help.page.title}">Usage & Specs</title>
-    <style>
-        :root {
-            --bg: linear-gradient(135deg, #f7f1e8 0%, #e6efe9 100%);
-            --panel: rgba(255, 253, 248, 0.94);
-            --ink: #1f2a2e;
-            --muted: #5d6a70;
-            --accent: #116466;
-            --accent-soft: rgba(215, 236, 233, 0.55);
-            --line: rgba(17, 100, 102, 0.16);
-        }
-        body { margin: 0; font-family: "Segoe UI", "Hiragino Sans", sans-serif; background: var(--bg); color: var(--ink); }
-        .shell { max-width: 960px; margin: 0 auto; padding: 32px 20px 64px; }
-        .topbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
-        .top-links { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-        .pill { color: var(--accent); font-weight: 700; text-decoration: none; background: rgba(255,255,255,0.78); border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; }
-        .locale-switcher { display: inline-flex; gap: 12px; background: rgba(255,255,255,0.78); border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; }
-        .locale-switcher a { color: var(--accent); font-weight: 700; text-decoration: none; }
-        .hero, .section { background: var(--panel); border: 1px solid rgba(17, 100, 102, 0.12); border-radius: 20px; box-shadow: 0 18px 40px rgba(31, 42, 46, 0.08); padding: 28px; margin-bottom: 20px; }
-        h1 { margin: 0 0 12px; font-size: clamp(2rem, 4vw, 2.8rem); }
-        h2 { margin: 0 0 14px; font-size: 1.25rem; }
-        .lead, .section p { margin: 0; line-height: 1.8; color: var(--muted); }
-        .steps { display: grid; gap: 14px; margin-top: 18px; }
-        .step { background: var(--accent-soft); border-radius: 16px; padding: 16px; }
-        .step strong { display: block; margin-bottom: 8px; color: var(--ink); }
-        .tips { margin: 0; padding-left: 20px; color: var(--muted); line-height: 1.8; }
-        .support-table { width: 100%; border-collapse: collapse; background: white; border-radius: 16px; overflow: hidden; border: 1px solid var(--line); }
-        .support-table th, .support-table td { padding: 14px 16px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
-        .support-table th { width: 34%; background: var(--accent-soft); font-weight: 700; }
-        .support-table tr:last-child th, .support-table tr:last-child td { border-bottom: 0; }
-        .unsupported-list { margin: 0; padding-left: 20px; line-height: 1.8; color: var(--muted); }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <link rel="stylesheet" th:href="@{/css/help.css}">
 </head>
 <body>
-<div class="shell">
-    <div class="topbar">
-        <div class="top-links">
-            <a class="pill" th:href="@{/(lang=${#locale.language})}" th:text="#{nav.home}">解析画面へ戻る</a>
-            <a class="pill" th:href="@{/help(lang=${#locale.language})}" th:text="#{nav.help}">使い方・仕様</a>
+<div class="page-shell page-shell--narrow">
+    <div class="page-header">
+        <div class="page-header__links">
+            <a class="pill-link" th:href="@{/(lang=${#locale.language})}" th:text="#{nav.home}">解析画面へ戻る</a>
+            <a class="pill-link" th:href="@{/help(lang=${#locale.language})}" th:text="#{nav.help}">使い方・仕様</a>
         </div>
-        <nav class="locale-switcher">
+        <nav class="lang-switcher">
             <a th:href="@{/help(lang='ja')}" th:text="#{lang.ja}">日本語</a>
             <a th:href="@{/help(lang='en')}" th:text="#{lang.en}">English</a>
         </nav>
     </div>
 
-    <section class="hero">
-        <h1 th:text="#{help.hero.title}">使い方・仕様</h1>
-        <p class="lead" th:text="#{help.hero.lead}">対応範囲、解析手順、成果物の確認方法をまとめた固定ページです。</p>
+    <section class="hero-panel help-hero" data-figma-section="help-hero">
+        <h1 class="page-title" th:text="#{help.hero.title}">使い方・仕様</h1>
+        <p class="page-lead" th:text="#{help.hero.lead}">対応範囲、解析手順、成果物の確認方法をまとめた固定ページです。</p>
     </section>
 
-    <section class="section">
+    <section class="content-panel" data-figma-section="help-steps">
         <h2 th:text="#{help.section.steps}">利用の流れ</h2>
-        <div class="steps">
-            <div class="step">
+        <div class="step-list">
+            <div class="step-card">
                 <strong th:text="#{help.step.upload.title}">1. zipをアップロード</strong>
                 <p th:text="#{help.step.upload.body}">Spring Boot / Maven の単一モジュール zip をアップロードします。</p>
             </div>
-            <div class="step">
+            <div class="step-card">
                 <strong th:text="#{help.step.result.title}">2. 結果を確認</strong>
                 <p th:text="#{help.step.result.body}">結果画面でスコア、違反件数、解析対象ファイルを確認できます。</p>
             </div>
-            <div class="step">
+            <div class="step-card">
                 <strong th:text="#{help.step.preview.title}">3. Markdownをプレビュー</strong>
                 <p th:text="#{help.step.preview.body}">ユーザー向けMarkdownとAI入力Markdownは、まずブラウザで内容確認してからダウンロードできます。</p>
             </div>
         </div>
     </section>
 
-    <section class="section">
+    <section class="content-panel" data-figma-section="support-table">
         <h2 th:text="#{page.home.section.supported}">現在の対応範囲</h2>
         <table class="support-table">
             <tbody>
@@ -89,46 +60,46 @@
         </table>
     </section>
 
-    <section class="section">
+    <section class="content-panel" data-figma-section="help-outputs">
         <h2 th:text="#{help.section.outputs}">成果物</h2>
-        <div class="steps">
-            <div class="step">
+        <div class="step-list">
+            <div class="step-card">
                 <strong th:text="#{help.output.human.title}">ユーザー向けMarkdown</strong>
                 <p th:text="#{help.output.human.body}">診断結果を人が読みやすい形でまとめたレポートです。</p>
             </div>
-            <div class="step">
+            <div class="step-card">
                 <strong th:text="#{help.output.ai.title}">AI入力Markdown</strong>
                 <p th:text="#{help.output.ai.body}">AIに渡しやすい入力整形版です。プレビュー画面で全文確認できます。</p>
             </div>
         </div>
     </section>
 
-    <section class="section">
+    <section class="content-panel" data-figma-section="zip-tips">
         <h2 th:text="#{help.section.zipTips}">推奨 ZIP 作成方法</h2>
-        <p th:text="#{help.zipTips.lead}">アップロード時の解凍エラーや構成判定エラーを減らすため、次の形を推奨します。</p>
-        <div class="steps">
-            <div class="step">
+        <p class="page-copy" th:text="#{help.zipTips.lead}">アップロード時の解凍エラーや構成判定エラーを減らすため、次の形を推奨します。</p>
+        <div class="step-list">
+            <div class="step-card">
                 <strong th:text="#{help.zipTips.structure.title}">構成</strong>
                 <p th:text="#{help.zipTips.structure.body}">ZIP を開いた最上位で pom.xml が確認できる単一モジュール構成を推奨します。</p>
             </div>
-            <div class="step">
+            <div class="step-card">
                 <strong th:text="#{help.zipTips.exclude.title}">除外を推奨するもの</strong>
-                <ul class="tips">
+                <ul class="bullet-list">
                     <li th:text="#{help.zipTips.exclude.git}">.git や .github などの管理ファイル</li>
                     <li th:text="#{help.zipTips.exclude.build}">target や build などのビルド成果物</li>
                     <li th:text="#{help.zipTips.exclude.large}">解析に不要な大容量データ、画像、Docker 関連ファイル</li>
                 </ul>
             </div>
-            <div class="step">
+            <div class="step-card">
                 <strong th:text="#{help.zipTips.retry.title}">エラー時の再試行</strong>
                 <p th:text="#{help.zipTips.retry.body}">解凍に失敗した場合は、標準 ZIP 形式で再圧縮し、不要物を減らしたうえで再アップロードしてください。</p>
             </div>
         </div>
     </section>
 
-    <section class="section">
+    <section class="content-panel" data-figma-section="unsupported-list">
         <h2 th:text="#{page.home.section.unsupported}">現時点で非対応</h2>
-        <ul class="unsupported-list">
+        <ul class="bullet-list">
             <li th:text="#{page.home.unsupported.gradle}">Gradle プロジェクト</li>
             <li th:text="#{page.home.unsupported.multimodule}">マルチモジュール構成</li>
             <li th:text="#{page.home.unsupported.springFramework}">Spring Framework 単体構成</li>
