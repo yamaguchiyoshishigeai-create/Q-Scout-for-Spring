@@ -1,3 +1,9 @@
+# 履歴資料
+
+この文書は CLI 単体前提の実行フローです。現行実装では Web 経路として `WebPageController` と `SharedAnalysisService` 経由の流れも存在します。
+
+---
+
 # 最小API設計 v0.1 - 実行フロー
 
 1. Main.main(args)
