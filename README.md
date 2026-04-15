@@ -1,6 +1,6 @@
 # Q-Scout for Spring
 
-この README は日本語版の正本です。英語要約版は [docs/README.en.md](docs/README.en.md) を参照してください。
+この README は日本語版の正本です。英語要約版は [docs/README.en.md](docs/README.en.md)、`docs` 配下の正本 / 履歴資料の整理方針は [docs/README.md](docs/README.md) を参照してください。
 
 Spring Boot / Spring Framework 向けのコード品質診断ツールとして、設計健全性と Spring ベストプラクティス準拠度をスコア付きで可視化するプロジェクトです。
 

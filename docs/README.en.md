@@ -50,3 +50,4 @@ Windows helper scripts are also available from the repository root, including `r
 ## Full Documentation
 
 The full README is maintained in Japanese at [../README.md](../README.md).
+The documentation index is available at [README.md](README.md), where canonical and archived documents are organized.

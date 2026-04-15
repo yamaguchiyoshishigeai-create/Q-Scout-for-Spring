@@ -1,3 +1,9 @@
+# 履歴資料
+
+この文書は Web 化前の最小 API 設計メモです。現行実装では `SharedAnalysisService`、preview/help コントローラ、多言語化対応が追加されています。
+
+---
+
 # 最小API設計 v0.1 - コンポーネントAPI
 
 public interface ProjectScanner {

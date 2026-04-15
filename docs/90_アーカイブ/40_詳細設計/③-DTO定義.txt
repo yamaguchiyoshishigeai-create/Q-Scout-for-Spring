@@ -1,3 +1,9 @@
+# 履歴資料
+
+この文書は Web 化前の最小 API 設計メモです。DTO 自体は多くが現存しますが、現行実装では Web 用 DTO と追加ドメインも存在します。
+
+---
+
 # 最小API設計 v0.1 - DTO定義
 
 public record AnalysisRequest(

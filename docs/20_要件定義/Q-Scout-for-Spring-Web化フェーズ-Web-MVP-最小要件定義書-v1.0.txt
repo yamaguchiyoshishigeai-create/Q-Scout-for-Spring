@@ -11,10 +11,10 @@
 過設計を排除し「動くWebサービス」を最短で実現することを最優先とする。
 
 前提：
-- CLIは既にMVPとして成立済み :contentReference[oaicite:0]{index=0}
+- CLIは既にMVPとして成立済み
 - Web化はCLI資産のラップである
-- AI連携は未実装（フェーズ0） :contentReference[oaicite:1]{index=1}
-- Render前提・同期処理 :contentReference[oaicite:2]{index=2}
+- AI連携は未実装（フェーズ0）
+- Render前提・同期処理
 
 ---
 
@@ -104,7 +104,7 @@ UI複雑化は価値に直結しないため排除する
 - レポートダウンロードリンク
 
 補足：
-CLI出力内容と一致させる :contentReference[oaicite:3]{index=3}
+CLI出力内容と一致させる
 
 ---
 
@@ -179,9 +179,14 @@ MVPでは非同期処理は不要
 9. 結果をメモリに格納
 10. 画面へ返却
 11. ダウンロードURL生成
-12. cleanup
+12. preview / download 用に一時保持し、その後 cleanup
 
 ---
+
+補足：
+
+- 生成された成果物は requestId 単位で一時保持し、preview / download に利用できるようにする
+- 永続保存は行わず、保持期限後に cleanup する
 
 ### 6.2 呼び出し構造
 
@@ -192,7 +197,7 @@ Web → 共通解析サービス → 既存CLIコア
 - RuleEngine
 - ScoreCalculator
 - ReportGenerator
-- AiMarkdownGenerator :contentReference[oaicite:4]{index=4}
+- AiMarkdownGenerator
 
 ---
 
@@ -239,7 +244,7 @@ MVP制約明示運用
 
 ### 8.1 制約
 
-- 最大実行時間：60秒 :contentReference[oaicite:5]{index=5}
+- 最大実行時間：60秒
 - 同期処理
 - 最大20MB
 - Javaプロジェクトのみ
@@ -274,7 +279,7 @@ MVP制約明示運用
 
 ## 10. 非機能要件（MVP）
 
-- 同時実行：許可（requestId分離） :contentReference[oaicite:6]{index=6}
+- 同時実行：許可（requestId分離）
 - 永続化なし
 - ログは最小限
 - UIは軽量
