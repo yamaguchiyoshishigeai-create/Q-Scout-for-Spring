@@ -1,15 +1,16 @@
-[OK] README_GUIDE_LINK_DONE
-STEP: README_GUIDE_LINK
+[OK] CODEXEXEC_RULE_SETUP_DONE
+STEP: CODEXEXEC_RULE_SETUP
 changed files:
-- docs/README.md
+- .gitignore
+- docs/CodexExec.result運用ルール.md
 - CodexExec.result
 
 summary:
-- docs/README.md に 20_要件定義ガイド.md への導線を追加
+- .gitignore を修正し、リポジトリルートの CodexExec.result を追跡対象に変更
+- docs/CodexExec.result運用ルール.md を追加
 
 untouched:
-- 20_要件定義ガイド.md 本文は未変更
 - other files unchanged
 
 commit: HEAD
-message: 要件定義ガイド導線を追加
+message: CodexExec.result運用ルールを整備

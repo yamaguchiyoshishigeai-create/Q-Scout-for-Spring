@@ -20,6 +20,6 @@ Thumbs.db
 .DS_Store
 
 # Codex 実行結果
-CodexExec.result
+# リポジトリルートの標準結果ファイルは追跡対象とする
 /samples/CodexExec.result
 
