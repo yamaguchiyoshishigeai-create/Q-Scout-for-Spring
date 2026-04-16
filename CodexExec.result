@@ -1,0 +1,15 @@
+[OK] README_GUIDE_LINK_DONE
+STEP: README_GUIDE_LINK
+changed files:
+- docs/README.md
+- CodexExec.result
+
+summary:
+- docs/README.md に 20_要件定義ガイド.md への導線を追加
+
+untouched:
+- 20_要件定義ガイド.md 本文は未変更
+- other files unchanged
+
+commit: HEAD
+message: 要件定義ガイド導線を追加
