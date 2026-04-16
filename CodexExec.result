@@ -1,17 +1,16 @@
-[OK] FUTURE_VISION_RELOCATE_DONE
-STEP: FUTURE_VISION_RELOCATE
+[OK] START_PROMPT_V3_UPDATE_DONE
+STEP: START_PROMPT_V3_UPDATE
 changed files:
-- docs/README.md
-- docs/10_企画/15_将来構想/Q-Scout-AI利用戦略-v1.0.md
-- docs/25_将来構想/Q-Scout-AI利用戦略-v1.0.md
+- Q-Scout-for-Spring_開始時プロンプト_完全版.md
 - CodexExec.result
 
 summary:
-- Q-Scout-AI利用戦略-v1.0.md を 10_企画/15_将来構想 配下へ再配置
-- docs/README.md の将来構想導線を企画配下の構想資料として更新
+- 開始時プロンプト文書を指定された v3.0 本文で全面置換
+- 他ファイルは変更せず、結果ファイルのみ運用ルールに従って更新
 
 untouched:
-- other files unchanged
+- implementation code unchanged
+- other docs unchanged
 
 commit: HEAD
-message: 将来構想を企画配下へ再配置
+message: 開始時プロンプトをv3.0へ更新
