@@ -1,5 +1,7 @@
 # ControllerToRepositoryDirectAccessRule 見直し方針書
-提案名：ControllerToRepositoryDirectAccessRule 見直し方針書 v1.0
+
+### 提案名
+ControllerToRepositoryDirectAccessRule 見直し方針書 v1.0
 
 ## 1. 文書目的
 本方針書は、Q-Scout for Spring における ControllerToRepositoryDirectAccessRule の見直し方針を定義するものである。
@@ -200,13 +202,19 @@ severity 連動メッセージ方式
 メッセージは severity に応じて変える。
 
 #### HIGH 用
+```text
 Controller performs write or use-case-level repository access directly. Move this logic behind a service layer.
+```
 
 #### MEDIUM 用
+```text
 Controller reads from repository directly. Prefer service mediation to preserve separation of concerns and future extensibility.
+```
 
 #### LOW 用
+```text
 Controller performs a simple read-only repository access. This may be acceptable in limited cases, but service mediation is usually preferable.
+```
 
 ### 補足注記
 人間用レポートまたは将来の詳細解説では、以下の注記を付けられるようにする。

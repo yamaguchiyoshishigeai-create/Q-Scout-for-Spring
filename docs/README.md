@@ -14,14 +14,14 @@
 ## 現行補助仕様
 
 - 実装骨格や責務分離の補助説明:
-  - `20_要件定義/Q-Scout-for-Spring-Web化フェーズ-既存CLI資産からの移行・流用方針-v1.0.txt`
-  - `20_要件定義/Q-Scout-for-Spring-Web化フェーズ-最小Webアーキテクチャ設計書-v1.0.txt`
+  - `20_要件定義/Q-Scout-for-Spring-Web化フェーズ-既存CLI資産からの移行・流用方針-v1.0.md`
+  - `20_要件定義/Q-Scout-for-Spring-Web化フェーズ-最小Webアーキテクチャ設計書-v1.0.md`
     - 現行実装の主要骨格を把握するための設計書です。`WebPreviewController` などの後続追加まで完全網羅した正本ではないため、必要に応じてソースコードと併読してください。
 - 補助案内:
   - `README.en.md`
     - 英語話者向けの要約と導線です。日本語 README の代替となる正本ではありません。
 - ルール解釈の補助仕様:
-  - `20_要件定義/ControllerToRepositoryDirectAccessRule_見直し方針書.txt`
+  - `20_要件定義/ControllerToRepositoryDirectAccessRule_見直し方針書.md`
 - 現行フロント差分設計:
   - `40_詳細設計/*.md`
 

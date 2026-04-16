@@ -17,10 +17,13 @@
 
 ## 2. 設計結論
 
-提案名：共通解析サービス抽出型Webアーキテクチャ  
-優先度：最優先  
+### 提案名
+共通解析サービス抽出型Webアーキテクチャ
 
-方針：
+### 優先度
+最優先
+
+### 方針
 - CLIとWebの入口分離
 - 解析処理は共通化
 - Web層は薄く構築
@@ -31,6 +34,7 @@
 
 ## 3. 全体構成
 
+```text
 [Browser]
   ↓
 [Web UI]
@@ -49,6 +53,7 @@
 [レポート生成]
   ↓
 [結果表示 / ダウンロード]
+```
 
 ---
 
@@ -121,10 +126,13 @@ Service
 ## 7. 一時ディレクトリ
 
 パス：
+
+```text
 /tmp/qscout/{requestId}/
   upload.zip
   extracted/
   output/
+```
 
 責務：
 - requestId生成
@@ -158,6 +166,7 @@ Service
 
 変更：
 
+```text
 CLI:
 Main
  → CliApplication
@@ -167,6 +176,7 @@ Web:
 Controller
  → WebAnalysisService
    → SharedAnalysisService
+```
 
 ---
 
@@ -190,7 +200,10 @@ Controller
 - qscout-ai-input.md
 
 保存：
+
+```text
 /tmp/qscout/{requestId}/output/
+```
 
 ---
 
@@ -236,6 +249,7 @@ Controller
 
 com.qscout.spring
 
+```text
 - cli
 - web
   - controller
@@ -248,6 +262,7 @@ com.qscout.spring
 - rule
 - infrastructure
 - util
+```
 
 ---
 
