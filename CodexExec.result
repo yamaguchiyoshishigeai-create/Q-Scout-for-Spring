@@ -1,16 +1,17 @@
-[OK] CODEXEXEC_RULE_SETUP_DONE
-STEP: CODEXEXEC_RULE_SETUP
+[OK] FUTURE_VISION_AI_STRATEGY_DONE
+STEP: FUTURE_VISION_AI_STRATEGY
 changed files:
-- .gitignore
-- docs/CodexExec.result運用ルール.md
+- docs/README.md
+- docs/25_将来構想/Q-Scout-AI利用戦略-v1.0.md
+- docs/20_要件定義/Q-Scout-AI利用戦略-v1.0.txt
 - CodexExec.result
 
 summary:
-- .gitignore を修正し、リポジトリルートの CodexExec.result を追跡対象に変更
-- docs/CodexExec.result運用ルール.md を追加
+- docs/25_将来構想/ を追加し、Q-Scout-AI利用戦略-v1.0 を .md 化して移設
+- docs/README.md に将来構想区分と導線を追加
 
 untouched:
 - other files unchanged
 
 commit: HEAD
-message: CodexExec.result運用ルールを整備
+message: 将来構想へAI利用戦略を移設
