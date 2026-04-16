@@ -1,17 +1,17 @@
-[OK] FUTURE_VISION_AI_STRATEGY_DONE
-STEP: FUTURE_VISION_AI_STRATEGY
+[OK] FUTURE_VISION_RELOCATE_DONE
+STEP: FUTURE_VISION_RELOCATE
 changed files:
 - docs/README.md
+- docs/10_企画/15_将来構想/Q-Scout-AI利用戦略-v1.0.md
 - docs/25_将来構想/Q-Scout-AI利用戦略-v1.0.md
-- docs/20_要件定義/Q-Scout-AI利用戦略-v1.0.txt
 - CodexExec.result
 
 summary:
-- docs/25_将来構想/ を追加し、Q-Scout-AI利用戦略-v1.0 を .md 化して移設
-- docs/README.md に将来構想区分と導線を追加
+- Q-Scout-AI利用戦略-v1.0.md を 10_企画/15_将来構想 配下へ再配置
+- docs/README.md の将来構想導線を企画配下の構想資料として更新
 
 untouched:
 - other files unchanged
 
 commit: HEAD
-message: 将来構想へAI利用戦略を移設
+message: 将来構想を企画配下へ再配置
