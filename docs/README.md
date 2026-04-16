@@ -6,10 +6,10 @@
 
 - リポジトリ全体の利用案内と起動方法: `../README.md`
 - 現行の要件・方針・主要仕様:
-  - `20_要件定義/Q-Scout-for-Spring-Web化フェーズ-Web-MVP-最小要件定義書-v1.0.txt`
-  - `20_要件定義/Q-Scout-for-Spring-Web化フェーズ-全体設計方針書-v1.0.txt`
-  - `20_要件定義/Q-Scout-for-Spring_多言語化対応仕様書_v1.0.txt`
-  - `20_要件定義/Web実行制約・運用前提-v0.1.txt`
+  - `20_要件定義/Q-Scout-for-Spring-Web化フェーズ-Web-MVP-最小要件定義書-v1.0.md`
+  - `20_要件定義/Q-Scout-for-Spring-Web化フェーズ-全体設計方針書-v1.0.md`
+  - `20_要件定義/Q-Scout-for-Spring_多言語化対応仕様書_v1.0.md`
+  - `20_要件定義/Web実行制約・運用前提-v0.1.md`
 
 ## 現行補助仕様
 

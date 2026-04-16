@@ -28,7 +28,10 @@ CLIツールからWebサービス化するにあたり、
 
 - 解析は一時ディレクトリ上で実行する
 - ディレクトリ例：
+
+```text
   /tmp/qscout/{requestId}/
+```
 
 - 処理完了後は削除する
 - エラー時も必ずクリーンアップする
@@ -51,7 +54,10 @@ CLIツールからWebサービス化するにあたり、
   - qscout-ai-input.md
 
 - 保存場所：
+
+```text
   /tmp/qscout/{requestId}/output/
+```
 
 - Web側はダウンロードURLとして返却する
 

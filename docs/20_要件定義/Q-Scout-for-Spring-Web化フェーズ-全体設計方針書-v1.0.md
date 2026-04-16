@@ -96,6 +96,7 @@ Thin Web Layer + Shared Analysis Core
 
 ### 構成概要
 
+```text
 [Browser]
   ↓
 [Web Controller]
@@ -109,6 +110,7 @@ Thin Web Layer + Shared Analysis Core
 [レポート生成]
   ↓
 [結果表示 / ダウンロード]
+```
 
 ---
 
@@ -180,10 +182,13 @@ Thin Web Layer + Shared Analysis Core
 - クリーンアップ
 
 ディレクトリ構成：
+
+```text
 /tmp/qscout/{requestId}/
   ├─ upload.zip
   ├─ extracted/
   └─ output/
+```
 
 ---
 
@@ -213,7 +218,10 @@ Thin Web Layer + Shared Analysis Core
 - qscout-ai-input.md
 
 配置：
+
+```text
 /tmp/qscout/{requestId}/output/
+```
 
 提供方法：
 - ブラウザ表示
