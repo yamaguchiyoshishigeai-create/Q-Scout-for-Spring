@@ -14,6 +14,7 @@ public record WebAnalysisResponse(
         String humanPreviewUrl,
         String aiPreviewUrl,
         String message,
+        String autoExcludedMessage,
         boolean timedOut,
         boolean completed
 ) {

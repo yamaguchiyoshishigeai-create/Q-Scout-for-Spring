@@ -95,6 +95,11 @@
                 </ul>
             </div>
             <div class="step-card">
+                <strong th:text="#{help.zipTips.autoExclude.title}">自動除外ポリシー</strong>
+                <p th:text="#{help.zipTips.autoExclude.body}">.git、.github、target、build、node_modules、.idea、.vscode は安全検査を通過した場合に自動除外されることがあります。</p>
+                <p th:text="#{help.zipTips.autoExclude.recommendation}">ただし、公開環境では事前に不要物を除外した ZIP を推奨します。</p>
+            </div>
+            <div class="step-card">
                 <strong th:text="#{help.zipTips.retry.title}">エラー時の再試行</strong>
                 <p th:text="#{help.zipTips.retry.body}">解凍に失敗した場合は、標準 ZIP 形式で再圧縮し、不要物を減らしたうえで再アップロードしてください。</p>
             </div>

@@ -15,6 +15,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -56,6 +57,8 @@ class WebAnalysisServiceTest {
         );
 
         when(tempWorkspaceService.createWorkspace()).thenReturn(workspace);
+        when(zipExtractionService.extract(workspace.uploadZipPath(), workspace.extractedDir()))
+                .thenReturn(new ZipExtractionResult(2, 3, Set.of(".git", "target")));
         when(zipExtractionService.resolveProjectRoot(workspace.extractedDir())).thenReturn(projectRoot);
         when(sharedAnalysisService.execute(any(AnalysisRequest.class))).thenReturn(result);
         when(requestAccessTokenService.createSignedUrl("/download/req-123/human", "req-123", "human")).thenReturn("/download/req-123/human?expires=111&token=h");
@@ -72,6 +75,7 @@ class WebAnalysisServiceTest {
         assertThat(response.originalFileName()).isEqualTo("sample.zip");
         assertThat(response.executedAt()).isNotBlank();
         assertThat(response.finalScore()).isEqualTo(85);
+        assertThat(response.autoExcludedMessage()).contains("除外件数");
         assertThat(response.humanDownloadLink().url()).isEqualTo("/download/req-123/human?expires=111&token=h");
         assertThat(response.humanPreviewUrl()).isEqualTo("/preview/req-123/human?lang=ja&expires=111&token=ph");
     }
@@ -102,6 +106,8 @@ class WebAnalysisServiceTest {
         );
 
         when(tempWorkspaceService.createWorkspace()).thenReturn(workspace);
+        when(zipExtractionService.extract(workspace.uploadZipPath(), workspace.extractedDir()))
+                .thenReturn(new ZipExtractionResult(2, 0, Set.of()));
         when(zipExtractionService.resolveProjectRoot(workspace.extractedDir())).thenReturn(projectRoot);
         when(sharedAnalysisService.execute(any(AnalysisRequest.class))).thenReturn(result);
         when(requestAccessTokenService.createSignedUrl("/download/req-124/human", "req-124", "human")).thenReturn("/download/req-124/human?expires=111&token=h");
@@ -112,6 +118,7 @@ class WebAnalysisServiceTest {
         var response = service.analyze(file);
 
         assertThat(response.originalFileName()).isEqualTo("不明なzipファイル");
+        assertThat(response.autoExcludedMessage()).isNull();
     }
 
     @Test

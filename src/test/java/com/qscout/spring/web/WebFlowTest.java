@@ -18,6 +18,7 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -51,6 +52,8 @@ class WebFlowTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("解析結果は、ユーザー向けレポートとAI向け入力の2種類で確認・ダウンロードできます。")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("pom.xml を含む Spring Boot / Maven / 単一モジュールの zip を選択してください")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("ZIP 作成の目安")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("自動除外される不要物")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString(".git、.github、target、build、node_modules、.idea、.vscode")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("プロジェクト直下に pom.xml が見える形で ZIP 化してください")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("解析を実行する")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("解析中です。しばらくお待ちください。")))
@@ -83,6 +86,8 @@ class WebFlowTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("The output is available in two forms: a human-readable report and AI-ready input.")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Choose a zip archive that contains a single-module Spring Boot / Maven project with pom.xml")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("ZIP guidance")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Auto-excluded contents")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString(".git, .github, target, build, node_modules, .idea, and .vscode")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Create the ZIP so pom.xml is visible at the project root")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Run Analysis")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Analysis is running. Please wait a moment.")))
@@ -108,6 +113,7 @@ class WebFlowTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("使い方・仕様")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("利用の流れ")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("推奨 ZIP 作成方法")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("自動除外ポリシー")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("ZIP を開いた最上位で pom.xml が確認できる単一モジュール構成を推奨します。")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("解析画面へ戻る")));
 
@@ -116,6 +122,7 @@ class WebFlowTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Usage &amp; Specs")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("How It Works")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Recommended ZIP Packaging")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Auto-exclusion policy")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Prefer a single-module archive where pom.xml is visible at the top level when the ZIP is opened.")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Back to Analyzer")));
     }
@@ -337,6 +344,24 @@ class WebFlowTest {
     }
 
     @Test
+    void showsAutoExcludedNoticeWhenGitDirectoryIsSkipped() throws Exception {
+        MockMultipartFile zip = new MockMultipartFile(
+                "projectZip",
+                "petclinic-equivalent.zip",
+                "application/zip",
+                zipDirectoryWithExtraEntries(
+                        Path.of("samples/sample-project").toAbsolutePath().normalize(),
+                        Map.of(".git/objects/pack/pack-a.pack", "ignored")
+                )
+        );
+
+        mockMvc.perform(multipart("/analyze").file(zip).header("X-Forwarded-For", "198.51.100.19"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("解析不要物を自動除外して解析を継続しました。")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString(".git")));
+    }
+
+    @Test
     void generatesEnglishReportAndReadableSummaryAfterLocaleSwitch() throws Exception {
         MockHttpSession session = (MockHttpSession) mockMvc.perform(get("/").param("lang", "en"))
                 .andReturn()
@@ -450,10 +475,19 @@ class WebFlowTest {
     }
 
     private byte[] zipDirectory(Path root) {
+        return zipDirectoryWithExtraEntries(root, Map.of());
+    }
+
+    private byte[] zipDirectoryWithExtraEntries(Path root, Map<String, String> extraEntries) {
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream);
                  var paths = Files.walk(root)) {
+                for (Map.Entry<String, String> extraEntry : extraEntries.entrySet()) {
+                    zipOutputStream.putNextEntry(new ZipEntry(extraEntry.getKey()));
+                    zipOutputStream.write(extraEntry.getValue().getBytes(StandardCharsets.UTF_8));
+                    zipOutputStream.closeEntry();
+                }
                 paths.filter(Files::isRegularFile).forEach(path -> {
                     String entryName = root.relativize(path).toString().replace('\\', '/');
                     try {

@@ -9,6 +9,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.charset.StandardCharsets;
 import java.util.Random;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -55,11 +56,12 @@ class ZipExtractionServiceTest {
         entries.put("sample\\src\\main\\java\\App.java", "class App {}\n");
         Files.write(zipPath, zipBytes(entries));
 
-        service.extract(zipPath, extractedDir);
+        ZipExtractionResult result = service.extract(zipPath, extractedDir);
 
         assertThat(Files.readString(extractedDir.resolve("sample/pom.xml"))).isEqualTo("<project/>");
         assertThat(Files.readString(extractedDir.resolve("sample/src/main/java/App.java"))).contains("class App");
         assertThat(service.resolveProjectRoot(extractedDir)).isEqualTo(extractedDir.resolve("sample").normalize());
+        assertThat(result.skippedEntryCount()).isZero();
     }
 
     @Test
@@ -124,13 +126,88 @@ class ZipExtractionServiceTest {
                 .hasMessageContaining("複数");
     }
 
+    @Test
+    void skipsAutoExcludedEntriesAndStillResolvesProjectRoot() throws IOException {
+        Path zipPath = tempDir.resolve("auto-excluded.zip");
+        Path extractedDir = tempDir.resolve("auto-excluded-out");
+        Files.createDirectories(extractedDir);
+        Map<String, String> entries = new LinkedHashMap<>();
+        entries.put(".git/objects/pack/pack-a.pack", "ignored");
+        entries.put("project/pom.xml", "<project/>");
+        entries.put("project/src/main/java/App.java", "class App {}\n");
+        Files.write(zipPath, zipBytes(entries));
+
+        ZipExtractionResult result = service.extract(zipPath, extractedDir);
+
+        assertThat(result.skippedEntryCount()).isEqualTo(1);
+        assertThat(result.skippedDirectoryNames()).contains(".git");
+        assertThat(Files.exists(extractedDir.resolve(".git"))).isFalse();
+        assertThat(service.resolveProjectRoot(extractedDir)).isEqualTo(extractedDir.resolve("project").normalize());
+    }
+
+    @Test
+    void acceptsPetclinicEquivalentArchiveWithLargeGitPack() throws IOException {
+        Path zipPath = tempDir.resolve("petclinic-equivalent.zip");
+        Path extractedDir = tempDir.resolve("petclinic-equivalent-out");
+        Files.createDirectories(extractedDir);
+        Map<String, String> entries = new LinkedHashMap<>();
+        entries.put(".git/objects/pack/pack-a.pack", "x".repeat(12 * 1024 * 1024));
+        entries.put("pom.xml", "<project/>");
+        entries.put("src/main/java/org/springframework/samples/petclinic/PetClinicApplication.java", "class PetClinicApplication {}\n");
+        Files.write(zipPath, zipBytes(entries));
+
+        ZipExtractionResult result = service.extract(zipPath, extractedDir);
+
+        assertThat(result.skippedEntryCount()).isEqualTo(1);
+        assertThat(Files.exists(extractedDir.resolve("pom.xml"))).isTrue();
+        assertThat(Files.exists(extractedDir.resolve(".git/objects/pack/pack-a.pack"))).isFalse();
+        assertThat(service.resolveProjectRoot(extractedDir)).isEqualTo(extractedDir.normalize());
+    }
+
+    @Test
+    void rejectsTraversalWhenPretendingToBeGit() throws IOException {
+        Path zipPath = tempDir.resolve("bad-git-path.zip");
+        Path extractedDir = tempDir.resolve("bad-git-path-out");
+        Files.createDirectories(extractedDir);
+        Files.write(zipPath, zipBytes(Map.of(".git/../../evil.txt", "boom")));
+
+        assertThatThrownBy(() -> service.extract(zipPath, extractedDir))
+                .isInstanceOf(InvalidUploadException.class)
+                .hasMessageContaining("不正なパス");
+    }
+
+    @Test
+    void rejectsNullCharacterInAutoExcludedEntry() throws IOException {
+        Path zipPath = tempDir.resolve("bad-null.zip");
+        Path extractedDir = tempDir.resolve("bad-null-out");
+        Files.createDirectories(extractedDir);
+        Files.write(zipPath, zipBytes(Map.of(".git/\u0000/config", "boom")));
+
+        assertThatThrownBy(() -> service.extract(zipPath, extractedDir))
+                .isInstanceOf(InvalidUploadException.class)
+                .hasMessageContaining("不正なパス");
+    }
+
+    @Test
+    void rejectsDeeplyNestedAutoExcludedEntry() throws IOException {
+        Path zipPath = tempDir.resolve("deep-git.zip");
+        Path extractedDir = tempDir.resolve("deep-git-out");
+        Files.createDirectories(extractedDir);
+        String deepEntry = ".git/" + "a/".repeat(ZipSecurityLimits.MAX_ENTRY_DEPTH) + "pack.idx";
+        Files.write(zipPath, zipBytes(Map.of(deepEntry, "boom")));
+
+        assertThatThrownBy(() -> service.extract(zipPath, extractedDir))
+                .isInstanceOf(InvalidUploadException.class)
+                .hasMessageContaining("階層");
+    }
+
     private byte[] zipBytes(Map<String, String> entries) {
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream)) {
                 for (Map.Entry<String, String> entry : entries.entrySet()) {
                     zipOutputStream.putNextEntry(new ZipEntry(entry.getKey()));
-                    zipOutputStream.write(entry.getValue().getBytes());
+                    zipOutputStream.write(entry.getValue().getBytes(StandardCharsets.UTF_8));
                     zipOutputStream.closeEntry();
                 }
             }

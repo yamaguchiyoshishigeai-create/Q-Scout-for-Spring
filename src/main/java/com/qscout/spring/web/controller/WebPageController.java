@@ -113,6 +113,7 @@ public class WebPageController {
                         "#artifacts",
                         "#artifacts",
                         message("page.home.sample.summary.message"),
+                        message("page.home.sample.summary.autoExcluded"),
                         false,
                         true
                 ),

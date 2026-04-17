@@ -60,7 +60,7 @@ public class WebAnalysisService {
         TempWorkspaceService.WorkspaceContext workspace = tempWorkspaceService.createWorkspace();
         try {
             zipExtractionService.saveUpload(projectZip, workspace.uploadZipPath());
-            zipExtractionService.extract(workspace.uploadZipPath(), workspace.extractedDir());
+            ZipExtractionResult extractionResult = zipExtractionService.extract(workspace.uploadZipPath(), workspace.extractedDir());
             Path projectRoot = zipExtractionService.resolveProjectRoot(workspace.extractedDir());
             SharedAnalysisService.SharedAnalysisResult result = executeWithTimeout(
                     new AnalysisRequest(projectRoot, workspace.outputDir())
@@ -98,6 +98,7 @@ public class WebAnalysisService {
                             Map.of("lang", language)
                     ),
                     message("result.completed"),
+                    buildAutoExcludedMessage(extractionResult),
                     false,
                     true
             );
@@ -151,6 +152,14 @@ public class WebAnalysisService {
     private String formatExecutedAt(Instant executedAt) {
         return EXECUTED_AT_FORMAT.withLocale(MessageSources.resolveLocale())
                 .format(executedAt.atZone(ZoneId.systemDefault()));
+    }
+
+    private String buildAutoExcludedMessage(ZipExtractionResult extractionResult) {
+        if (extractionResult == null || !extractionResult.hasAutoExcludedEntries()) {
+            return null;
+        }
+        String skippedTargets = String.join(", ", extractionResult.skippedDirectoryNames());
+        return message("result.autoExcluded.notice", extractionResult.skippedEntryCount(), skippedTargets);
     }
 
     private String message(String key, Object... args) {

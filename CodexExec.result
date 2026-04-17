@@ -1,54 +1,64 @@
-[OK] DOCS_30_ALIGNMENT_DONE
-STEP: COMMIT_1_docs_30_formalization
+[OK] SAFE_ZIP_AUTO_EXCLUDE_V1_DONE
+STEP: SAFE_ZIP_AUTO_EXCLUDE_V1
 changed files:
-- docs/30_基本設計/基本設計.md
 - CodexExec.result
+- src/main/java/com/qscout/spring/web/controller/WebPageController.java
+- src/main/java/com/qscout/spring/web/dto/WebAnalysisResponse.java
+- src/main/java/com/qscout/spring/web/service/UploadValidationService.java
+- src/main/java/com/qscout/spring/web/service/WebAnalysisService.java
+- src/main/java/com/qscout/spring/web/service/ZipArchiveEntry.java
+- src/main/java/com/qscout/spring/web/service/ZipArchiveEntryPolicy.java
+- src/main/java/com/qscout/spring/web/service/ZipExtractionResult.java
+- src/main/java/com/qscout/spring/web/service/ZipExtractionService.java
+- src/main/java/com/qscout/spring/web/service/ZipSecurityLimits.java
+- src/main/resources/messages_en.properties
+- src/main/resources/messages_ja.properties
+- src/main/resources/templates/fragments/summary.html
+- src/main/resources/templates/help.html
+- src/main/resources/templates/index.html
+- src/test/java/com/qscout/spring/web/WebFlowTest.java
+- src/test/java/com/qscout/spring/web/controller/WebPageControllerTest.java
+- src/test/java/com/qscout/spring/web/service/UploadValidationServiceTest.java
+- src/test/java/com/qscout/spring/web/service/WebAnalysisServiceTest.java
+- src/test/java/com/qscout/spring/web/service/ZipArchiveEntryPolicyTest.java
+- src/test/java/com/qscout/spring/web/service/ZipExtractionServiceTest.java
 
 summary:
-- `docs/30_基本設計/基本設計.md` に正本としての位置づけ、提供形態の基本方針、CLI 由来資産の補足、関連文書との関係を追記した
-- 既存本文の骨格は維持しつつ、`20_要件定義/` と `40_詳細設計/` との役割境界を明示した
-- `docs/30_基本設計/基本設計.txt` は実行時点で存在しなかったため、削除作業は不要だった
+- ZIP entry handling was changed to keep security validation first, then auto-exclude fixed unnecessary directories: .git, .github, target, build, node_modules, .idea, .vscode
+- Auto-excluded entries still go through path normalization, NUL rejection, absolute-path rejection, .. rejection, depth limit, invalid entry checks, and compression-ratio checks
+- Added dedicated safety caps for skipped content and skipped-content accounting, while keeping analyzed-content single-file and total extracted-size limits unchanged
+- Extraction now skips unnecessary entries on disk, tracks skipped counts/directories, and keeps project-root resolution based on extracted analyzable files only
+- Web response/UI now can show that analysis continued after auto-excluding unnecessary content
+- index/help and ja/en i18n were updated with auto-exclusion examples and pre-exclusion recommendations while preserving the existing secret-upload warning
+- Added/updated tests for normal flow, .git/target skip flow, petclinic-equivalent ZIP, path traversal, NUL, deep nesting, policy-level compression-ratio rejection, and UI/help localization
+- Security confirmation:
+- `.git/../../evil` is rejected
+- NUL-containing entries are rejected
+- auto-excluded names do not bypass compression-ratio checks at policy level
+- deep fake auto-excluded paths are rejected
+- `.git` skipping does not break `pom.xml`-based root resolution
+- existing preview/download/token/header flows still pass in test suite
+- Verification:
+- `mvn -q test` passed using workspace-local Maven repo
+- petclinic-equivalent case passed in tests by mixing analyzable project files with a large `.git/objects/pack/*.pack` entry and confirming analysis/extraction continues
+- local startup first failed because existing `RequestAccessTokenService` requires a secret in normal mode; startup then succeeded with existing dev flag `QSCOUT_ALLOW_INSECURE_DEV_SECRET=true`
+- compatibility impact:
+- CLI analysis core was not changed
+- Web ZIP validation/extraction behavior changed only around fixed auto-exclusion handling and response messaging
+- untouched user changes:
+- pre-existing untracked sample directories under `samples/` were not modified
+- post-processing:
+- test run completed successfully
+- spring-boot local run process was started for verification and then stopped
+- temporary startup logs were written under `target/`
+- pending:
+- no functional pending items for this phase
+- next phase candidates:
+- add a small dedicated UI badge/list for skipped directories/counts
+- add optional structured audit logging for skipped-entry summaries
 
 untouched:
-- docs/30_基本設計/基本設計.txt は未存在のため変更なし
+- CLI analysis core and unrelated user sample directories were left unchanged
 
 commit: none
-message: docs: add formal basic design document under docs/30
-
-[OK] DOCS_README_ALIGNMENT_DONE
-STEP: COMMIT_2_docs_readme_boundary_update
-changed files:
-- docs/README.md
-- CodexExec.result
-
-summary:
-- `30_基本設計/基本設計.md` を現行正本へ追加した
-- `20_要件定義/` `30_基本設計/` `40_詳細設計/` の役割差を「文書階層の基本方針」として追記した
-- 最小 Web アーキテクチャ設計書の説明を補助資料位置づけへ修正し、`30_基本設計/基本設計.txt` のプレースホルダ参照を除去した
-
-untouched:
-- `README.md` 本文は変更なし
-
-commit: none
-message: docs: update docs README to reflect 20 30 40 document boundaries
-
-[OK] DOCS_20_BOUNDARY_DONE
-STEP: COMMIT_3_docs_20_boundary_clarification
-changed files:
-- docs/20_要件定義/20_要件定義ガイド.md
-- docs/20_要件定義/Q-Scout-for-Spring-Web化フェーズ-全体設計方針書-v1.0.md
-- docs/20_要件定義/Q-Scout-for-Spring-Web化フェーズ-最小Webアーキテクチャ設計書-v1.0.md
-- docs/20_要件定義/Q-Scout-for-Spring-Web化フェーズ-Web-MVP-最小要件定義書-v1.0.md
-- docs/20_要件定義/Web実行制約・運用前提-v0.1.md
-- CodexExec.result
-
-summary:
-- `20_要件定義` 配下 5 文書の冒頭付近に、各文書の役割と `docs/30_基本設計/基本設計.md` 参照導線を最小追記した
-- 既存本文は大きく書き換えず、要件と基本設計の境界を読み手に早期提示する構成へ整えた
-- `最小Webアーキテクチャ設計書` が補助資料であること、`全体設計方針書` が上位方針文書であることを明示した
-
-untouched:
-- `docs/20_要件定義/Q-Scout-for-Spring_多言語化対応仕様書_v1.0.md` は今回の指示対象外のため未変更
-
-commit: none
-message: docs: clarify requirement-design boundaries in docs/20
+message: none

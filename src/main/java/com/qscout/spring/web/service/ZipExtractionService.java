@@ -13,7 +13,9 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -37,19 +39,33 @@ public class ZipExtractionService {
         }
     }
 
-    public void extract(Path zipPath, Path extractedDir) {
+    public ZipExtractionResult extract(Path zipPath, Path extractedDir) {
         try (InputStream inputStream = Files.newInputStream(zipPath);
              ZipInputStream zipInputStream = new ZipInputStream(inputStream)) {
             ZipEntry entry;
             int entryCount = 0;
+            int extractedEntryCount = 0;
+            int skippedEntryCount = 0;
             long totalExtractedBytes = 0;
+            long skippedDeclaredTotal = 0;
+            Set<String> skippedDirectories = new LinkedHashSet<>();
             while ((entry = zipInputStream.getNextEntry()) != null) {
-                String entryName = normalizeEntryName(entry.getName());
-                validateEntry(entry, entryName);
+                ZipArchiveEntry inspectedEntry = ZipArchiveEntryPolicy.inspect(entry, this::message);
                 entryCount++;
                 if (entryCount > ZipSecurityLimits.MAX_ENTRY_COUNT) {
                     throw new InvalidUploadException(message("error.invalidUpload.tooManyEntries"));
                 }
+                if (inspectedEntry.autoExcluded()) {
+                    skippedEntryCount++;
+                    skippedDirectories.add(inspectedEntry.excludedDirectoryName());
+                    if (entry.getSize() > 0) {
+                        skippedDeclaredTotal += entry.getSize();
+                        ZipArchiveEntryPolicy.validateSkippedDeclaredTotal(skippedDeclaredTotal, this::message);
+                    }
+                    zipInputStream.closeEntry();
+                    continue;
+                }
+                String entryName = inspectedEntry.normalizedEntryName();
                 Path target = extractedDir.resolve(entryName).normalize();
                 if (!target.startsWith(extractedDir.normalize())) {
                     throw new InvalidUploadException(message("error.invalidUpload.path"));
@@ -69,9 +85,11 @@ public class ZipExtractionService {
                     if (totalExtractedBytes > ZipSecurityLimits.MAX_EXTRACTED_SIZE_BYTES) {
                         throw new InvalidUploadException(message("error.invalidUpload.totalSize"));
                     }
+                    extractedEntryCount++;
                 }
                 zipInputStream.closeEntry();
             }
+            return new ZipExtractionResult(extractedEntryCount, skippedEntryCount, Set.copyOf(skippedDirectories));
         } catch (IOException exception) {
             throw new InvalidUploadException(message("error.invalidUpload.unzip"), exception);
         }
@@ -103,40 +121,6 @@ public class ZipExtractionService {
         return candidates.get(0).normalize();
     }
 
-    private String normalizeEntryName(String entryName) {
-        String normalized = entryName.replace('\\', '/');
-        while (normalized.startsWith("/")) {
-            normalized = normalized.substring(1);
-        }
-        return normalized;
-    }
-
-    private void validateEntry(ZipEntry entry, String entryName) {
-        if (entryName.isBlank() || entryName.contains("\u0000")) {
-            throw new InvalidUploadException(message("error.invalidUpload.path"));
-        }
-        if (entryName.contains(":")) {
-            throw new InvalidUploadException(message("error.invalidUpload.invalidEntry"));
-        }
-        Path normalizedPath = Path.of(entryName).normalize();
-        if (normalizedPath.isAbsolute() || normalizedPath.startsWith("..")) {
-            throw new InvalidUploadException(message("error.invalidUpload.path"));
-        }
-        if (pathDepth(entryName) > ZipSecurityLimits.MAX_ENTRY_DEPTH) {
-            throw new InvalidUploadException(message("error.invalidUpload.nesting"));
-        }
-        long declaredSize = entry.getSize();
-        if (declaredSize > ZipSecurityLimits.MAX_SINGLE_ENTRY_SIZE_BYTES) {
-            throw new InvalidUploadException(message("error.invalidUpload.fileTooLarge"));
-        }
-        long compressedSize = entry.getCompressedSize();
-        if (declaredSize > 0
-                && compressedSize > 0
-                && declaredSize / compressedSize > ZipSecurityLimits.MAX_COMPRESSION_RATIO) {
-            throw new InvalidUploadException(message("error.invalidUpload.compressionRatio"));
-        }
-    }
-
     private long copyEntry(InputStream inputStream, Path target) throws IOException {
         byte[] buffer = new byte[8192];
         long totalWritten = 0;
@@ -154,14 +138,6 @@ public class ZipExtractionService {
             throw exception;
         }
         return totalWritten;
-    }
-
-    private int pathDepth(String normalizedEntryName) {
-        String trimmed = normalizedEntryName.endsWith("/") ? normalizedEntryName.substring(0, normalizedEntryName.length() - 1) : normalizedEntryName;
-        if (trimmed.isBlank()) {
-            return 0;
-        }
-        return trimmed.split("/").length;
     }
 
     private String message(String key, Object... args) {

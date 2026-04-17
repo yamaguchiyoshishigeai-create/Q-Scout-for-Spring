@@ -8,6 +8,7 @@
                 <strong th:text="${summaryDisplay.response.message}">解析が完了しました。</strong>
                 <span class="sample-note" th:if="${summaryDisplay.sample}" th:text="#{page.home.sample.summary.badge}">Sample</span>
             </div>
+            <p class="artifact-copy" th:if="${summaryDisplay.response.autoExcludedMessage != null}" th:text="${summaryDisplay.response.autoExcludedMessage}">解析不要物を自動除外して解析を継続しました。</p>
             <div class="result-meta">
                 <div class="result-meta-card">
                     <span class="result-meta-label" th:text="#{result.targetFile.label}">対象ファイル</span>

@@ -36,7 +36,7 @@ class WebPageControllerTest {
                 new DownloadLinkView("download", "/download/req-1/ai", "qscout-ai-input.md"),
                 "/preview/req-1/human?lang=ja",
                 "/preview/req-1/ai?lang=ja",
-                "ok", false, true
+                "ok", "auto excluded", false, true
         );
         when(webAnalysisService.analyze(file)).thenReturn(response);
 
