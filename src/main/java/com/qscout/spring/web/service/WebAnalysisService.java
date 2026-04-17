@@ -17,6 +17,7 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -35,6 +36,7 @@ public class WebAnalysisService {
     private final TempWorkspaceService tempWorkspaceService;
     private final ZipExtractionService zipExtractionService;
     private final SharedAnalysisService sharedAnalysisService;
+    private final RequestAccessTokenService requestAccessTokenService;
     private final MessageSource messageSource;
 
     public WebAnalysisService(
@@ -42,12 +44,14 @@ public class WebAnalysisService {
             TempWorkspaceService tempWorkspaceService,
             ZipExtractionService zipExtractionService,
             SharedAnalysisService sharedAnalysisService,
+            RequestAccessTokenService requestAccessTokenService,
             MessageSource messageSource
     ) {
         this.uploadValidationService = uploadValidationService;
         this.tempWorkspaceService = tempWorkspaceService;
         this.zipExtractionService = zipExtractionService;
         this.sharedAnalysisService = sharedAnalysisService;
+        this.requestAccessTokenService = requestAccessTokenService;
         this.messageSource = messageSource;
     }
 
@@ -56,11 +60,12 @@ public class WebAnalysisService {
         TempWorkspaceService.WorkspaceContext workspace = tempWorkspaceService.createWorkspace();
         try {
             zipExtractionService.saveUpload(projectZip, workspace.uploadZipPath());
-            zipExtractionService.extract(workspace.uploadZipPath(), workspace.extractedDir());
+            ZipExtractionResult extractionResult = zipExtractionService.extract(workspace.uploadZipPath(), workspace.extractedDir());
             Path projectRoot = zipExtractionService.resolveProjectRoot(workspace.extractedDir());
             SharedAnalysisService.SharedAnalysisResult result = executeWithTimeout(
                     new AnalysisRequest(projectRoot, workspace.outputDir())
             );
+            String language = MessageSources.resolveLocale().getLanguage();
             return new WebAnalysisResponse(
                     workspace.requestId(),
                     originalFileName(projectZip),
@@ -70,14 +75,35 @@ public class WebAnalysisService {
                     result.scoreSummary().highCount(),
                     result.scoreSummary().mediumCount(),
                     result.scoreSummary().lowCount(),
-                    new DownloadLinkView(message("result.download.human"), "/download/" + workspace.requestId() + "/human", "qscout-report.md"),
-                    new DownloadLinkView(message("result.download.ai"), "/download/" + workspace.requestId() + "/ai", "qscout-ai-input.md"),
+                    new DownloadLinkView(
+                            message("result.download.human"),
+                            requestAccessTokenService.createSignedUrl("/download/" + workspace.requestId() + "/human", workspace.requestId(), "human"),
+                            "qscout-report.md"
+                    ),
+                    new DownloadLinkView(
+                            message("result.download.ai"),
+                            requestAccessTokenService.createSignedUrl("/download/" + workspace.requestId() + "/ai", workspace.requestId(), "ai"),
+                            "qscout-ai-input.md"
+                    ),
+                    requestAccessTokenService.createSignedUrl(
+                            "/preview/" + workspace.requestId() + "/human",
+                            workspace.requestId(),
+                            "human",
+                            Map.of("lang", language)
+                    ),
+                    requestAccessTokenService.createSignedUrl(
+                            "/preview/" + workspace.requestId() + "/ai",
+                            workspace.requestId(),
+                            "ai",
+                            Map.of("lang", language)
+                    ),
                     message("result.completed"),
+                    buildAutoExcludedMessage(extractionResult),
                     false,
                     true
             );
         } catch (RuntimeException exception) {
-            logger.warn("Web analysis failed. requestId={}", workspace.requestId(), exception);
+            logger.warn("Web analysis failed. requestId={}, reasonCode={}", workspace.requestId(), reasonCode(exception));
             tempWorkspaceService.cleanupNow(workspace);
             throw exception;
         }
@@ -128,7 +154,22 @@ public class WebAnalysisService {
                 .format(executedAt.atZone(ZoneId.systemDefault()));
     }
 
+    private String buildAutoExcludedMessage(ZipExtractionResult extractionResult) {
+        if (extractionResult == null || !extractionResult.hasAutoExcludedEntries()) {
+            return null;
+        }
+        String skippedTargets = String.join(", ", extractionResult.skippedDirectoryNames());
+        return message("result.autoExcluded.notice", extractionResult.skippedEntryCount(), skippedTargets);
+    }
+
     private String message(String key, Object... args) {
         return messageSource.getMessage(key, args, MessageSources.resolveLocale());
+    }
+
+    private String reasonCode(RuntimeException exception) {
+        if (exception instanceof AnalysisTimeoutException) {
+            return "ANALYSIS_TIMEOUT";
+        }
+        return "ANALYSIS_FAILED";
     }
 }

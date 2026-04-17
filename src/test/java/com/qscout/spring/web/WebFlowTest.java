@@ -1,5 +1,7 @@
 package com.qscout.spring.web;
 
+import com.qscout.spring.web.dto.WebAnalysisResponse;
+import com.qscout.spring.web.service.RequestAccessTokenService;
 import com.qscout.spring.web.service.UploadValidationService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +18,7 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -32,10 +33,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 class WebFlowTest {
-    private static final Pattern DOWNLOAD_PATTERN = Pattern.compile("/download/([0-9a-fA-F-]{36})/human");
-
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private RequestAccessTokenService requestAccessTokenService;
 
     @Test
     void defaultsToJapaneseOnHomePage() throws Exception {
@@ -50,9 +52,12 @@ class WebFlowTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("解析結果は、ユーザー向けレポートとAI向け入力の2種類で確認・ダウンロードできます。")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("pom.xml を含む Spring Boot / Maven / 単一モジュールの zip を選択してください")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("ZIP 作成の目安")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("自動除外される不要物")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString(".git、.github、target、build、node_modules、.idea、.vscode")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("プロジェクト直下に pom.xml が見える形で ZIP 化してください")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("解析を実行する")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("解析中です。しばらくお待ちください。")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("公開環境へ機密情報をアップロードしないでください")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("成果物サンプル")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("サンプル結果を表示しています。")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("bookstore.zip")))
@@ -81,9 +86,12 @@ class WebFlowTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("The output is available in two forms: a human-readable report and AI-ready input.")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Choose a zip archive that contains a single-module Spring Boot / Maven project with pom.xml")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("ZIP guidance")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Auto-excluded contents")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString(".git, .github, target, build, node_modules, .idea, and .vscode")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Create the ZIP so pom.xml is visible at the project root")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Run Analysis")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Analysis is running. Please wait a moment.")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Do not upload sensitive code or secrets to the public environment")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Artifact Sample")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Showing a sample result.")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("bookstore.zip")))
@@ -105,6 +113,7 @@ class WebFlowTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("使い方・仕様")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("利用の流れ")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("推奨 ZIP 作成方法")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("自動除外ポリシー")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("ZIP を開いた最上位で pom.xml が確認できる単一モジュール構成を推奨します。")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("解析画面へ戻る")));
 
@@ -113,6 +122,7 @@ class WebFlowTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Usage &amp; Specs")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("How It Works")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Recommended ZIP Packaging")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Auto-exclusion policy")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Prefer a single-module archive where pom.xml is visible at the top level when the ZIP is opened.")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Back to Analyzer")));
     }
@@ -154,7 +164,7 @@ class WebFlowTest {
 
     @Test
     void showsLocalizedErrorMessagesForInvalidUpload() throws Exception {
-        mockMvc.perform(multipart("/analyze"))
+        mockMvc.perform(multipart("/analyze").header("X-Forwarded-For", "198.51.100.10"))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists("error"))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("zipファイルを選択してください。")))
@@ -166,7 +176,7 @@ class WebFlowTest {
                 .getRequest()
                 .getSession(false);
 
-        mockMvc.perform(multipart("/analyze").session(session))
+        mockMvc.perform(multipart("/analyze").header("X-Forwarded-For", "198.51.100.11").session(session))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists("error"))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Please select a zip file.")))
@@ -183,7 +193,7 @@ class WebFlowTest {
                 zipDirectory(Path.of("samples/invalid-no-pom").toAbsolutePath().normalize())
         );
 
-        mockMvc.perform(multipart("/analyze").file(missingPomZip))
+        mockMvc.perform(multipart("/analyze").file(missingPomZip).header("X-Forwarded-For", "198.51.100.12"))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists("error"))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("pom.xml が見つかりません。Spring Boot / Mavenプロジェクトをアップロードしてください。")));
@@ -193,7 +203,7 @@ class WebFlowTest {
                 .getRequest()
                 .getSession(false);
 
-        mockMvc.perform(multipart("/analyze").file(missingPomZip).session(session))
+        mockMvc.perform(multipart("/analyze").file(missingPomZip).header("X-Forwarded-For", "198.51.100.13").session(session))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists("error"))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("pom.xml was not found. Please upload a Spring Boot / Maven project.")));
@@ -201,7 +211,7 @@ class WebFlowTest {
 
     @Test
     void showsUploadTooLargeModalInJapanese() throws Exception {
-        mockMvc.perform(multipart("/analyze").file(oversizedZip()))
+        mockMvc.perform(multipart("/analyze").file(oversizedZip()).header("X-Forwarded-For", "198.51.100.14"))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists("uploadErrorModal"))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("アップロードに失敗しました")))
@@ -216,7 +226,7 @@ class WebFlowTest {
                 .getRequest()
                 .getSession(false);
 
-        mockMvc.perform(multipart("/analyze").file(oversizedZip()).session(session))
+        mockMvc.perform(multipart("/analyze").file(oversizedZip()).header("X-Forwarded-For", "198.51.100.15").session(session))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists("uploadErrorModal"))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Upload failed")))
@@ -244,7 +254,7 @@ class WebFlowTest {
                 zipDirectory(Path.of("samples/sample-project").toAbsolutePath().normalize())
         );
 
-        MvcResult result = mockMvc.perform(multipart("/analyze").file(zip))
+        MvcResult result = mockMvc.perform(multipart("/analyze").file(zip).header("X-Forwarded-For", "198.51.100.16"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("解析が完了しました。")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("対象ファイル：")))
@@ -264,14 +274,15 @@ class WebFlowTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("ダウンロード")))
                 .andReturn();
 
-        String requestId = extractRequestId(result);
-        String html = result.getResponse().getContentAsString();
-        assertThat(html).contains("/preview/" + requestId + "/human?lang=ja");
-        assertThat(html).contains("/preview/" + requestId + "/ai?lang=ja");
-        assertThat(html).contains("/download/" + requestId + "/human");
-        assertThat(html).contains("/download/" + requestId + "/ai");
+        WebAnalysisResponse response = extractResponse(result);
+        String requestId = response.requestId();
+        assertThat(response.humanPreviewUrl()).contains("/preview/" + requestId + "/human");
+        assertThat(response.humanPreviewUrl()).contains("token=");
+        assertThat(response.aiPreviewUrl()).contains("/preview/" + requestId + "/ai");
+        assertThat(response.humanDownloadLink().url()).contains("/download/" + requestId + "/human");
+        assertThat(response.aiDownloadLink().url()).contains("/download/" + requestId + "/ai");
 
-        MvcResult humanReport = mockMvc.perform(get("/download/{requestId}/human", requestId))
+        MvcResult humanReport = mockMvc.perform(get(response.humanDownloadLink().url()))
                 .andExpect(status().isOk())
                 .andReturn();
         String humanContent = new String(humanReport.getResponse().getContentAsByteArray(), StandardCharsets.UTF_8);
@@ -285,7 +296,7 @@ class WebFlowTest {
         assertThat(humanContent).contains("[詳細解説を見る](/help/rules/controller-to-repository-direct-access?lang=ja)");
         assertThat(humanContent).doesNotContain("詳細解説キー:");
 
-        MvcResult aiReport = mockMvc.perform(get("/download/{requestId}/ai", requestId))
+        MvcResult aiReport = mockMvc.perform(get(response.aiDownloadLink().url()))
                 .andExpect(status().isOk())
                 .andReturn();
         String aiContent = new String(aiReport.getResponse().getContentAsByteArray(), StandardCharsets.UTF_8);
@@ -304,13 +315,14 @@ class WebFlowTest {
                 zipDirectory(Path.of("samples/sample-project").toAbsolutePath().normalize())
         );
 
-        MvcResult analyzeResult = mockMvc.perform(multipart("/analyze").file(zip))
+        MvcResult analyzeResult = mockMvc.perform(multipart("/analyze").file(zip).header("X-Forwarded-For", "198.51.100.17"))
                 .andExpect(status().isOk())
                 .andReturn();
 
-        String requestId = extractRequestId(analyzeResult);
+        WebAnalysisResponse response = extractResponse(analyzeResult);
+        String requestId = response.requestId();
 
-        mockMvc.perform(get("/preview/{requestId}/human", requestId))
+        mockMvc.perform(get(response.humanPreviewUrl()))
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("ユーザー向けMarkdownプレビュー")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("qscout-report.md")))
@@ -322,13 +334,31 @@ class WebFlowTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("今回の検査対象ルール")))
                 .andExpect(content().string(not(org.hamcrest.Matchers.containsString("詳細解説キー:"))));
 
-        mockMvc.perform(get("/preview/{requestId}/ai", requestId))
+        mockMvc.perform(get(response.aiPreviewUrl()))
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("AI入力Markdownプレビュー")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("qscout-ai-input.md")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("このMarkdownをダウンロード")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("/download/" + requestId + "/ai")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("# Project Analysis Input")));
+    }
+
+    @Test
+    void showsAutoExcludedNoticeWhenGitDirectoryIsSkipped() throws Exception {
+        MockMultipartFile zip = new MockMultipartFile(
+                "projectZip",
+                "petclinic-equivalent.zip",
+                "application/zip",
+                zipDirectoryWithExtraEntries(
+                        Path.of("samples/sample-project").toAbsolutePath().normalize(),
+                        Map.of(".git/objects/pack/pack-a.pack", "ignored")
+                )
+        );
+
+        mockMvc.perform(multipart("/analyze").file(zip).header("X-Forwarded-For", "198.51.100.19"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("解析不要物を自動除外して解析を継続しました。")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString(".git")));
     }
 
     @Test
@@ -345,7 +375,7 @@ class WebFlowTest {
                 zipDirectory(Path.of("samples/sample-project").toAbsolutePath().normalize())
         );
 
-        MvcResult result = mockMvc.perform(multipart("/analyze").file(zip).session(session))
+        MvcResult result = mockMvc.perform(multipart("/analyze").file(zip).header("X-Forwarded-For", "198.51.100.18").session(session))
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Analysis completed.")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Target file:")))
@@ -364,9 +394,10 @@ class WebFlowTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Low")))
                 .andReturn();
 
-        String requestId = extractRequestId(result);
+        WebAnalysisResponse response = extractResponse(result);
+        String requestId = response.requestId();
 
-        MvcResult humanReport = mockMvc.perform(get("/download/{requestId}/human", requestId).session(session))
+        MvcResult humanReport = mockMvc.perform(get(response.humanDownloadLink().url()).session(session))
                 .andExpect(status().isOk())
                 .andReturn();
         String humanContent = new String(humanReport.getResponse().getContentAsByteArray(), StandardCharsets.UTF_8);
@@ -381,7 +412,7 @@ class WebFlowTest {
         assertThat(humanContent).doesNotContain("Detail key:");
         assertThat(humanContent).doesNotContain("Q-Scout 診断レポート");
 
-        MvcResult aiReport = mockMvc.perform(get("/download/{requestId}/ai", requestId).session(session))
+        MvcResult aiReport = mockMvc.perform(get(response.aiDownloadLink().url()).session(session))
                 .andExpect(status().isOk())
                 .andReturn();
         String aiContent = new String(aiReport.getResponse().getContentAsByteArray(), StandardCharsets.UTF_8);
@@ -391,7 +422,7 @@ class WebFlowTest {
         assertThat(aiContent).doesNotContain("Q-Scout Report");
         assertThat(aiContent).doesNotContain("Q-Scout 診断レポート");
 
-        mockMvc.perform(get("/preview/{requestId}/human", requestId).session(session))
+        mockMvc.perform(get(response.humanPreviewUrl()).session(session))
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Human-readable Markdown Preview")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Download This Markdown")))
@@ -420,16 +451,18 @@ class WebFlowTest {
     }
     @Test
     void rejectsInvalidFileKey() throws Exception {
-        mockMvc.perform(get("/download/{requestId}/{fileKey}", "00000000-0000-0000-0000-000000000000", "bad"))
+        String requestId = "00000000-0000-0000-0000-000000000000";
+        String downloadUrl = requestAccessTokenService.createSignedUrl("/download/" + requestId + "/bad", requestId, "bad");
+        String previewUrl = requestAccessTokenService.createSignedUrl("/preview/" + requestId + "/bad", requestId, "bad");
+
+        mockMvc.perform(get(downloadUrl))
                 .andExpect(status().isNotFound());
-        mockMvc.perform(get("/preview/{requestId}/{fileKey}", "00000000-0000-0000-0000-000000000000", "bad"))
+        mockMvc.perform(get(previewUrl))
                 .andExpect(status().isNotFound());
     }
 
-    private String extractRequestId(MvcResult result) throws Exception {
-        Matcher matcher = DOWNLOAD_PATTERN.matcher(result.getResponse().getContentAsString());
-        assertThat(matcher.find()).isTrue();
-        return matcher.group(1);
+    private WebAnalysisResponse extractResponse(MvcResult result) {
+        return (WebAnalysisResponse) result.getModelAndView().getModel().get("response");
     }
 
     private MockMultipartFile oversizedZip() {
@@ -442,10 +475,19 @@ class WebFlowTest {
     }
 
     private byte[] zipDirectory(Path root) {
+        return zipDirectoryWithExtraEntries(root, Map.of());
+    }
+
+    private byte[] zipDirectoryWithExtraEntries(Path root, Map<String, String> extraEntries) {
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream);
                  var paths = Files.walk(root)) {
+                for (Map.Entry<String, String> extraEntry : extraEntries.entrySet()) {
+                    zipOutputStream.putNextEntry(new ZipEntry(extraEntry.getKey()));
+                    zipOutputStream.write(extraEntry.getValue().getBytes(StandardCharsets.UTF_8));
+                    zipOutputStream.closeEntry();
+                }
                 paths.filter(Files::isRegularFile).forEach(path -> {
                     String entryName = root.relativize(path).toString().replace('\\', '/');
                     try {

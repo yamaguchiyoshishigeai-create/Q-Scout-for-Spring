@@ -11,7 +11,10 @@ public record WebAnalysisResponse(
         int lowCount,
         DownloadLinkView humanDownloadLink,
         DownloadLinkView aiDownloadLink,
+        String humanPreviewUrl,
+        String aiPreviewUrl,
         String message,
+        String autoExcludedMessage,
         boolean timedOut,
         boolean completed
 ) {

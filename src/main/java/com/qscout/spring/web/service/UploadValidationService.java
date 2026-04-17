@@ -10,11 +10,12 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 @Service
 public class UploadValidationService {
-    public static final long MAX_UPLOAD_SIZE_BYTES = 20L * 1024 * 1024;
+    public static final long MAX_UPLOAD_SIZE_BYTES = ZipSecurityLimits.MAX_UPLOAD_SIZE_BYTES;
 
     private final MessageSource messageSource;
 
@@ -41,7 +42,24 @@ public class UploadValidationService {
         }
 
         try (InputStream inputStream = file.getInputStream(); ZipInputStream zipInputStream = new ZipInputStream(inputStream)) {
-            if (zipInputStream.getNextEntry() == null) {
+            boolean hasEntries = false;
+            int entryCount = 0;
+            long skippedDeclaredTotal = 0;
+            ZipEntry entry;
+            while ((entry = zipInputStream.getNextEntry()) != null) {
+                hasEntries = true;
+                entryCount++;
+                if (entryCount > ZipSecurityLimits.MAX_ENTRY_COUNT) {
+                    throw new InvalidUploadException(message("error.invalidUpload.tooManyEntries"));
+                }
+                ZipArchiveEntry inspectedEntry = ZipArchiveEntryPolicy.inspect(entry, this::message);
+                if (inspectedEntry.autoExcluded() && entry.getSize() > 0) {
+                    skippedDeclaredTotal += entry.getSize();
+                    ZipArchiveEntryPolicy.validateSkippedDeclaredTotal(skippedDeclaredTotal, this::message);
+                }
+                zipInputStream.closeEntry();
+            }
+            if (!hasEntries) {
                 throw new InvalidUploadException(message("error.invalidUpload.emptyArchive"));
             }
         } catch (IOException exception) {

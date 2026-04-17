@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 [OK] DOCS_40_RESTRUCTURE_DONE
 STEP: COMMIT_1_to_COMMIT_3_docs_40_restructure
 changed files:
@@ -72,3 +73,69 @@ unimplemented:
 
 concerns:
 - `CodexExec.result` は最終コミット自身を含むため、3 本目の `commit` 欄は `same commit` と記載した
+=======
+[OK] SAFE_ZIP_AUTO_EXCLUDE_V1_DONE
+STEP: SAFE_ZIP_AUTO_EXCLUDE_V1
+changed files:
+- CodexExec.result
+- src/main/java/com/qscout/spring/web/controller/WebPageController.java
+- src/main/java/com/qscout/spring/web/dto/WebAnalysisResponse.java
+- src/main/java/com/qscout/spring/web/service/UploadValidationService.java
+- src/main/java/com/qscout/spring/web/service/WebAnalysisService.java
+- src/main/java/com/qscout/spring/web/service/ZipArchiveEntry.java
+- src/main/java/com/qscout/spring/web/service/ZipArchiveEntryPolicy.java
+- src/main/java/com/qscout/spring/web/service/ZipExtractionResult.java
+- src/main/java/com/qscout/spring/web/service/ZipExtractionService.java
+- src/main/java/com/qscout/spring/web/service/ZipSecurityLimits.java
+- src/main/resources/messages_en.properties
+- src/main/resources/messages_ja.properties
+- src/main/resources/templates/fragments/summary.html
+- src/main/resources/templates/help.html
+- src/main/resources/templates/index.html
+- src/test/java/com/qscout/spring/web/WebFlowTest.java
+- src/test/java/com/qscout/spring/web/controller/WebPageControllerTest.java
+- src/test/java/com/qscout/spring/web/service/UploadValidationServiceTest.java
+- src/test/java/com/qscout/spring/web/service/WebAnalysisServiceTest.java
+- src/test/java/com/qscout/spring/web/service/ZipArchiveEntryPolicyTest.java
+- src/test/java/com/qscout/spring/web/service/ZipExtractionServiceTest.java
+
+summary:
+- ZIP entry handling was changed to keep security validation first, then auto-exclude fixed unnecessary directories: .git, .github, target, build, node_modules, .idea, .vscode
+- Auto-excluded entries still go through path normalization, NUL rejection, absolute-path rejection, .. rejection, depth limit, invalid entry checks, and compression-ratio checks
+- Added dedicated safety caps for skipped content and skipped-content accounting, while keeping analyzed-content single-file and total extracted-size limits unchanged
+- Extraction now skips unnecessary entries on disk, tracks skipped counts/directories, and keeps project-root resolution based on extracted analyzable files only
+- Web response/UI now can show that analysis continued after auto-excluding unnecessary content
+- index/help and ja/en i18n were updated with auto-exclusion examples and pre-exclusion recommendations while preserving the existing secret-upload warning
+- Added/updated tests for normal flow, .git/target skip flow, petclinic-equivalent ZIP, path traversal, NUL, deep nesting, policy-level compression-ratio rejection, and UI/help localization
+- Security confirmation:
+- `.git/../../evil` is rejected
+- NUL-containing entries are rejected
+- auto-excluded names do not bypass compression-ratio checks at policy level
+- deep fake auto-excluded paths are rejected
+- `.git` skipping does not break `pom.xml`-based root resolution
+- existing preview/download/token/header flows still pass in test suite
+- Verification:
+- `mvn -q test` passed using workspace-local Maven repo
+- petclinic-equivalent case passed in tests by mixing analyzable project files with a large `.git/objects/pack/*.pack` entry and confirming analysis/extraction continues
+- local startup first failed because existing `RequestAccessTokenService` requires a secret in normal mode; startup then succeeded with existing dev flag `QSCOUT_ALLOW_INSECURE_DEV_SECRET=true`
+- compatibility impact:
+- CLI analysis core was not changed
+- Web ZIP validation/extraction behavior changed only around fixed auto-exclusion handling and response messaging
+- untouched user changes:
+- pre-existing untracked sample directories under `samples/` were not modified
+- post-processing:
+- test run completed successfully
+- spring-boot local run process was started for verification and then stopped
+- temporary startup logs were written under `target/`
+- pending:
+- no functional pending items for this phase
+- next phase candidates:
+- add a small dedicated UI badge/list for skipped directories/counts
+- add optional structured audit logging for skipped-entry summaries
+
+untouched:
+- CLI analysis core and unrelated user sample directories were left unchanged
+
+commit: none
+message: none
+>>>>>>> 1941d4f5a8466341f488d1632495d39c1c17b7a3

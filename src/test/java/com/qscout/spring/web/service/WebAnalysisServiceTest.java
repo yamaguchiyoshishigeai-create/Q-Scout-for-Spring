@@ -15,9 +15,12 @@ import org.springframework.mock.web.MockMultipartFile;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -34,7 +37,8 @@ class WebAnalysisServiceTest {
         TempWorkspaceService tempWorkspaceService = mock(TempWorkspaceService.class);
         ZipExtractionService zipExtractionService = mock(ZipExtractionService.class);
         SharedAnalysisService sharedAnalysisService = mock(SharedAnalysisService.class);
-        WebAnalysisService service = new WebAnalysisService(uploadValidationService, tempWorkspaceService, zipExtractionService, sharedAnalysisService, MessageSources.create());
+        RequestAccessTokenService requestAccessTokenService = mock(RequestAccessTokenService.class);
+        WebAnalysisService service = new WebAnalysisService(uploadValidationService, tempWorkspaceService, zipExtractionService, sharedAnalysisService, requestAccessTokenService, MessageSources.create());
         MockMultipartFile file = new MockMultipartFile("projectZip", "sample.zip", "application/zip", new byte[]{1, 2, 3});
         TempWorkspaceService.WorkspaceContext workspace = new TempWorkspaceService.WorkspaceContext(
                 "req-123",
@@ -53,8 +57,14 @@ class WebAnalysisServiceTest {
         );
 
         when(tempWorkspaceService.createWorkspace()).thenReturn(workspace);
+        when(zipExtractionService.extract(workspace.uploadZipPath(), workspace.extractedDir()))
+                .thenReturn(new ZipExtractionResult(2, 3, Set.of(".git", "target")));
         when(zipExtractionService.resolveProjectRoot(workspace.extractedDir())).thenReturn(projectRoot);
         when(sharedAnalysisService.execute(any(AnalysisRequest.class))).thenReturn(result);
+        when(requestAccessTokenService.createSignedUrl("/download/req-123/human", "req-123", "human")).thenReturn("/download/req-123/human?expires=111&token=h");
+        when(requestAccessTokenService.createSignedUrl("/download/req-123/ai", "req-123", "ai")).thenReturn("/download/req-123/ai?expires=111&token=a");
+        when(requestAccessTokenService.createSignedUrl(eq("/preview/req-123/human"), eq("req-123"), eq("human"), anyMap())).thenReturn("/preview/req-123/human?lang=ja&expires=111&token=ph");
+        when(requestAccessTokenService.createSignedUrl(eq("/preview/req-123/ai"), eq("req-123"), eq("ai"), anyMap())).thenReturn("/preview/req-123/ai?lang=ja&expires=111&token=pa");
 
         var response = service.analyze(file);
 
@@ -65,7 +75,9 @@ class WebAnalysisServiceTest {
         assertThat(response.originalFileName()).isEqualTo("sample.zip");
         assertThat(response.executedAt()).isNotBlank();
         assertThat(response.finalScore()).isEqualTo(85);
-        assertThat(response.humanDownloadLink().url()).isEqualTo("/download/req-123/human");
+        assertThat(response.autoExcludedMessage()).contains("除外件数");
+        assertThat(response.humanDownloadLink().url()).isEqualTo("/download/req-123/human?expires=111&token=h");
+        assertThat(response.humanPreviewUrl()).isEqualTo("/preview/req-123/human?lang=ja&expires=111&token=ph");
     }
 
     @Test
@@ -74,7 +86,8 @@ class WebAnalysisServiceTest {
         TempWorkspaceService tempWorkspaceService = mock(TempWorkspaceService.class);
         ZipExtractionService zipExtractionService = mock(ZipExtractionService.class);
         SharedAnalysisService sharedAnalysisService = mock(SharedAnalysisService.class);
-        WebAnalysisService service = new WebAnalysisService(uploadValidationService, tempWorkspaceService, zipExtractionService, sharedAnalysisService, MessageSources.create());
+        RequestAccessTokenService requestAccessTokenService = mock(RequestAccessTokenService.class);
+        WebAnalysisService service = new WebAnalysisService(uploadValidationService, tempWorkspaceService, zipExtractionService, sharedAnalysisService, requestAccessTokenService, MessageSources.create());
         MockMultipartFile file = new MockMultipartFile("projectZip", "", "application/zip", new byte[]{1, 2, 3});
         TempWorkspaceService.WorkspaceContext workspace = new TempWorkspaceService.WorkspaceContext(
                 "req-124",
@@ -93,12 +106,19 @@ class WebAnalysisServiceTest {
         );
 
         when(tempWorkspaceService.createWorkspace()).thenReturn(workspace);
+        when(zipExtractionService.extract(workspace.uploadZipPath(), workspace.extractedDir()))
+                .thenReturn(new ZipExtractionResult(2, 0, Set.of()));
         when(zipExtractionService.resolveProjectRoot(workspace.extractedDir())).thenReturn(projectRoot);
         when(sharedAnalysisService.execute(any(AnalysisRequest.class))).thenReturn(result);
+        when(requestAccessTokenService.createSignedUrl("/download/req-124/human", "req-124", "human")).thenReturn("/download/req-124/human?expires=111&token=h");
+        when(requestAccessTokenService.createSignedUrl("/download/req-124/ai", "req-124", "ai")).thenReturn("/download/req-124/ai?expires=111&token=a");
+        when(requestAccessTokenService.createSignedUrl(eq("/preview/req-124/human"), eq("req-124"), eq("human"), anyMap())).thenReturn("/preview/req-124/human?lang=ja&expires=111&token=ph");
+        when(requestAccessTokenService.createSignedUrl(eq("/preview/req-124/ai"), eq("req-124"), eq("ai"), anyMap())).thenReturn("/preview/req-124/ai?lang=ja&expires=111&token=pa");
 
         var response = service.analyze(file);
 
         assertThat(response.originalFileName()).isEqualTo("不明なzipファイル");
+        assertThat(response.autoExcludedMessage()).isNull();
     }
 
     @Test
@@ -107,7 +127,8 @@ class WebAnalysisServiceTest {
         TempWorkspaceService tempWorkspaceService = mock(TempWorkspaceService.class);
         ZipExtractionService zipExtractionService = mock(ZipExtractionService.class);
         SharedAnalysisService sharedAnalysisService = mock(SharedAnalysisService.class);
-        WebAnalysisService service = new WebAnalysisService(uploadValidationService, tempWorkspaceService, zipExtractionService, sharedAnalysisService, MessageSources.create());
+        RequestAccessTokenService requestAccessTokenService = mock(RequestAccessTokenService.class);
+        WebAnalysisService service = new WebAnalysisService(uploadValidationService, tempWorkspaceService, zipExtractionService, sharedAnalysisService, requestAccessTokenService, MessageSources.create());
         MockMultipartFile file = new MockMultipartFile("projectZip", "sample.zip", "application/zip", new byte[]{1, 2, 3});
         TempWorkspaceService.WorkspaceContext workspace = new TempWorkspaceService.WorkspaceContext(
                 "req-999",

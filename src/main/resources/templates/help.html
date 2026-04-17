@@ -23,6 +23,10 @@
     <section class="hero-panel help-hero" data-figma-section="help-hero">
         <h1 class="page-title" th:text="#{help.hero.title}">使い方・仕様</h1>
         <p class="page-lead" th:text="#{help.hero.lead}">対応範囲、解析手順、成果物の確認方法をまとめた固定ページです。</p>
+        <div class="step-card">
+            <strong th:text="#{security.notice.title}">公開環境へ機密情報をアップロードしないでください</strong>
+            <p th:text="#{security.notice.body}">API キー、秘密鍵、.env、個人情報を含む zip は公開環境へ送らないでください。</p>
+        </div>
     </section>
 
     <section class="content-panel" data-figma-section="help-steps">
@@ -89,6 +93,11 @@
                     <li th:text="#{help.zipTips.exclude.build}">target や build などのビルド成果物</li>
                     <li th:text="#{help.zipTips.exclude.large}">解析に不要な大容量データ、画像、Docker 関連ファイル</li>
                 </ul>
+            </div>
+            <div class="step-card">
+                <strong th:text="#{help.zipTips.autoExclude.title}">自動除外ポリシー</strong>
+                <p th:text="#{help.zipTips.autoExclude.body}">.git、.github、target、build、node_modules、.idea、.vscode は安全検査を通過した場合に自動除外されることがあります。</p>
+                <p th:text="#{help.zipTips.autoExclude.recommendation}">ただし、公開環境では事前に不要物を除外した ZIP を推奨します。</p>
             </div>
             <div class="step-card">
                 <strong th:text="#{help.zipTips.retry.title}">エラー時の再試行</strong>
