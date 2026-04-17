@@ -6,6 +6,8 @@ public record PreviewArtifactView(
         String fileName,
         String content,
         String downloadUrl,
+        String japanesePreviewUrl,
+        String englishPreviewUrl,
         String renderedHtml
 ) {
 }

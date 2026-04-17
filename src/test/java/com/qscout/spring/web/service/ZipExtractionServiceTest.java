@@ -9,6 +9,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Random;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.zip.ZipEntry;
@@ -62,6 +63,55 @@ class ZipExtractionServiceTest {
     }
 
     @Test
+    void rejectsZipWithTooManyEntries() throws IOException {
+        Path zipPath = tempDir.resolve("too-many.zip");
+        Path extractedDir = tempDir.resolve("too-many-out");
+        Files.createDirectories(extractedDir);
+        Files.write(zipPath, zipWithManyEntries(ZipSecurityLimits.MAX_ENTRY_COUNT + 1));
+
+        assertThatThrownBy(() -> service.extract(zipPath, extractedDir))
+                .isInstanceOf(InvalidUploadException.class)
+                .hasMessageContaining("エントリ数");
+    }
+
+    @Test
+    void rejectsZipWithTooLargeExpandedSize() throws IOException {
+        Path zipPath = tempDir.resolve("huge.zip");
+        Path extractedDir = tempDir.resolve("huge-out");
+        Files.createDirectories(extractedDir);
+        Files.write(zipPath, zipWithLargeEntries(11, 10 * 1024 * 1024));
+
+        assertThatThrownBy(() -> service.extract(zipPath, extractedDir))
+                .isInstanceOf(InvalidUploadException.class)
+                .hasMessageContaining("総サイズ");
+    }
+
+    @Test
+    void rejectsZipWithSingleFileOverLimit() throws IOException {
+        Path zipPath = tempDir.resolve("single-huge.zip");
+        Path extractedDir = tempDir.resolve("single-huge-out");
+        Files.createDirectories(extractedDir);
+        Files.write(zipPath, zipWithLargeEntries(1, (int) ZipSecurityLimits.MAX_SINGLE_ENTRY_SIZE_BYTES + 1));
+
+        assertThatThrownBy(() -> service.extract(zipPath, extractedDir))
+                .isInstanceOf(InvalidUploadException.class)
+                .hasMessageContaining("ファイルサイズ");
+    }
+
+    @Test
+    void rejectsDeeplyNestedEntries() throws IOException {
+        Path zipPath = tempDir.resolve("nested.zip");
+        Path extractedDir = tempDir.resolve("nested-out");
+        Files.createDirectories(extractedDir);
+        String deepEntry = "a/".repeat(ZipSecurityLimits.MAX_ENTRY_DEPTH) + "pom.xml";
+        Files.write(zipPath, zipBytes(Map.of(deepEntry, "<project/>")));
+
+        assertThatThrownBy(() -> service.extract(zipPath, extractedDir))
+                .isInstanceOf(InvalidUploadException.class)
+                .hasMessageContaining("階層");
+    }
+
+    @Test
     void rejectsMultipleProjectCandidates() throws IOException {
         Path extractedDir = tempDir.resolve("multi");
         Files.createDirectories(extractedDir.resolve("a"));
@@ -81,6 +131,45 @@ class ZipExtractionServiceTest {
                 for (Map.Entry<String, String> entry : entries.entrySet()) {
                     zipOutputStream.putNextEntry(new ZipEntry(entry.getKey()));
                     zipOutputStream.write(entry.getValue().getBytes());
+                    zipOutputStream.closeEntry();
+                }
+            }
+            return outputStream.toByteArray();
+        } catch (IOException exception) {
+            throw new IllegalStateException(exception);
+        }
+    }
+
+    private byte[] zipWithManyEntries(int count) {
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream)) {
+                for (int i = 0; i < count; i++) {
+                    zipOutputStream.putNextEntry(new ZipEntry("project/src/main/java/File" + i + ".java"));
+                    zipOutputStream.write("class A {}".getBytes());
+                    zipOutputStream.closeEntry();
+                }
+            }
+            return outputStream.toByteArray();
+        } catch (IOException exception) {
+            throw new IllegalStateException(exception);
+        }
+    }
+
+    private byte[] zipWithLargeEntries(int fileCount, int bytesPerFile) {
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            byte[] chunk = new byte[8192];
+            new Random(1234L).nextBytes(chunk);
+            try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream)) {
+                for (int fileIndex = 0; fileIndex < fileCount; fileIndex++) {
+                    zipOutputStream.putNextEntry(new ZipEntry("project/generated/file-" + fileIndex + ".bin"));
+                    int remaining = bytesPerFile;
+                    while (remaining > 0) {
+                        int writeSize = Math.min(chunk.length, remaining);
+                        zipOutputStream.write(chunk, 0, writeSize);
+                        remaining -= writeSize;
+                    }
                     zipOutputStream.closeEntry();
                 }
             }

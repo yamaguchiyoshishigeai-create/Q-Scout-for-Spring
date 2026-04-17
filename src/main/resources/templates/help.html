@@ -23,6 +23,10 @@
     <section class="hero-panel help-hero" data-figma-section="help-hero">
         <h1 class="page-title" th:text="#{help.hero.title}">使い方・仕様</h1>
         <p class="page-lead" th:text="#{help.hero.lead}">対応範囲、解析手順、成果物の確認方法をまとめた固定ページです。</p>
+        <div class="step-card">
+            <strong th:text="#{security.notice.title}">公開環境へ機密情報をアップロードしないでください</strong>
+            <p th:text="#{security.notice.body}">API キー、秘密鍵、.env、個人情報を含む zip は公開環境へ送らないでください。</p>
+        </div>
     </section>
 
     <section class="content-panel" data-figma-section="help-steps">

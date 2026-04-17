@@ -15,8 +15,8 @@
             <a class="pill-link" th:href="@{/help(lang=${#locale.language})}" th:text="#{nav.help}">使い方・仕様</a>
         </div>
         <nav class="lang-switcher">
-            <a th:href="@{/preview/{requestId}/{fileKey}(requestId=${preview.requestId},fileKey=${preview.fileKey},lang='ja')}" th:text="#{lang.ja}">日本語</a>
-            <a th:href="@{/preview/{requestId}/{fileKey}(requestId=${preview.requestId},fileKey=${preview.fileKey},lang='en')}" th:text="#{lang.en}">English</a>
+            <a th:href="${preview.japanesePreviewUrl}" th:text="#{lang.ja}">日本語</a>
+            <a th:href="${preview.englishPreviewUrl}" th:text="#{lang.en}">English</a>
         </nav>
     </div>
 

@@ -18,7 +18,7 @@ class TempWorkspaceServiceTest {
     void createsAndCleansWorkspace() {
         TempWorkspaceService.WorkspaceContext workspace = service.createWorkspace();
         try {
-            assertThat(workspace.requestId()).matches("^[0-9a-fA-F-]{36}$");
+            assertThat(workspace.requestId()).isEqualTo(java.util.UUID.fromString(workspace.requestId()).toString());
             assertThat(Files.exists(workspace.extractedDir())).isTrue();
             assertThat(Files.exists(workspace.outputDir())).isTrue();
         } finally {
@@ -42,5 +42,13 @@ class TempWorkspaceServiceTest {
         } finally {
             Files.deleteIfExists(rootDir);
         }
+    }
+
+    @Test
+    void rejectsNonCanonicalRequestId() {
+        assertThatThrownBy(() -> service.resolveWorkspaceRoot("AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA"))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> service.resolveWorkspaceRoot("not-a-uuid"))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }

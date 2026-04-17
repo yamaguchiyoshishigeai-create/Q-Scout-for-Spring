@@ -12,14 +12,12 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Comparator;
+import java.util.Locale;
 import java.util.UUID;
-import java.util.regex.Pattern;
 
 @Service
 public class TempWorkspaceService {
     private static final Logger logger = LoggerFactory.getLogger(TempWorkspaceService.class);
-    private static final Pattern REQUEST_ID_PATTERN = Pattern.compile("^[0-9a-fA-F-]{36}$");
-    private static final Duration RETENTION = Duration.ofMinutes(15);
 
     private final Path baseDir = Path.of(System.getProperty("java.io.tmpdir"), "qscout");
 
@@ -40,12 +38,12 @@ public class TempWorkspaceService {
     }
 
     public void cleanupNow(WorkspaceContext workspace) {
-        logger.info("Cleaning up workspace. requestId={}, rootDir={}", workspace.requestId(), workspace.rootDir());
+        logger.info("Cleaning up workspace. requestId={}, reasonCode=WORKSPACE_CLEANUP", workspace.requestId());
         deleteRecursively(workspace.rootDir());
     }
 
     public Path resolveWorkspaceRoot(String requestId) {
-        if (!REQUEST_ID_PATTERN.matcher(requestId).matches()) {
+        if (!isCanonicalRequestId(requestId)) {
             throw new IllegalArgumentException("Invalid request id.");
         }
         return baseDir.resolve(requestId).normalize();
@@ -58,7 +56,7 @@ public class TempWorkspaceService {
         }
         try {
             Instant lastModified = Files.getLastModifiedTime(rootDir).toInstant();
-            return lastModified.plus(RETENTION).isBefore(Instant.now());
+            return lastModified.plus(retention()).isBefore(Instant.now());
         } catch (IOException exception) {
             return true;
         }
@@ -72,6 +70,10 @@ public class TempWorkspaceService {
         }
     }
 
+    public Duration retention() {
+        return ZipSecurityLimits.WORKSPACE_RETENTION;
+    }
+
     private void cleanupExpiredWorkspaces() {
         if (!Files.exists(baseDir)) {
             return;
@@ -80,14 +82,14 @@ public class TempWorkspaceService {
             for (Path candidate : stream) {
                 if (Files.isDirectory(candidate)) {
                     String requestId = candidate.getFileName().toString();
-                    if (REQUEST_ID_PATTERN.matcher(requestId).matches() && isExpired(requestId)) {
-                        logger.info("Removing expired workspace. requestId={}, rootDir={}", requestId, candidate);
+                    if (isCanonicalRequestId(requestId) && isExpired(requestId)) {
+                        logger.info("Removing expired workspace. requestId={}, reasonCode=WORKSPACE_EXPIRED", requestId);
                         deleteRecursively(candidate);
                     }
                 }
             }
         } catch (IOException exception) {
-            logger.warn("Failed to scan temporary workspace directory for cleanup. baseDir={}", baseDir, exception);
+            logger.warn("Failed to scan temporary workspace directory for cleanup. reasonCode=WORKSPACE_SCAN_FAILED");
             // Best effort cleanup only.
         }
     }
@@ -96,19 +98,41 @@ public class TempWorkspaceService {
         if (rootDir == null || !Files.exists(rootDir)) {
             return;
         }
+        String requestId = requestIdOf(rootDir);
         try (var paths = Files.walk(rootDir)) {
             paths.sorted(Comparator.reverseOrder()).forEach(path -> {
                 try {
                     Files.deleteIfExists(path);
                 } catch (IOException exception) {
-                    logger.warn("Failed to delete temporary workspace path. path={}", path, exception);
+                    logger.warn("Failed to delete temporary workspace path. requestId={}, reasonCode=WORKSPACE_DELETE_FAILED, entry={}",
+                            requestId,
+                            path.getFileName());
                     // Best effort cleanup only.
                 }
             });
         } catch (IOException exception) {
-            logger.warn("Failed to walk temporary workspace for cleanup. rootDir={}", rootDir, exception);
+            logger.warn("Failed to walk temporary workspace for cleanup. requestId={}, reasonCode=WORKSPACE_WALK_FAILED", requestId);
             // Best effort cleanup only.
         }
+    }
+
+    private boolean isCanonicalRequestId(String requestId) {
+        if (requestId == null || requestId.isBlank()) {
+            return false;
+        }
+        try {
+            return UUID.fromString(requestId).toString().equals(requestId.toLowerCase(Locale.ROOT))
+                    && requestId.equals(requestId.toLowerCase(Locale.ROOT));
+        } catch (IllegalArgumentException exception) {
+            return false;
+        }
+    }
+
+    private String requestIdOf(Path rootDir) {
+        if (rootDir == null || rootDir.getFileName() == null) {
+            return "unknown";
+        }
+        return rootDir.getFileName().toString();
     }
 
     public record WorkspaceContext(
