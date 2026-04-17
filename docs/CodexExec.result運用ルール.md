@@ -25,7 +25,16 @@
 
 ---
 
-## 4. 最低限含める項目
+## 4. コミット運用
+
+- Codex 修正が入り、`CodexExec.result` の出力まで完了した作業は、原則として git コミットまで行う
+- コミットコメントは `CodexExec.md` 内に指示がある場合、その文言を採用する
+- `CodexExec.md` 内にコミットコメントの指示がない場合は、作業内容から適切な日本語短文コメントを生成して採用する
+- `CodexExec.result` には、実際に採用したコミットコメントと、そのコメントが `CodexExec.md` 指示採用か自動生成かを明記する
+
+---
+
+## 5. 最低限含める項目
 
 - 実行結果（`[OK]` / `[FAIL]`）
 - `STEP`
@@ -34,10 +43,11 @@
 - `untouched` または `reason`
 - `commit`
 - `message`
+- `message source`
 
 ---
 
-## 5. 成功時の出力例
+## 6. 成功時の出力例
 
 ```text
 [OK] SAMPLE_STEP_DONE
@@ -54,11 +64,12 @@ untouched:
 
 commit: <SHA>
 message: <commit message>
+message source: CodexExec.md 指示採用 / 自動生成
 ```
 
 ---
 
-## 6. 失敗時の出力例
+## 7. 失敗時の出力例
 
 ```text
 [FAIL] SAMPLE_STEP_FAILED
@@ -74,11 +85,12 @@ reason:
 
 commit: <SHA または none>
 message: <commit message または none>
+message source: CodexExec.md 指示採用 / 自動生成 / none
 ```
 
 ---
 
-## 7. 今後の運用
+## 8. 今後の運用
 
 今後の Codex 指示では、`CodexExec.result` をリポジトリルートへ上書き出力し、commit / push 対象に含める前提で運用してよい。  
-結果確認は本ファイルを基準に行い、必要な場合のみ補足説明をチャットで追加する。
+結果確認は本ファイルを基準に行い、必要な場合のみ補足説明をチャットで追加する。コミットコメントを採用した根拠も、以後は `CodexExec.result` に併記するものとする。

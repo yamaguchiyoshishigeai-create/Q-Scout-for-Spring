@@ -1,54 +1,48 @@
-[OK] DOCS_30_ALIGNMENT_DONE
-STEP: COMMIT_1_docs_30_formalization
+[OK] DOCS_40_PLAN_AND_JAVADOC_POLICY_DONE
+STEP: COMMIT_1_to_COMMIT_3_docs_40_and_codexexec_rule_update
 changed files:
-- docs/30_基本設計/基本設計.md
-- CodexExec.result
-
-summary:
-- `docs/30_基本設計/基本設計.md` に正本としての位置づけ、提供形態の基本方針、CLI 由来資産の補足、関連文書との関係を追記した
-- 既存本文の骨格は維持しつつ、`20_要件定義/` と `40_詳細設計/` との役割境界を明示した
-- `docs/30_基本設計/基本設計.txt` は実行時点で存在しなかったため、削除作業は不要だった
-
-untouched:
-- docs/30_基本設計/基本設計.txt は未存在のため変更なし
-
-commit: none
-message: docs: add formal basic design document under docs/30
-
-[OK] DOCS_README_ALIGNMENT_DONE
-STEP: COMMIT_2_docs_readme_boundary_update
-changed files:
+- docs/40_詳細設計/40_詳細設計整理フェーズ実行計画.md
+- docs/40_詳細設計/JavaDoc導入方針書.md
+- docs/CodexExec.result運用ルール.md
 - docs/README.md
 - CodexExec.result
 
 summary:
-- `30_基本設計/基本設計.md` を現行正本へ追加した
-- `20_要件定義/` `30_基本設計/` `40_詳細設計/` の役割差を「文書階層の基本方針」として追記した
-- 最小 Web アーキテクチャ設計書の説明を補助資料位置づけへ修正し、`30_基本設計/基本設計.txt` のプレースホルダ参照を除去した
+- COMMIT 1 で `docs/40_詳細設計/40_詳細設計整理フェーズ実行計画.md` を新規作成し、40 系整理を棚卸し・分類・ガイド整備・導線整理優先で進める方針、7 つの実行ステップ、推奨コミット単位、利点を定義した
+- COMMIT 2 で `docs/40_詳細設計/JavaDoc導入方針書.md` を新規作成し、JavaDoc を企画・要件・基本設計の置換ではなくコード責務の補助正本と位置づけ、`SharedAnalysisService`、`WebAnalysisService`、`CliApplication`、主要 Controller、主要 DTO を優先対象として段階導入方針を定義した
+- COMMIT 3 で `docs/CodexExec.result運用ルール.md` にコミット運用原則と `message source` 記載要件を追記し、`docs/README.md` に 40 系整理計画および JavaDoc 方針書への導線を追加した
+- 新規文書はいずれも `docs/30_基本設計/基本設計.md` との責務境界を崩さないように整理し、40 系へ要件定義や基本設計を大量再記述しない構成とした
+
+created / updated documents:
+- 作成: 40_詳細設計整理フェーズ実行計画
+- 作成: JavaDoc導入方針書
+- 更新: CodexExec.result運用ルール
+- 更新: Docs Guide
+
+commit units:
+- COMMIT 1: `docs/40_詳細設計/40_詳細設計整理フェーズ実行計画.md`
+- COMMIT 2: `docs/40_詳細設計/JavaDoc導入方針書.md`
+- COMMIT 3: `docs/CodexExec.result運用ルール.md`, `docs/README.md`, `CodexExec.result`
+
+commit 1: c8af9ae
+message 1: docs: 40詳細設計整理フェーズ実行計画を追加
+message source 1: CodexExec.md 指示採用
+
+commit 2: 7ca77fa
+message 2: docs: JavaDoc導入方針書を追加
+message source 2: CodexExec.md 指示採用
+
+commit 3: same commit
+message 3: docs: CodexExec.result運用ルールにコミット運用を追記
+message source 3: CodexExec.md 指示採用
 
 untouched:
-- `README.md` 本文は変更なし
+- `docs/40_詳細設計/` 配下の既存差分設計書本文は今回の対象外のため未変更
+- Java 実装本体および JavaDoc 実装導入作業は今回の対象外のため未実施
 
-commit: none
-message: docs: update docs README to reflect 20 30 40 document boundaries
+unimplemented:
+- `40_詳細設計` ガイド本文そのものの新規整備は今後の整理フェーズで実施
+- 実コードへの JavaDoc 付与と生成物確認は今後の導入フェーズで実施
 
-[OK] DOCS_20_BOUNDARY_DONE
-STEP: COMMIT_3_docs_20_boundary_clarification
-changed files:
-- docs/20_要件定義/20_要件定義ガイド.md
-- docs/20_要件定義/Q-Scout-for-Spring-Web化フェーズ-全体設計方針書-v1.0.md
-- docs/20_要件定義/Q-Scout-for-Spring-Web化フェーズ-最小Webアーキテクチャ設計書-v1.0.md
-- docs/20_要件定義/Q-Scout-for-Spring-Web化フェーズ-Web-MVP-最小要件定義書-v1.0.md
-- docs/20_要件定義/Web実行制約・運用前提-v0.1.md
-- CodexExec.result
-
-summary:
-- `20_要件定義` 配下 5 文書の冒頭付近に、各文書の役割と `docs/30_基本設計/基本設計.md` 参照導線を最小追記した
-- 既存本文は大きく書き換えず、要件と基本設計の境界を読み手に早期提示する構成へ整えた
-- `最小Webアーキテクチャ設計書` が補助資料であること、`全体設計方針書` が上位方針文書であることを明示した
-
-untouched:
-- `docs/20_要件定義/Q-Scout-for-Spring_多言語化対応仕様書_v1.0.md` は今回の指示対象外のため未変更
-
-commit: none
-message: docs: clarify requirement-design boundaries in docs/20
+concerns:
+- `CodexExec.result` は最終コミット自身を含むため、3 本目の `commit` 欄は `same commit` と記載した
