@@ -1,16 +1,54 @@
-[OK] START_PROMPT_V3_UPDATE_DONE
-STEP: START_PROMPT_V3_UPDATE
+[OK] DOCS_30_ALIGNMENT_DONE
+STEP: COMMIT_1_docs_30_formalization
 changed files:
-- Q-Scout-for-Spring_開始時プロンプト_完全版.md
+- docs/30_基本設計/基本設計.md
 - CodexExec.result
 
 summary:
-- 開始時プロンプト文書を指定された v3.0 本文で全面置換
-- 他ファイルは変更せず、結果ファイルのみ運用ルールに従って更新
+- `docs/30_基本設計/基本設計.md` に正本としての位置づけ、提供形態の基本方針、CLI 由来資産の補足、関連文書との関係を追記した
+- 既存本文の骨格は維持しつつ、`20_要件定義/` と `40_詳細設計/` との役割境界を明示した
+- `docs/30_基本設計/基本設計.txt` は実行時点で存在しなかったため、削除作業は不要だった
 
 untouched:
-- implementation code unchanged
-- other docs unchanged
+- docs/30_基本設計/基本設計.txt は未存在のため変更なし
 
-commit: HEAD
-message: 開始時プロンプトをv3.0へ更新
+commit: none
+message: docs: add formal basic design document under docs/30
+
+[OK] DOCS_README_ALIGNMENT_DONE
+STEP: COMMIT_2_docs_readme_boundary_update
+changed files:
+- docs/README.md
+- CodexExec.result
+
+summary:
+- `30_基本設計/基本設計.md` を現行正本へ追加した
+- `20_要件定義/` `30_基本設計/` `40_詳細設計/` の役割差を「文書階層の基本方針」として追記した
+- 最小 Web アーキテクチャ設計書の説明を補助資料位置づけへ修正し、`30_基本設計/基本設計.txt` のプレースホルダ参照を除去した
+
+untouched:
+- `README.md` 本文は変更なし
+
+commit: none
+message: docs: update docs README to reflect 20 30 40 document boundaries
+
+[OK] DOCS_20_BOUNDARY_DONE
+STEP: COMMIT_3_docs_20_boundary_clarification
+changed files:
+- docs/20_要件定義/20_要件定義ガイド.md
+- docs/20_要件定義/Q-Scout-for-Spring-Web化フェーズ-全体設計方針書-v1.0.md
+- docs/20_要件定義/Q-Scout-for-Spring-Web化フェーズ-最小Webアーキテクチャ設計書-v1.0.md
+- docs/20_要件定義/Q-Scout-for-Spring-Web化フェーズ-Web-MVP-最小要件定義書-v1.0.md
+- docs/20_要件定義/Web実行制約・運用前提-v0.1.md
+- CodexExec.result
+
+summary:
+- `20_要件定義` 配下 5 文書の冒頭付近に、各文書の役割と `docs/30_基本設計/基本設計.md` 参照導線を最小追記した
+- 既存本文は大きく書き換えず、要件と基本設計の境界を読み手に早期提示する構成へ整えた
+- `最小Webアーキテクチャ設計書` が補助資料であること、`全体設計方針書` が上位方針文書であることを明示した
+
+untouched:
+- `docs/20_要件定義/Q-Scout-for-Spring_多言語化対応仕様書_v1.0.md` は今回の指示対象外のため未変更
+
+commit: none
+message: docs: clarify requirement-design boundaries in docs/20
