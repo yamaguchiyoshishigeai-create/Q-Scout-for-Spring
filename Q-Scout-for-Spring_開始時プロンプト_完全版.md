@@ -12,7 +12,7 @@
 - 本プロジェクトでは、**リポジトリ連携を利用して現行状態を確認すること**を前提とする
 - 文書だけで判断せず、**README / docs / src / templates / tests / scripts を照合**する
 - docs は整理済みであり、**docs 全体索引 → 企画 → 将来構想 → 要件定義 → 詳細設計** の順で読む
-- Codex 作業結果確認は、原則として **リポジトリルートの `CodexExec.result`** を基準に行う
+- Codex 作業結果確認は、原則として **リポジトリルートの `CodexExec.result` を起点にし、`pr url` がある場合は PR 差分を最優先で確認** する
 - 文書と実装がズレる場合は、**ズレを明示した上で現行実装を優先**する
 - 既存 CLI 資産を活かし、**Web 層は薄く、解析コア共有**の原則を崩さない
 
@@ -393,20 +393,31 @@ AI 向け Markdown は、現行実装では **英語固定** です。
 
 ## 15. Codex 連携時の運用前提
 
-### 15.1 結果確認
-- Codex 作業結果の確認は、原則として **リポジトリルートの `CodexExec.result`** を基準に行う
-- 長文の実行ログ貼り付けは原則不要
-- 詳細な出力ルールは `docs/CodexExec.result運用ルール.md` に従う
+### 15.1 Codex 実行手順
+- Codex 実装作業では、原則として **実装 → テスト → `CodexExec.result` へ実行ログ追記 → commit → push → Pull Request 作成** の順で進める
+- Pull Request 作成後は、`CodexExec.result` の該当ログブロックへ PR 情報を追記し、その更新も branch に反映する
+- 長文の実行ログ貼り付けは原則不要とし、詳細な出力ルールは `docs/CodexExec.result運用ルール.md` に従う
 
-### 15.2 指示文作成時
+### 15.2 `CodexExec.result` の必須記録項目
+- 各ログブロックには、従来項目に加えて `push` / `pr` / `pr url` / `pr base` / `pr head` / `pr status` を必須で記録する
+- Pull Request 作成に失敗した場合は、その時点で停止し、成功した最終工程・失敗工程・エラーメッセージ・push 済み branch 名・compare URL を可能な範囲で記録する
+
+### 15.3 ChatGPT の確認順序
+- まず `CodexExec.result` の該当ログブロックを特定する
+- `pr url` がある場合は **PR 差分を最優先で確認** する
+- `CodexExec.result` 本文は補助根拠として扱う
+- `pr url` がない場合のみ、変更対象ファイルや commit を直接確認する
+
+### 15.4 指示文作成時
 - コミットコメントを指示文に内包する
 - 可能なら STEP 名を明示する
 - 空になって不要になったフォルダが生じる場合は、削除指示も含める
 - docs 作業では、変更対象を必要最小限に限定する
 
-### 15.3 確認時
-- `CodexExec.result`
-- 変更対象ファイル
+### 15.5 確認時
+- `CodexExec.result` の該当ログブロック
+- `pr url` がある場合は当該 Pull Request
+- `pr url` がない場合は変更対象ファイルまたは commit
 - 必要に応じて `docs/README.md`
 を確認する
 

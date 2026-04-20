@@ -9,6 +9,7 @@
 
 - ChatGPT がリポジトリ上の単一標準ファイルを基準に結果確認できること
 - Codex の実行結果を簡潔かつ再確認可能な形で残せること
+- ChatGPT が `CodexExec.result` を起点に、`pr url` がある場合は PR 差分を最優先で確認できること
 - 並列作業、重複作業、ブランチ統合時でも `CodexExec.result` が破綻しにくいこと
 - 履歴ファイルを増殖させず、単一ファイル運用を維持すること
 
@@ -22,6 +23,7 @@
 - **実行のたびに毎回上書きしてはならない**
 - `CodexExec.result` は **先頭追記型の実行ログファイル** として運用する
 - 新しい実行結果は、既存内容を保持したまま **先頭に1ブロック追加** する
+- `CodexExec.result` は、実行結果メモであると同時に **PR 確認先を示す索引付き実行ログ** として扱う
 - ChatGPT は `CodexExec.result` 全体を漫然と読むのではなく、対象作業のログブロックを特定して確認する
 
 ---
@@ -49,6 +51,12 @@ untouched:
 commit: <SHA / same commit / none>
 message: <commit message / none>
 message source: CodexExec.md 指示採用 / 自動生成 / none
+push: success / failed / none
+pr: <PR number / none>
+pr url: <URL / none>
+pr base: <base branch / none>
+pr head: <head branch / none>
+pr status: <open / merged / closed / failed / none>
 ===== CODEX_RESULT_END =====
 ```
 
@@ -91,17 +99,21 @@ message source: CodexExec.md 指示採用 / 自動生成 / none
 - ChatGPT への長文の実行結果貼り付けは原則不要とする
 - ChatGPT は `CodexExec.result` のうち、対象作業の **該当ログブロック** を基準に結果確認を行う
 - 該当ブロックの特定には、原則として **`TASK_ID` / `TITLE` / `EXECUTED_AT`** を用いる
+- `pr url` が存在する場合、ChatGPT は **PR 差分を最優先で確認** する
+- `CodexExec.result` 本文は、PR 差分確認を補助する根拠として扱う
 - 直近作業を確認する場合でも、ChatGPT は対象ブロックを明示的に確認する
 
 ---
 
-## 6. コミット運用
+## 6. commit / push / PR 運用
 
-- Codex 修正が入り、`CodexExec.result` の出力まで完了した作業は、原則として git コミットまで行う
+- Codex 修正が入り、`CodexExec.result` の出力まで完了した作業は、原則として **commit → push → Pull Request 作成** まで行う
 - コミットコメントは `CodexExec.md` 内に指示がある場合、その文言を採用する
 - `CodexExec.md` 内にコミットコメントの指示がない場合は、作業内容から適切な日本語短文コメントを生成して採用する
 - `CodexExec.result` には、実際に採用したコミットコメントと、そのコメントが `CodexExec.md` 指示採用か自動生成かを明記する
 - `CodexExec.result` 自身を更新したコミットを同じ結果ブロックで記録する場合、必要に応じて `commit: same commit` のような表現を用いてよい
+- Pull Request を作成できた場合は、同じログブロックへ `push` / `pr` / `pr url` / `pr base` / `pr head` / `pr status` を追記する
+- Pull Request 作成に失敗した場合は、その時点で停止し、成功した最終工程・失敗工程・エラーメッセージ・push 済み branch 名・compare URL を可能な範囲で `reason` に記録する
 
 ---
 
@@ -120,6 +132,12 @@ message source: CodexExec.md 指示採用 / 自動生成 / none
 - `commit`
 - `message`
 - `message source`
+- `push`
+- `pr`
+- `pr url`
+- `pr base`
+- `pr head`
+- `pr status`
 
 必要に応じて、以下を追加してよい。
 
@@ -154,6 +172,12 @@ untouched:
 commit: abc1234
 message: 不要物自動除外付き安全解凍を実装
 message source: CodexExec.md 指示採用
+push: success
+pr: 12
+pr url: https://github.com/OWNER/REPO/pull/12
+pr base: main
+pr head: sample-task-branch
+pr status: open
 ===== CODEX_RESULT_END =====
 ```
 
@@ -178,10 +202,21 @@ summary:
 
 reason:
 - 既存テストとの整合が取れず完了できなかった
+- last successful step: push
+- failed step: Pull Request 作成
+- error: Validation Failed
+- pushed branch: sample-task-branch
+- compare url: https://github.com/OWNER/REPO/compare/main...sample-task-branch
 
 commit: none
 message: none
 message source: none
+push: success
+pr: none
+pr url: none
+pr base: main
+pr head: sample-task-branch
+pr status: failed
 ===== CODEX_RESULT_END =====
 ```
 
@@ -217,6 +252,9 @@ message source: none
 - ただし、確認対象は **ファイル全体ではなく、該当作業のログブロック** とする
 - ユーザーまたは指示文に `TASK_ID` / `TITLE` / `EXECUTED_AT` が示されている場合、まずそれに一致するブロックを探す
 - 複数候補がある場合は、`EXECUTED_AT` が一致するものを優先する
+- `pr url` が存在する場合は、**PR 差分確認を最優先** とする
+- `CodexExec.result` 本文は、PR 差分確認後の補助根拠として扱う
+- `pr url` がない場合のみ、変更対象ファイルや commit を直接確認する
 - 直近作業の確認でも、安易に先頭ブロックだけを採用せず、対象作業名との一致を確認する
 
 ---
@@ -236,7 +274,7 @@ message source: none
 
 ## 14. 今後の運用
 
-今後の Codex 指示では、`CodexExec.result` をリポジトリルートへ **先頭追記型ログファイル** として出力し、commit / push 対象に含める前提で運用してよい。  
-結果確認は本ファイルを基準に行い、必要な場合のみ補足説明をチャットで追加する。  
+今後の Codex 指示では、`CodexExec.result` をリポジトリルートへ **先頭追記型ログファイル** として出力し、commit / push / Pull Request 対応関係を含めて運用してよい。  
+結果確認は本ファイルを起点に行い、`pr url` がある場合は PR 差分確認を第一優先とする。  
 コミットコメントを採用した根拠も、以後は `CodexExec.result` の該当ログブロックへ併記するものとする。  
-また、並列作業や重複作業が起きても、対象ブロックを特定して確認する運用を原則とする。
+また、並列作業や重複作業が起きても、対象ブロックを特定し、PR 確認先を含めて確認する運用を原則とする。

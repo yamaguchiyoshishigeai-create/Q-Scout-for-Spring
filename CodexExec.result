@@ -1,3 +1,36 @@
+===== CODEX_RESULT_BEGIN =====
+TASK_ID: DOCS_PR_PRIORITY_CONFIRMATION_V1
+TITLE: Codex PR優先確認運用 差替え実装 v1.0
+EXECUTED_AT: 2026-04-20T14:31:31+09:00
+STATUS: [OK]
+STEP: DOCS_PR_PRIORITY_CONFIRMATION_V1
+changed files:
+- docs/CodexExec.result運用ルール.md
+- Q-Scout-for-Spring_開始時プロンプト_完全版.md
+- CodexExec.result
+
+summary:
+- `docs/CodexExec.result運用ルール.md` に PR 優先確認方針と PR 記録必須項目を追加した
+- `Q-Scout-for-Spring_開始時プロンプト_完全版.md` の Codex 連携節を `CodexExec.result` 起点 + PR 差分優先確認へ差し替えた
+- PR 作成失敗時の停止条件と記録項目を両文書で整合させた
+
+untouched:
+- src/ 配下の実装コード、設定、テストは未変更
+
+notes:
+- 文書改定のためコードテストは実施せず、必須語句と確認順序の内容整合性確認のみ実施した
+
+commit: same commit
+message: docs: PR優先確認運用へ差し替え
+message source: 自動生成
+push: none
+pr: none
+pr url: none
+pr base: main
+pr head: codex-pr-priority-docs
+pr status: none
+===== CODEX_RESULT_END =====
+
 [OK] DOCS_42_UI_DIFF_RENAME_DONE
 STEP: COMMIT_1_to_COMMIT_3_docs_42_ui_diff_rename
 changed files:
