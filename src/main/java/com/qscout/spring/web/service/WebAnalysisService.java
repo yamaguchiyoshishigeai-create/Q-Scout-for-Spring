@@ -26,6 +26,15 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+/**
+ * Web から受け取った解析要求を共通解析へ接続し、画面表示用レスポンスを組み立てるサービスである。
+ *
+ * <p>アップロード検証、一時ワークスペース準備、zip 展開、タイムアウト付き解析実行、
+ * ダウンロード導線の組み立てをまとめて扱う。</p>
+ *
+ * <p>画面描画そのものは controller / view に委ね、解析アルゴリズム本体は
+ * {@link SharedAnalysisService} へ委譲する。</p>
+ */
 @Service
 public class WebAnalysisService {
     private static final Logger logger = LoggerFactory.getLogger(WebAnalysisService.class);
@@ -55,6 +64,13 @@ public class WebAnalysisService {
         this.messageSource = messageSource;
     }
 
+    /**
+     * アップロードされたプロジェクト ZIP を解析し、Web 画面で利用する結果情報を返す。
+     *
+     * @param projectZip 解析対象プロジェクトを含むアップロード ZIP
+     * @return スコア概要、ダウンロード導線、プレビュー導線を含む Web 応答
+     * @throws AnalysisTimeoutException 解析が制限時間内に完了しなかった場合
+     */
     public WebAnalysisResponse analyze(MultipartFile projectZip) {
         uploadValidationService.validate(projectZip);
         TempWorkspaceService.WorkspaceContext workspace = tempWorkspaceService.createWorkspace();

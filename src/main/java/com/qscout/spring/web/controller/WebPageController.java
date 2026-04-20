@@ -27,6 +27,14 @@ import org.springframework.web.multipart.MultipartFile;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+/**
+ * トップページ、ヘルプ画面、および Web 解析実行導線の入口を担う Controller である。
+ *
+ * <p>HTTP リクエストを受け取り、共通表示用 Model を構築しつつ
+ * {@link WebAnalysisService} やレート制御サービスへ委譲する。</p>
+ *
+ * <p>解析本体や成果物生成は持たず、画面応答とエラーハンドリングの調停に留める。</p>
+ */
 @Controller
 public class WebPageController {
     private static final Logger logger = LoggerFactory.getLogger(WebPageController.class);
@@ -41,18 +49,39 @@ public class WebPageController {
         this.messageSource = messageSource;
     }
 
+    /**
+     * トップページを表示する。
+     *
+     * @param model 画面共通情報を格納する Model
+     * @return トップページのテンプレート名
+     */
     @GetMapping("/")
     public String showIndex(Model model) {
         populateCommon(model);
         return "index";
     }
 
+    /**
+     * ヘルプ画面を表示する。
+     *
+     * @param model 画面共通情報を格納する Model
+     * @return ヘルプ画面のテンプレート名
+     */
     @GetMapping("/help")
     public String showHelp(Model model) {
         populateCommon(model);
         return "help";
     }
 
+    /**
+     * 解析対象 ZIP のアップロードを受け付け、結果表示またはエラー表示用の Model を組み立てる。
+     *
+     * @param file ユーザーが送信した解析対象 ZIP
+     * @param model 解析結果またはエラー情報を格納する Model
+     * @param request レート制御用のリクエスト情報
+     * @param servletResponse レート制御時の HTTP 応答ヘッダーを設定するレスポンス
+     * @return 結果表示を含むトップページのテンプレート名
+     */
     @PostMapping("/analyze")
     public String analyze(
             @RequestParam(value = "projectZip", required = false) MultipartFile file,
