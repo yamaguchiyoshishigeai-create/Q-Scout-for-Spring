@@ -1,4 +1,33 @@
 ===== CODEX_RESULT_BEGIN =====
+TASK_ID: PR6_CODEX_RESULT_COMMIT_FIX_V1
+TITLE: PR #6 最新CodexExec.result commit欄修正 指示書 v1.0
+EXECUTED_AT: 2026-04-21T00:55:13.2630881+09:00
+STATUS: [OK]
+STEP: FIX_LATEST_CODEX_RESULT_BLOCK_COMMIT_FIELD
+changed files:
+- CodexExec.result
+
+summary:
+- PR #6 レビュー指摘に基づき、`TASK_ID: CODEX_RESULT_MERGE_GUARD_RETRY_V1` ブロックの `commit` 欄を修正した
+- 前回失敗時 commit ではなく、retry 結果を反映した実 commit `34dbf10` に合わせた
+- 他の過去ログ本文は触らず、対象ブロックの `commit` 欄のみを最小修正した
+
+untouched:
+- docs/CodexExec.result運用ルール.md
+- .gitattributes
+
+commit: 34dbf10
+message: docs: PR6のCodexExec.result commit欄を修正
+message source: CodexExec.md 指示採用
+push: pending
+pr: #6
+pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/6
+pr base: main
+pr head: ドキュメント整理
+pr status: open
+===== CODEX_RESULT_END =====
+
+===== CODEX_RESULT_BEGIN =====
 TASK_ID: CODEX_RESULT_MERGE_GUARD_RETRY_V1
 TITLE: CodexExec.result競合低減設定 再実行指示書 v1.1
 EXECUTED_AT: 2026-04-21T00:40:44.6343921+09:00
@@ -17,7 +46,7 @@ untouched:
 - docs/CodexExec.result運用ルール.md
 - .gitattributes
 
-commit: 36737be
+commit: 34dbf10
 message: docs: CodexExec.result競合低減設定を反映
 message source: CodexExec.md 指示採用
 push: success
