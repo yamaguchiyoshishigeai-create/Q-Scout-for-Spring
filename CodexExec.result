@@ -1,4 +1,91 @@
 ===== CODEX_RESULT_BEGIN =====
+TASK_ID: JAVADOC_PREP_TRIAL_V1
+TITLE: JavaDoc導入準備 実施指示書 v1.0
+EXECUTED_AT: 2026-04-20T14:40:14+09:00
+STATUS: [OK]
+STEP: COMMIT_1_to_COMMIT_3_javadoc_preparation_and_trial
+changed files:
+- docs/40_詳細設計/45_整理方針・補助文書/JavaDoc導入準備メモ.md
+- src/main/java/com/qscout/spring/application/package-info.java
+- src/main/java/com/qscout/spring/web/controller/package-info.java
+- src/main/java/com/qscout/spring/web/service/package-info.java
+- src/main/java/com/qscout/spring/application/SharedAnalysisService.java
+- src/main/java/com/qscout/spring/web/service/WebAnalysisService.java
+- src/main/java/com/qscout/spring/cli/CliApplication.java
+- src/main/java/com/qscout/spring/web/controller/WebPageController.java
+- src/main/java/com/qscout/spring/web/controller/WebPreviewController.java
+- CodexExec.result
+
+commit units:
+- COMMIT 1
+  - sha: 6cbe706
+  - message: docs: JavaDoc導入準備の対象と粒度を整理
+  - message source: CodexExec.md 指示採用
+- COMMIT 2
+  - sha: 1ddc85d
+  - message: docs: package-infoによるJavaDoc導入準備を追加
+  - message source: CodexExec.md 指示採用
+- COMMIT 3
+  - sha: 345e0c4
+  - message: docs: 最優先クラスへJavaDocを試行導入
+  - message source: CodexExec.md 指示採用
+
+added package-info:
+- `com.qscout.spring.application`
+- `com.qscout.spring.web.controller`
+- `com.qscout.spring.web.service`
+
+trial javadoc classes:
+- `SharedAnalysisService`
+- `WebAnalysisService`
+- `CliApplication`
+- `WebPageController`
+- `WebPreviewController`
+
+responsibility summaries:
+- `SharedAnalysisService` を CLI / Web 共通の解析中核として位置づけ、走査・分析・スコア算出・成果物生成を一連で扱い、Web 専用責務を持たない文面を追加した
+- `WebAnalysisService` を Web 実行統括として位置づけ、アップロード検証、ワークスペース準備、zip 展開、共通解析呼び出し、Web 応答構築を担い、解析アルゴリズム本体は持たない文面を追加した
+- `CliApplication` を CLI 入口として位置づけ、引数解析、共通解析委譲、`ExecutionSummary` 返却を担い、Web 応答責務を持たない文面を追加した
+- `WebPageController` をトップページ / help / 解析導線の入口として位置づけ、Model 構築とサービス委譲を担い、解析本体や成果物生成を持たない文面を追加した
+- `WebPreviewController` を成果物プレビュー入口として位置づけ、トークン検証、成果物参照、Markdown プレビュー構築を担い、成果物生成本体を持たない文面を追加した
+
+deferred targets:
+- `RequestAccessTokenService`
+- `UploadValidationService`
+- `DownloadArtifactService`
+- `MarkdownPreviewRenderer`
+- 主要 DTO 群
+- 他の Controller 群
+- 代表的な infrastructure サービス群
+
+adopted granularity:
+- 準備フェーズ用の補助文書を追加し、試行導入対象 5 クラス、`package-info.java` 対象 3 package、クラス JavaDoc と主要 public メソッド JavaDoc の粒度を固定した
+- `package-info.java` は各 package が担う層責務と、担わない責務を短文で示す最小構成とした
+- クラス JavaDoc は責務、主な利用場面、他層との境界、担わない責務を短い段落で統一した
+- 主要 public メソッド JavaDoc は `@param`、`@return`、必要箇所のみ `@throws` を付与した
+- private メソッド、全 DTO、他 package への全面展開は今回行っていない
+
+summary:
+- COMMIT 1 で `JavaDoc導入準備メモ.md` を追加し、今回の試行対象、見送り対象、テンプレート、導入粒度を整理した
+- COMMIT 2 で `application`、`web.controller`、`web.service` に `package-info.java` を追加し、基本設計に沿った層責務を短く明示した
+- COMMIT 3 で最優先 5 クラスへクラス JavaDoc と主要 public メソッド JavaDoc を追加し、責務境界をコード近傍で把握しやすくした
+- ローカル Maven で `mvn.cmd test` を実行し、136 tests passed を確認した
+
+unimplemented:
+- `com.qscout.spring.web.dto` と `com.qscout.spring.infrastructure` の `package-info.java` は今回は追加していない
+- 次点以降の service、Controller、主要 DTO への JavaDoc 展開は今回は未実施
+- JavaDoc 生成物からの詳細設計正本再整理や docs 側の大規模展開は未実施
+
+concerns:
+- 初回テスト実行時に Maven Surefire 関連依存がローカル環境へ追加取得された
+- `CodexExec.result` は既存運用に合わせて先頭追記し、過去ログブロックは保持した
+
+commit: same commit
+message: docs: CodexExec.resultを更新
+message source: 自動生成
+===== CODEX_RESULT_END =====
+
+===== CODEX_RESULT_BEGIN =====
 TASK_ID: DOCS_ALL_LAYER_REVIEW_MINOR_FIX_V1
 TITLE: 全層通読整合レビュー後 微修正指示書 v1.0
 EXECUTED_AT: 2026-04-20T12:40:23+09:00
