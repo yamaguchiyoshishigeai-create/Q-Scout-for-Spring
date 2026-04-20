@@ -20,6 +20,14 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.GONE;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
+/**
+ * 生成済み成果物のプレビュー表示入口を担う Controller である。
+ *
+ * <p>アクセス用トークン検証、成果物参照、Markdown の HTML 化、
+ * プレビュー画面用 Model 構築を扱う。</p>
+ *
+ * <p>成果物生成本体は持たず、既に生成済みの内容を安全に参照させる導線に専念する。</p>
+ */
 @Controller
 public class WebPreviewController {
     private final DownloadArtifactService downloadArtifactService;
@@ -36,6 +44,18 @@ public class WebPreviewController {
         this.requestAccessTokenService = requestAccessTokenService;
     }
 
+    /**
+     * 署名付き URL から成果物を取得し、プレビュー画面用 Model を構築する。
+     *
+     * @param requestId 成果物保持先を識別する requestId
+     * @param fileKey 参照対象成果物を識別するキー
+     * @param expires 署名付き URL の有効期限エポック秒
+     * @param token requestId と fileKey に対する署名トークン
+     * @param model プレビュー表示情報を格納する Model
+     * @param response キャッシュ抑止ヘッダーを設定する HTTP レスポンス
+     * @return プレビュー画面のテンプレート名
+     * @throws ResponseStatusException トークン不正、成果物期限切れ、または対象成果物が存在しない場合
+     */
     @GetMapping("/preview/{requestId}/{fileKey}")
     public String preview(
             @PathVariable String requestId,

@@ -19,6 +19,14 @@ import com.qscout.spring.rule.TransactionalMisuseRule;
 
 import java.util.List;
 
+/**
+ * CLI 実行の入口として、引数解析と共通解析サービス呼び出しを仲介するアプリケーションである。
+ *
+ * <p>コマンドライン引数から {@link AnalysisRequest} を組み立て、解析結果を
+ * {@link ExecutionSummary} として返す。</p>
+ *
+ * <p>Web 応答や HTTP の責務は持たず、ローカル実行経路の維持に専念する。</p>
+ */
 public final class CliApplication {
     private final ArgumentParser argumentParser;
     private final SharedAnalysisService sharedAnalysisService;
@@ -32,6 +40,12 @@ public final class CliApplication {
         this.sharedAnalysisService = sharedAnalysisService;
     }
 
+    /**
+     * CLI 引数を解析し、共通解析を実行して出力サマリを返す。
+     *
+     * @param args CLI から渡された引数列
+     * @return スコアと生成成果物パスを含む CLI 実行結果サマリ
+     */
     public ExecutionSummary run(String[] args) {
         AnalysisRequest request = argumentParser.parse(args);
         SharedAnalysisService.SharedAnalysisResult result = sharedAnalysisService.execute(request);
