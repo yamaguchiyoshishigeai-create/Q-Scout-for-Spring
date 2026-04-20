@@ -20,15 +20,15 @@ untouched:
 notes:
 - 文書改定のためコードテストは実施せず、必須語句と確認順序の内容整合性確認のみ実施した
 
-commit: same commit
+commit: 05b48f1
 message: docs: PR優先確認運用へ差し替え
 message source: 自動生成
-push: none
-pr: none
-pr url: none
+push: success
+pr: 3
+pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/3
 pr base: main
 pr head: codex-pr-priority-docs
-pr status: none
+pr status: open
 ===== CODEX_RESULT_END =====
 
 [OK] DOCS_42_UI_DIFF_RENAME_DONE
