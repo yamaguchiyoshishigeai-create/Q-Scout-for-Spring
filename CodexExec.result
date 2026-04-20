@@ -27,15 +27,15 @@ untouched:
 notes:
 - `CodexExec.result` 内に残っていた既存 conflict marker は、今回の追記に合わせて除去した
 
-commit: pending
+commit: 51e15bb
 message: security: X-Forwarded-For を trusted proxy 限定に修正
 message source: ユーザー指示採用
-push: none
-pr: none
-pr url: none
+push: success
+pr: 5
+pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/5
 pr base: main
 pr head: codex-trusted-proxy-client-ip-v1
-pr status: none
+pr status: open
 ===== CODEX_RESULT_END =====
 
 =======
