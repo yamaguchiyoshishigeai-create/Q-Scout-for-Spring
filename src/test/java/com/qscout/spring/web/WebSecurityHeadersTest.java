@@ -22,7 +22,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
+@SpringBootTest(properties = {
+        "qscout.client-ip.trust-forwarded-headers=true",
+        "qscout.client-ip.trusted-proxies=127.0.0.1,::1"
+})
 @AutoConfigureMockMvc
 class WebSecurityHeadersTest {
     @Autowired
