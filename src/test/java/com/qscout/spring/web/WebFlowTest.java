@@ -30,7 +30,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
+@SpringBootTest(properties = {
+        "qscout.client-ip.trust-forwarded-headers=true",
+        "qscout.client-ip.trusted-proxies=127.0.0.1,::1"
+})
 @AutoConfigureMockMvc
 class WebFlowTest {
     @Autowired

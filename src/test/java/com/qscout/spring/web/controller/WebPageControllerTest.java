@@ -10,7 +10,9 @@ import com.qscout.spring.web.dto.WebAnalysisResponse;
 import com.qscout.spring.web.exception.AnalysisTimeoutException;
 import com.qscout.spring.web.exception.InvalidUploadException;
 import com.qscout.spring.web.exception.UploadTooLargeException;
+import com.qscout.spring.web.service.ClientIpResolver;
 import com.qscout.spring.web.service.RequestRateLimiter;
+import com.qscout.spring.web.service.TrustedProxyPolicy;
 import com.qscout.spring.web.service.WebAnalysisService;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -20,6 +22,9 @@ import org.springframework.ui.ConcurrentModel;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 class WebPageControllerTest {
@@ -28,7 +33,7 @@ class WebPageControllerTest {
         WebAnalysisService webAnalysisService = mock(WebAnalysisService.class);
         RequestRateLimiter requestRateLimiter = mock(RequestRateLimiter.class);
         when(requestRateLimiter.evaluate("127.0.0.1")).thenReturn(RateLimitDecision.allow(4));
-        WebPageController controller = new WebPageController(webAnalysisService, requestRateLimiter, MessageSources.create());
+        WebPageController controller = controller(webAnalysisService, requestRateLimiter, defaultClientIpResolver());
         MockMultipartFile file = new MockMultipartFile("projectZip", "sample.zip", "application/zip", new byte[]{1});
         WebAnalysisResponse response = new WebAnalysisResponse(
                 "req-1", "sample.zip", "2026-04-13 10:30", 80, 3, 1, 1, 1,
@@ -53,7 +58,7 @@ class WebPageControllerTest {
     @Test
     void returnsHelpPage() {
         WebAnalysisService webAnalysisService = mock(WebAnalysisService.class);
-        WebPageController controller = new WebPageController(webAnalysisService, mock(RequestRateLimiter.class), MessageSources.create());
+        WebPageController controller = controller(webAnalysisService, mock(RequestRateLimiter.class), defaultClientIpResolver());
 
         ConcurrentModel model = new ConcurrentModel();
         String view = controller.showHelp(model);
@@ -69,7 +74,7 @@ class WebPageControllerTest {
         WebAnalysisService webAnalysisService = mock(WebAnalysisService.class);
         RequestRateLimiter requestRateLimiter = mock(RequestRateLimiter.class);
         when(requestRateLimiter.evaluate("127.0.0.1")).thenReturn(RateLimitDecision.allow(4));
-        WebPageController controller = new WebPageController(webAnalysisService, requestRateLimiter, MessageSources.create());
+        WebPageController controller = controller(webAnalysisService, requestRateLimiter, defaultClientIpResolver());
         MockMultipartFile file = new MockMultipartFile("projectZip", "large.zip", "application/zip", new byte[]{1});
         when(webAnalysisService.analyze(file)).thenThrow(new UploadTooLargeException("too large"));
 
@@ -89,7 +94,7 @@ class WebPageControllerTest {
         WebAnalysisService webAnalysisService = mock(WebAnalysisService.class);
         RequestRateLimiter requestRateLimiter = mock(RequestRateLimiter.class);
         when(requestRateLimiter.evaluate("127.0.0.1")).thenReturn(RateLimitDecision.allow(4));
-        WebPageController controller = new WebPageController(webAnalysisService, requestRateLimiter, MessageSources.create());
+        WebPageController controller = controller(webAnalysisService, requestRateLimiter, defaultClientIpResolver());
         MockMultipartFile file = new MockMultipartFile("projectZip", "bad.zip", "application/zip", new byte[]{1});
         when(webAnalysisService.analyze(file)).thenThrow(new InvalidUploadException("bad input"));
 
@@ -106,7 +111,7 @@ class WebPageControllerTest {
         WebAnalysisService webAnalysisService = mock(WebAnalysisService.class);
         RequestRateLimiter requestRateLimiter = mock(RequestRateLimiter.class);
         when(requestRateLimiter.evaluate("127.0.0.1")).thenReturn(RateLimitDecision.allow(4));
-        WebPageController controller = new WebPageController(webAnalysisService, requestRateLimiter, MessageSources.create());
+        WebPageController controller = controller(webAnalysisService, requestRateLimiter, defaultClientIpResolver());
         MockMultipartFile file = new MockMultipartFile("projectZip", "slow.zip", "application/zip", new byte[]{1});
         when(webAnalysisService.analyze(file)).thenThrow(new AnalysisTimeoutException("timeout", new RuntimeException("slow")));
 
@@ -122,7 +127,7 @@ class WebPageControllerTest {
         WebAnalysisService webAnalysisService = mock(WebAnalysisService.class);
         RequestRateLimiter requestRateLimiter = mock(RequestRateLimiter.class);
         when(requestRateLimiter.evaluate("198.51.100.10")).thenReturn(RateLimitDecision.deny(120));
-        WebPageController controller = new WebPageController(webAnalysisService, requestRateLimiter, MessageSources.create());
+        WebPageController controller = controller(webAnalysisService, requestRateLimiter, defaultClientIpResolver());
 
         ConcurrentModel model = new ConcurrentModel();
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -134,6 +139,62 @@ class WebPageControllerTest {
         assertThat(response.getHeader("Retry-After")).isEqualTo("120");
         ErrorViewModel error = (ErrorViewModel) model.getAttribute("error");
         assertThat(error.detailCode()).isEqualTo("RATE_LIMIT_EXCEEDED");
+    }
+
+    @Test
+    void ignoresSpoofedForwardedHeaderForRateLimitingWhenRemoteAddrIsNotTrusted() {
+        WebAnalysisService webAnalysisService = mock(WebAnalysisService.class);
+        RequestRateLimiter requestRateLimiter = mock(RequestRateLimiter.class);
+        when(requestRateLimiter.evaluate("198.51.100.10")).thenReturn(RateLimitDecision.deny(120));
+        WebPageController controller = controller(webAnalysisService, requestRateLimiter, defaultClientIpResolver());
+
+        MockHttpServletRequest request = request("198.51.100.10");
+        request.addHeader("X-Forwarded-For", "203.0.113.1");
+        ConcurrentModel model = new ConcurrentModel();
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        controller.analyze(null, model, request, response);
+
+        verify(requestRateLimiter).evaluate("198.51.100.10");
+        verify(requestRateLimiter, never()).evaluate("203.0.113.1");
+        verifyNoInteractions(webAnalysisService);
+        assertThat(response.getStatus()).isEqualTo(429);
+    }
+
+    @Test
+    void usesForwardedHeaderForRateLimitingWhenRemoteAddrIsTrusted() {
+        WebAnalysisService webAnalysisService = mock(WebAnalysisService.class);
+        RequestRateLimiter requestRateLimiter = mock(RequestRateLimiter.class);
+        when(requestRateLimiter.evaluate("203.0.113.1")).thenReturn(RateLimitDecision.deny(120));
+        WebPageController controller = controller(webAnalysisService, requestRateLimiter, trustedForwardedResolver());
+
+        MockHttpServletRequest request = request("127.0.0.1");
+        request.addHeader("X-Forwarded-For", "203.0.113.1, 198.51.100.200");
+        ConcurrentModel model = new ConcurrentModel();
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        controller.analyze(null, model, request, response);
+
+        verify(requestRateLimiter).evaluate("203.0.113.1");
+        verify(requestRateLimiter, never()).evaluate("127.0.0.1");
+        verifyNoInteractions(webAnalysisService);
+        assertThat(response.getStatus()).isEqualTo(429);
+    }
+
+    private WebPageController controller(
+            WebAnalysisService webAnalysisService,
+            RequestRateLimiter requestRateLimiter,
+            ClientIpResolver clientIpResolver
+    ) {
+        return new WebPageController(webAnalysisService, requestRateLimiter, clientIpResolver, MessageSources.create());
+    }
+
+    private ClientIpResolver defaultClientIpResolver() {
+        return new ClientIpResolver(TrustedProxyPolicy.forTesting(false, "127.0.0.1", "::1"));
+    }
+
+    private ClientIpResolver trustedForwardedResolver() {
+        return new ClientIpResolver(TrustedProxyPolicy.forTesting(true, "127.0.0.1", "::1"));
     }
 
     private MockHttpServletRequest request(String remoteAddr) {

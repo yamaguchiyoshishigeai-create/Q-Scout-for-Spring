@@ -12,6 +12,7 @@ import com.qscout.spring.web.exception.AnalysisTimeoutException;
 import com.qscout.spring.web.exception.InvalidProjectStructureException;
 import com.qscout.spring.web.exception.InvalidUploadException;
 import com.qscout.spring.web.exception.UploadTooLargeException;
+import com.qscout.spring.web.service.ClientIpResolver;
 import com.qscout.spring.web.service.RequestRateLimiter;
 import com.qscout.spring.web.service.WebAnalysisService;
 import org.slf4j.Logger;
@@ -41,11 +42,18 @@ public class WebPageController {
 
     private final WebAnalysisService webAnalysisService;
     private final RequestRateLimiter requestRateLimiter;
+    private final ClientIpResolver clientIpResolver;
     private final MessageSource messageSource;
 
-    public WebPageController(WebAnalysisService webAnalysisService, RequestRateLimiter requestRateLimiter, MessageSource messageSource) {
+    public WebPageController(
+            WebAnalysisService webAnalysisService,
+            RequestRateLimiter requestRateLimiter,
+            ClientIpResolver clientIpResolver,
+            MessageSource messageSource
+    ) {
         this.webAnalysisService = webAnalysisService;
         this.requestRateLimiter = requestRateLimiter;
+        this.clientIpResolver = clientIpResolver;
         this.messageSource = messageSource;
     }
 
@@ -90,9 +98,10 @@ public class WebPageController {
             HttpServletResponse servletResponse
     ) {
         populateCommon(model);
-        RateLimitDecision decision = requestRateLimiter.evaluate(resolveClientIp(request));
+        String clientIp = clientIpResolver.resolve(request);
+        RateLimitDecision decision = requestRateLimiter.evaluate(clientIp);
         if (!decision.allowed()) {
-            logger.warn("Analyze request rate limited. clientIp={}, reasonCode=RATE_LIMIT_EXCEEDED", resolveClientIp(request));
+            logger.warn("Analyze request rate limited. clientIp={}, reasonCode=RATE_LIMIT_EXCEEDED", clientIp);
             servletResponse.setStatus(429);
             servletResponse.setHeader("Retry-After", Long.toString(decision.retryAfterSeconds()));
             model.addAttribute("error", new ErrorViewModel(message("error.rateLimit.exceeded"), "RATE_LIMIT_EXCEEDED", true));
@@ -153,14 +162,6 @@ public class WebPageController {
 
     private String message(String key, Object... args) {
         return messageSource.getMessage(key, args, MessageSources.resolveLocale());
-    }
-
-    private String resolveClientIp(HttpServletRequest request) {
-        String forwardedFor = request.getHeader("X-Forwarded-For");
-        if (forwardedFor != null && !forwardedFor.isBlank()) {
-            return forwardedFor.split(",")[0].trim();
-        }
-        return request.getRemoteAddr() != null ? request.getRemoteAddr() : "unknown";
     }
 
     private String sanitizedFileName(MultipartFile file) {
