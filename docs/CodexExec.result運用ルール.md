@@ -149,6 +149,14 @@ pr status: <open / merged / closed / failed / none>
 - Pull Request を作成できた場合は、同じログブロックへ `push` / `pr` / `pr url` / `pr base` / `pr head` / `pr status` を追記する
 - Pull Request 作成に失敗した場合は、その時点で停止し、成功した最終工程・失敗工程・エラーメッセージ・push 済み branch 名・compare URL を可能な範囲で `reason` に記録する
 
+### 6.1 自己参照ずれ防止ルール
+
+- 最新ログブロックが**自分自身を含む最終コミット**を記録対象にする場合、`commit` 欄は raw SHA ではなく **`same commit` を優先**する
+- raw SHA を `commit` 欄へ記載してよいのは、**最新ブロック自身を含まない既存コミット群**を記録対象とする場合に限る
+- `push` / `pr` / `pr url` / `pr status` を確定値で記録する必要がある場合、`CodexExec.result` の先頭追記は **最終専用コミット** として分離してよい
+- この場合の標準順序は、**実ファイル変更のコミット群を先に確定し、その後に `CodexExec.result` 記録専用コミットを作成し、最後に push / Pull Request 作成を行う** ものとする
+- これにより、最新ブロックの `commit` が 1 手前の SHA になったり、`push: pending` のまま確定ログとして残る再発を防ぐ
+
 ---
 
 ## 7. 最低限含める項目
