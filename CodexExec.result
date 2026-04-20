@@ -1,4 +1,95 @@
-=======
+===== CODEX_RESULT_BEGIN =====
+TASK_ID: JAVADOC_SCOPE_EXPANSION_V1
+TITLE: JavaDoc対象拡張フェーズ 実施指示書 v1.0
+EXECUTED_AT: 2026-04-20T16:48:55+09:00
+STATUS: [OK]
+STEP: COMMIT_1_to_COMMIT_3_javadoc_scope_expansion
+changed files:
+- src/main/java/com/qscout/spring/web/service/RequestAccessTokenService.java
+- src/main/java/com/qscout/spring/web/service/UploadValidationService.java
+- src/main/java/com/qscout/spring/web/service/DownloadArtifactService.java
+- src/main/java/com/qscout/spring/web/service/MarkdownPreviewRenderer.java
+- src/main/java/com/qscout/spring/web/controller/WebDownloadController.java
+- src/main/java/com/qscout/spring/domain/AnalysisRequest.java
+- src/main/java/com/qscout/spring/domain/AnalysisResult.java
+- src/main/java/com/qscout/spring/domain/ScoreSummary.java
+- src/main/java/com/qscout/spring/domain/ReportArtifact.java
+- src/main/java/com/qscout/spring/domain/ExecutionSummary.java
+- CodexExec.result
+
+commit units:
+- COMMIT 1
+  - sha: dfdced2
+  - message: docs: 次点サービスへJavaDocを拡張
+  - message source: CodexExec.md 指示採用
+- COMMIT 2
+  - sha: 0122c33
+  - message: docs: WebDownloadControllerへJavaDocを追加
+  - message source: CodexExec.md 指示採用
+- COMMIT 3
+  - sha: d00d34f
+  - message: docs: 主要DTOへ最小JavaDocを追加
+  - message source: CodexExec.md 指示採用
+
+javadoc targets:
+- service / renderer
+  - `RequestAccessTokenService`
+  - `UploadValidationService`
+  - `DownloadArtifactService`
+  - `MarkdownPreviewRenderer`
+- controller
+  - `WebDownloadController`
+- dto
+  - `AnalysisRequest`
+  - `AnalysisResult`
+  - `ScoreSummary`
+  - `ReportArtifact`
+  - `ExecutionSummary`
+
+responsibility summaries:
+- `RequestAccessTokenService` に、成果物ダウンロード / プレビュー参照用の一時トークン生成・検証責務と、成果物生成本体を担わない境界を追加した
+- `UploadValidationService` に、ZIP アップロード検証責務と、解析実行前の入力検証に責務を限定する文面を追加した
+- `DownloadArtifactService` に、生成済み成果物の参照解決責務と、解析本体や成果物生成を担わない文面を追加した
+- `MarkdownPreviewRenderer` に、生成済み Markdown のプレビュー表示補助責務と、解析 / 生成本体を持たない文面を追加した
+- `WebDownloadController` に、ダウンロード要求の入口、トークン検証、成果物取得委譲を担い、生成本体ではない文面を追加した
+- `AnalysisRequest` に、解析対象ルートと成果物出力先を束ねる要求 DTO である文面を追加した
+- `AnalysisResult` に、プロジェクト文脈、ルール別結果、違反一覧を束ねる結果 DTO である文面を追加した
+- `ScoreSummary` に、最終スコアと重大度別件数を要約する集計 DTO である文面を追加した
+- `ReportArtifact` に、人間向け / AI 用成果物パスを束ねる DTO である文面を追加した
+- `ExecutionSummary` に、CLI 返却用のスコア概要と成果物パスを束ねる DTO である文面を追加した
+
+summary:
+- 次点 service / renderer 4 件へクラス JavaDoc と主要 public メソッド JavaDoc を追加し、Web 補助サービス群の責務境界を揃えた
+- `WebDownloadController` に JavaDoc を追加し、`WebPageController` と `WebPreviewController` に続く Web 入口群の責務説明を補完した
+- 主要 DTO 5 件へ最小限の record JavaDoc を追加し、CLI / Web 共通のドメイン DTO の意味をコード近傍で把握しやすくした
+- `CodexExec.result` の更新時に、既存の conflict marker を除去してログ形式を整えた
+
+test:
+- 実行コマンド: `C:\Users\academia\.m2\wrapper\dists\apache-maven-3.9.12\59fe215c0ad6947fea90184bf7add084544567b927287592651fda3782e0e798\bin\mvn.cmd test`
+- 1 回目はタイムアウト、2 回目は成功
+- 結果: 136 tests passed
+
+untouched:
+- `package-info.java` の追加対象拡大は未実施
+- `infrastructure` 全体、`rule` 実装群、他の Controller 群、全 DTO への全面展開は未実施
+- private メソッドへの詳細 JavaDoc と実装リファクタリング主体の変更は未実施
+
+concerns:
+- `CodexExec.result` には今回着手前から conflict marker が残っていたため、先頭追記とあわせて整形した
+- 1 回目のテスト実行はタイムアウトしたが、同一コマンドの再実行では成功し、JavaDoc 追加に起因する失敗は確認されなかった
+
+commit: same commit
+message: docs: CodexExec.resultを更新
+message source: 自動生成
+push: success
+pr: 4
+pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/4
+pr base: ドキュメント整理
+pr head: codex-javadoc-scope-expansion
+pr status: open
+===== CODEX_RESULT_END =====
+
+===== CODEX_RESULT_BEGIN =====
 TASK_ID: JAVADOC_PREP_TRIAL_V1
 TITLE: JavaDoc導入準備 実施指示書 v1.0
 EXECUTED_AT: 2026-04-20T14:40:14+09:00
@@ -86,7 +177,6 @@ message source: 自動生成
 ===== CODEX_RESULT_END =====
 
 ===== CODEX_RESULT_BEGIN =====
-<<<<<<< HEAD
 TASK_ID: DOCS_PR_PRIORITY_CONFIRMATION_V1
 TITLE: Codex PR優先確認運用 差替え実装 v1.0
 EXECUTED_AT: 2026-04-20T14:31:31+09:00
@@ -172,7 +262,6 @@ concerns:
 commit: same commit
 message: docs: CodexExec.resultを更新
 message source: 自動生成
->>>>>>> origin/ドキュメント整理
 ===== CODEX_RESULT_END =====
 
 [OK] DOCS_42_UI_DIFF_RENAME_DONE
