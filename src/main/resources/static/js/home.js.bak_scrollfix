@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
     var form = document.getElementById("analyzeForm");
     if (!form) {
         return;
@@ -12,11 +12,8 @@
     var modalBody = document.getElementById("uploadErrorBody");
     var modalRetry = document.getElementById("uploadErrorRetry");
     var modalClose = document.getElementById("uploadErrorClose");
-    var runAnalysisSection = document.getElementById("run-analysis");
-    var resultSummarySection = document.getElementById("result-summary");
     var maxUploadBytes = Number(form.dataset.maxUploadBytes || 0);
     var helpers = window.qScoutApp || {};
-    var storageKey = "qscout-post-analyze-scroll-target";
 
     function setRunning(visible) {
         if (helpers.setVisible) {
@@ -43,63 +40,13 @@
         return Boolean(file) && maxUploadBytes > 0 && file.size > maxUploadBytes;
     }
 
-    function setPendingScrollTarget(target) {
-        try {
-            window.sessionStorage.setItem(storageKey, target);
-        } catch (e) {
-            // no-op
-        }
-    }
-
-    function clearPendingScrollTarget() {
-        try {
-            window.sessionStorage.removeItem(storageKey);
-        } catch (e) {
-            // no-op
-        }
-    }
-
     function handleTooLargeFile() {
-        setPendingScrollTarget("run-analysis");
         showUploadError(
             form.dataset.uploadTooLargeTitle,
             form.dataset.uploadTooLargeBody,
             form.dataset.uploadTooLargeRetry
         );
         fileInput.value = "";
-    }
-
-    function restorePostAnalyzeScroll() {
-        var pendingTarget = null;
-
-        try {
-            pendingTarget = window.sessionStorage.getItem(storageKey);
-        } catch (e) {
-            pendingTarget = null;
-        }
-
-        if (!pendingTarget) {
-            return;
-        }
-
-        clearPendingScrollTarget();
-
-        if (pendingTarget === "result-summary"
-            && resultSummarySection
-            && resultSummarySection.dataset.hasResult === "true") {
-            resultSummarySection.scrollIntoView({ behavior: "smooth", block: "start" });
-            if (window.history && window.history.replaceState) {
-                window.history.replaceState(null, "", "#result-summary");
-            }
-            return;
-        }
-
-        if (runAnalysisSection) {
-            runAnalysisSection.scrollIntoView({ behavior: "smooth", block: "start" });
-            if (window.history && window.history.replaceState) {
-                window.history.replaceState(null, "", "#run-analysis");
-            }
-        }
     }
 
     fileInput.addEventListener("change", function () {
@@ -116,7 +63,6 @@
             handleTooLargeFile();
             return;
         }
-        setPendingScrollTarget("result-summary");
         button.disabled = true;
         setRunning(true);
     });
@@ -132,13 +78,10 @@
     }
 
     if (modal.dataset.open === "true") {
-        setPendingScrollTarget("run-analysis");
         showUploadError(
             modal.dataset.serverTitle || form.dataset.uploadTooLargeTitle,
             modal.dataset.serverBody || form.dataset.uploadTooLargeBody,
             modal.dataset.serverRetry || form.dataset.uploadTooLargeRetry
         );
     }
-
-    restorePostAnalyzeScroll();
 }());

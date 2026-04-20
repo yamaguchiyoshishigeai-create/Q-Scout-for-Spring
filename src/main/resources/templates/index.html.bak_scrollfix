@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
@@ -63,7 +63,7 @@
                 </div>
             </section>
 
-            <section class="content-panel" id="run-analysis" data-figma-section="upload-panel" th:attr="data-has-error=${error != null}">
+            <section class="content-panel" id="run-analysis" data-figma-section="upload-panel">
                 <div class="section-title-row"><div><span class="section-eyebrow" th:text="#{page.home.section.run.eyebrow}">Run Diagnosis</span><h2 th:text="#{page.home.section.run.title}">診断を実行</h2></div><span class="section-tag" th:text="#{page.home.section.run.tag}">zip / 20MB / 60s</span></div>
                 <p class="section-copy" th:text="#{page.home.section.run.copy}">アップロードフォームと基本条件をこのセクションに集約し、詳細な対応範囲は help ページにまとめています。</p>
                 <div class="support-grid support-grid--spaced"><article class="support-card"><strong th:text="#{page.home.section.run.support.title}">対応プロジェクトの要点</strong><ul class="support-compact"><li th:text="#{page.home.support.framework.short}">Spring Boot / Maven の単一モジュール</li><li th:text="#{page.home.support.required.short}">ZIP直下で pom.xml を確認できる構成</li><li th:text="#{page.home.support.source.short}">Java ソースコードを含むこと</li></ul></article><article class="support-card"><strong th:text="#{page.home.section.run.unsupported.title}">現時点で対象外</strong><ul class="unsupported-list"><li th:text="#{page.home.unsupported.gradle}">Gradle プロジェクト</li><li th:text="#{page.home.unsupported.multimodule}">マルチモジュール構成</li><li th:text="#{page.home.unsupported.kotlin}">Kotlin 主体プロジェクト</li></ul><a class="info-link" th:href="@{/help(lang=${#locale.language})}" th:text="#{page.home.section.run.helpLink}">使い方・仕様で詳細を見る</a></article></div>
@@ -88,7 +88,7 @@
                 <div class="notice error" th:if="${error != null}"><strong th:text="${error.userMessage}">エラーが発生しました。</strong><p th:if="${error.retryable}" th:text="#{error.retryable}">内容を確認して再度アップロードしてください。</p></div>
             </section>
 
-            <section class="content-panel" id="result-summary" data-figma-section="result-summary" th:attr="data-has-result=${resultSummary != null}">
+            <section class="content-panel" id="result-summary" data-figma-section="result-summary">
                 <div class="section-title-row"><div><span class="section-eyebrow" th:text="#{page.home.section.summary.eyebrow}">Results</span><h2 th:text="#{page.home.section.summary.title}">結果サマリ</h2></div><span class="section-tag" th:text="#{page.home.section.summary.tag}">Score / Violations / Artifacts</span></div>
                 <p class="section-copy" th:text="#{page.home.section.summary.copy}">解析後はここで対象ファイル、実行時刻、総合スコア、重大度内訳をまとめて確認できます。</p>
                 <th:block th:if="${resultSummary != null}" th:with="summaryDisplay=${resultSummary}">
@@ -129,4 +129,3 @@
 <script th:src="@{/js/home.js}"></script>
 </body>
 </html>
-
