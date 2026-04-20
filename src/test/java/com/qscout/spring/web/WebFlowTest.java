@@ -28,6 +28,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(properties = {
@@ -167,7 +168,12 @@ class WebFlowTest {
 
     @Test
     void showsLocalizedErrorMessagesForInvalidUpload() throws Exception {
-        mockMvc.perform(multipart("/analyze").header("X-Forwarded-For", "198.51.100.10"))
+        MvcResult result = mockMvc.perform(multipart("/analyze").header("X-Forwarded-For", "198.51.100.10"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/#run-analysis"))
+                .andReturn();
+
+        mockMvc.perform(get("/").flashAttrs(result.getFlashMap()))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists("error"))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("zipファイルを選択してください。")))
@@ -179,7 +185,12 @@ class WebFlowTest {
                 .getRequest()
                 .getSession(false);
 
-        mockMvc.perform(multipart("/analyze").header("X-Forwarded-For", "198.51.100.11").session(session))
+        MvcResult englishResult = mockMvc.perform(multipart("/analyze").header("X-Forwarded-For", "198.51.100.11").session(session))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/#run-analysis"))
+                .andReturn();
+
+        mockMvc.perform(get("/").session(session).flashAttrs(englishResult.getFlashMap()))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists("error"))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Please select a zip file.")))
@@ -196,7 +207,12 @@ class WebFlowTest {
                 zipDirectory(Path.of("samples/invalid-no-pom").toAbsolutePath().normalize())
         );
 
-        mockMvc.perform(multipart("/analyze").file(missingPomZip).header("X-Forwarded-For", "198.51.100.12"))
+        MvcResult result = mockMvc.perform(multipart("/analyze").file(missingPomZip).header("X-Forwarded-For", "198.51.100.12"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/#run-analysis"))
+                .andReturn();
+
+        mockMvc.perform(get("/").flashAttrs(result.getFlashMap()))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists("error"))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("pom.xml が見つかりません。Spring Boot / Mavenプロジェクトをアップロードしてください。")));
@@ -206,7 +222,12 @@ class WebFlowTest {
                 .getRequest()
                 .getSession(false);
 
-        mockMvc.perform(multipart("/analyze").file(missingPomZip).header("X-Forwarded-For", "198.51.100.13").session(session))
+        MvcResult englishResult = mockMvc.perform(multipart("/analyze").file(missingPomZip).header("X-Forwarded-For", "198.51.100.13").session(session))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/#run-analysis"))
+                .andReturn();
+
+        mockMvc.perform(get("/").session(session).flashAttrs(englishResult.getFlashMap()))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists("error"))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("pom.xml was not found. Please upload a Spring Boot / Maven project.")));
@@ -214,7 +235,12 @@ class WebFlowTest {
 
     @Test
     void showsUploadTooLargeModalInJapanese() throws Exception {
-        mockMvc.perform(multipart("/analyze").file(oversizedZip()).header("X-Forwarded-For", "198.51.100.14"))
+        MvcResult result = mockMvc.perform(multipart("/analyze").file(oversizedZip()).header("X-Forwarded-For", "198.51.100.14"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/#run-analysis"))
+                .andReturn();
+
+        mockMvc.perform(get("/").flashAttrs(result.getFlashMap()))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists("uploadErrorModal"))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("アップロードに失敗しました")))
@@ -229,7 +255,12 @@ class WebFlowTest {
                 .getRequest()
                 .getSession(false);
 
-        mockMvc.perform(multipart("/analyze").file(oversizedZip()).header("X-Forwarded-For", "198.51.100.15").session(session))
+        MvcResult result = mockMvc.perform(multipart("/analyze").file(oversizedZip()).header("X-Forwarded-For", "198.51.100.15").session(session))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/#run-analysis"))
+                .andReturn();
+
+        mockMvc.perform(get("/").session(session).flashAttrs(result.getFlashMap()))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists("uploadErrorModal"))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Upload failed")))
@@ -258,6 +289,11 @@ class WebFlowTest {
         );
 
         MvcResult result = mockMvc.perform(multipart("/analyze").file(zip).header("X-Forwarded-For", "198.51.100.16"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/#result-summary"))
+                .andReturn();
+
+        mockMvc.perform(get("/").flashAttrs(result.getFlashMap()))
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("解析が完了しました。")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("対象ファイル：")))
@@ -274,8 +310,7 @@ class WebFlowTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("ユーザー向けMarkdown")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("AI入力Markdown")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("プレビュー")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("ダウンロード")))
-                .andReturn();
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("ダウンロード")));
 
         WebAnalysisResponse response = extractResponse(result);
         String requestId = response.requestId();
@@ -319,7 +354,8 @@ class WebFlowTest {
         );
 
         MvcResult analyzeResult = mockMvc.perform(multipart("/analyze").file(zip).header("X-Forwarded-For", "198.51.100.17"))
-                .andExpect(status().isOk())
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/#result-summary"))
                 .andReturn();
 
         WebAnalysisResponse response = extractResponse(analyzeResult);
@@ -358,7 +394,12 @@ class WebFlowTest {
                 )
         );
 
-        mockMvc.perform(multipart("/analyze").file(zip).header("X-Forwarded-For", "198.51.100.19"))
+        MvcResult result = mockMvc.perform(multipart("/analyze").file(zip).header("X-Forwarded-For", "198.51.100.19"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/#result-summary"))
+                .andReturn();
+
+        mockMvc.perform(get("/").flashAttrs(result.getFlashMap()))
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("解析不要物を自動除外して解析を継続しました。")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString(".git")));
@@ -379,6 +420,11 @@ class WebFlowTest {
         );
 
         MvcResult result = mockMvc.perform(multipart("/analyze").file(zip).header("X-Forwarded-For", "198.51.100.18").session(session))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/#result-summary"))
+                .andReturn();
+
+        mockMvc.perform(get("/").session(session).flashAttrs(result.getFlashMap()))
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Analysis completed.")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Target file:")))
@@ -394,8 +440,7 @@ class WebFlowTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Breakdown:")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("High")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Medium")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Low")))
-                .andReturn();
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Low")));
 
         WebAnalysisResponse response = extractResponse(result);
         String requestId = response.requestId();
@@ -465,7 +510,7 @@ class WebFlowTest {
     }
 
     private WebAnalysisResponse extractResponse(MvcResult result) {
-        return (WebAnalysisResponse) result.getModelAndView().getModel().get("response");
+        return (WebAnalysisResponse) result.getFlashMap().get("response");
     }
 
     private MockMultipartFile oversizedZip() {

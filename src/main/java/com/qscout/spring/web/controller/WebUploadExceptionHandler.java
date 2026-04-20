@@ -30,7 +30,7 @@ public class WebUploadExceptionHandler {
                 message("error.upload.tooLarge.body"),
                 message("error.upload.tooLarge.retry")
         ));
-        return "redirect:/";
+        return "redirect:/#run-analysis";
     }
 
     private String message(String key, Object... args) {

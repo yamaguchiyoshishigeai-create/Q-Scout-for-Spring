@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 import org.springframework.ui.ConcurrentModel;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -46,11 +47,12 @@ class WebPageControllerTest {
         when(webAnalysisService.analyze(file)).thenReturn(response);
 
         ConcurrentModel model = new ConcurrentModel();
-        String view = controller.analyze(file, model, request("127.0.0.1"), new MockHttpServletResponse());
+        RedirectAttributesModelMap redirectAttributes = new RedirectAttributesModelMap();
+        String view = controller.analyze(file, model, request("127.0.0.1"), new MockHttpServletResponse(), redirectAttributes);
 
-        assertThat(view).isEqualTo("index");
-        assertThat(model.getAttribute("response")).isEqualTo(response);
-        assertThat(model.getAttribute("resultSummary")).isEqualTo(new SummaryDisplayView(response, false, "#artifacts"));
+        assertThat(view).isEqualTo("redirect:/#result-summary");
+        assertThat(redirectAttributes.getFlashAttributes().get("response")).isEqualTo(response);
+        assertThat(redirectAttributes.getFlashAttributes().get("resultSummary")).isEqualTo(new SummaryDisplayView(response, false, "#artifacts"));
         assertThat(model.getAttribute("sampleSummary")).isNotNull();
         assertThat(model.getAttribute("limits")).isNotNull();
     }
@@ -79,9 +81,11 @@ class WebPageControllerTest {
         when(webAnalysisService.analyze(file)).thenThrow(new UploadTooLargeException("too large"));
 
         ConcurrentModel model = new ConcurrentModel();
-        controller.analyze(file, model, request("127.0.0.1"), new MockHttpServletResponse());
+        RedirectAttributesModelMap redirectAttributes = new RedirectAttributesModelMap();
+        String view = controller.analyze(file, model, request("127.0.0.1"), new MockHttpServletResponse(), redirectAttributes);
 
-        UploadErrorModalView modal = (UploadErrorModalView) model.getAttribute("uploadErrorModal");
+        assertThat(view).isEqualTo("redirect:/#run-analysis");
+        UploadErrorModalView modal = (UploadErrorModalView) redirectAttributes.getFlashAttributes().get("uploadErrorModal");
         assertThat(modal).isNotNull();
         assertThat(modal.title()).isEqualTo("アップロードに失敗しました");
         assertThat(modal.body()).isEqualTo("アップロードしたzipファイルが上限サイズ20MBを超えています。");
@@ -99,9 +103,11 @@ class WebPageControllerTest {
         when(webAnalysisService.analyze(file)).thenThrow(new InvalidUploadException("bad input"));
 
         ConcurrentModel model = new ConcurrentModel();
-        controller.analyze(file, model, request("127.0.0.1"), new MockHttpServletResponse());
+        RedirectAttributesModelMap redirectAttributes = new RedirectAttributesModelMap();
+        String view = controller.analyze(file, model, request("127.0.0.1"), new MockHttpServletResponse(), redirectAttributes);
 
-        ErrorViewModel error = (ErrorViewModel) model.getAttribute("error");
+        assertThat(view).isEqualTo("redirect:/#run-analysis");
+        ErrorViewModel error = (ErrorViewModel) redirectAttributes.getFlashAttributes().get("error");
         assertThat(error.detailCode()).isEqualTo("INPUT_ERROR");
         assertThat(error.userMessage()).isEqualTo("bad input");
     }
@@ -116,9 +122,11 @@ class WebPageControllerTest {
         when(webAnalysisService.analyze(file)).thenThrow(new AnalysisTimeoutException("timeout", new RuntimeException("slow")));
 
         ConcurrentModel model = new ConcurrentModel();
-        controller.analyze(file, model, request("127.0.0.1"), new MockHttpServletResponse());
+        RedirectAttributesModelMap redirectAttributes = new RedirectAttributesModelMap();
+        String view = controller.analyze(file, model, request("127.0.0.1"), new MockHttpServletResponse(), redirectAttributes);
 
-        ErrorViewModel error = (ErrorViewModel) model.getAttribute("error");
+        assertThat(view).isEqualTo("redirect:/#run-analysis");
+        ErrorViewModel error = (ErrorViewModel) redirectAttributes.getFlashAttributes().get("error");
         assertThat(error.detailCode()).isEqualTo("TIMEOUT");
     }
 
@@ -131,14 +139,16 @@ class WebPageControllerTest {
 
         ConcurrentModel model = new ConcurrentModel();
         MockHttpServletResponse response = new MockHttpServletResponse();
+        RedirectAttributesModelMap redirectAttributes = new RedirectAttributesModelMap();
 
-        String view = controller.analyze(null, model, request("198.51.100.10"), response);
+        String view = controller.analyze(null, model, request("198.51.100.10"), response, redirectAttributes);
 
         assertThat(view).isEqualTo("index");
         assertThat(response.getStatus()).isEqualTo(429);
         assertThat(response.getHeader("Retry-After")).isEqualTo("120");
         ErrorViewModel error = (ErrorViewModel) model.getAttribute("error");
         assertThat(error.detailCode()).isEqualTo("RATE_LIMIT_EXCEEDED");
+        assertThat(model.getAttribute("postAnalyzeAnchor")).isEqualTo("run-analysis");
     }
 
     @Test
@@ -152,8 +162,9 @@ class WebPageControllerTest {
         request.addHeader("X-Forwarded-For", "203.0.113.1");
         ConcurrentModel model = new ConcurrentModel();
         MockHttpServletResponse response = new MockHttpServletResponse();
+        RedirectAttributesModelMap redirectAttributes = new RedirectAttributesModelMap();
 
-        controller.analyze(null, model, request, response);
+        controller.analyze(null, model, request, response, redirectAttributes);
 
         verify(requestRateLimiter).evaluate("198.51.100.10");
         verify(requestRateLimiter, never()).evaluate("203.0.113.1");
@@ -172,8 +183,9 @@ class WebPageControllerTest {
         request.addHeader("X-Forwarded-For", "203.0.113.1, 198.51.100.200");
         ConcurrentModel model = new ConcurrentModel();
         MockHttpServletResponse response = new MockHttpServletResponse();
+        RedirectAttributesModelMap redirectAttributes = new RedirectAttributesModelMap();
 
-        controller.analyze(null, model, request, response);
+        controller.analyze(null, model, request, response, redirectAttributes);
 
         verify(requestRateLimiter).evaluate("203.0.113.1");
         verify(requestRateLimiter, never()).evaluate("127.0.0.1");

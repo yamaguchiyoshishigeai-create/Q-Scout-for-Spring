@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 class WebUploadExceptionHandlerTest {
     @Test
-    void redirectsBackToHomeWithUploadErrorModalWhenMultipartLimitIsExceeded() throws Exception {
+    void redirectsBackToRunAnalysisWithUploadErrorModalWhenMultipartLimitIsExceeded() throws Exception {
         Locale previous = LocaleContextHolder.getLocale();
         LocaleContextHolder.setLocale(Locale.JAPANESE);
         try {
@@ -32,7 +32,7 @@ class WebUploadExceptionHandlerTest {
 
             var result = mockMvc.perform(post("/analyze").locale(Locale.JAPANESE))
                     .andExpect(status().is3xxRedirection())
-                    .andExpect(redirectedUrl("/"))
+                    .andExpect(redirectedUrl("/#run-analysis"))
                     .andExpect(flash().attributeExists("uploadErrorModal"))
                     .andReturn();
 
@@ -56,7 +56,7 @@ class WebUploadExceptionHandlerTest {
 
             var result = mockMvc.perform(post("/analyze").locale(Locale.ENGLISH))
                     .andExpect(status().is3xxRedirection())
-                    .andExpect(redirectedUrl("/"))
+                    .andExpect(redirectedUrl("/#run-analysis"))
                     .andExpect(flash().attributeExists("uploadErrorModal"))
                     .andReturn();
 
