@@ -1,4 +1,49 @@
 ===== CODEX_RESULT_BEGIN =====
+TASK_ID: INDEX_LIMITS_NAVIGATION_FIX_V1
+TITLE: index再描画 limits 安定化と解析後遷移修正 v1.1
+EXECUTED_AT: 2026-04-21T03:42:32.7281409+09:00
+STATUS: [OK]
+STEP: COMMIT_PUSH_PR_INDEX_LIMITS_NAVIGATION_V1
+changed files:
+- src/main/java/com/qscout/spring/web/controller/CommonViewModelAdvice.java
+- src/main/java/com/qscout/spring/web/controller/WebPageController.java
+- src/main/java/com/qscout/spring/web/controller/WebUploadExceptionHandler.java
+- src/main/resources/static/js/home.js
+- src/main/resources/templates/index.html
+- src/test/java/com/qscout/spring/web/WebFlowTest.java
+- src/test/java/com/qscout/spring/web/controller/WebPageControllerTest.java
+- src/test/java/com/qscout/spring/web/controller/WebUploadExceptionHandlerTest.java
+- CodexExec.result
+
+summary:
+- `limits` の供給を `CommonViewModelAdvice` の `@ModelAttribute` へ共通化し、`index.html` 側も null セーフ化して `limits` null 起因の 500 を防止した
+- `POST /analyze` 成功時は flash attribute を使った PRG で `/#result-summary` へ、失敗時と multipart 例外時は `/#run-analysis` へ戻すように統一した
+- `sessionStorage + scrollIntoView()` の後追いスクロールを `home.js` から削除し、サーバー主導のアンカー遷移へ寄せた
+- 関連テストを redirect / flash attribute 前提へ更新し、`compile` と `package` は通した
+
+untouched:
+- ChatExec.ps1
+- .m2/
+
+notes:
+- 実装コミット: `88c6eb8` `fix: stabilize index limits binding and result-summary navigation`
+- 実行コマンド: `mvn -q "-Dmaven.repo.local=.m2\repository" -DskipTests compile`
+- 実行コマンド: `mvn -q "-Dmaven.repo.local=.m2\repository" "-Dmaven.test.skip=true" package`
+- 関連テスト実行は既存の test compile 崩れにより完走不可
+- jar 起動によるローカル HTTP 確認は、この環境では 8080 listen 待ちの段階で完了できなかった
+
+commit: same commit
+message: docs: record index limits stabilization result
+message source: 自動生成
+push: success
+pr: #7
+pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/7
+pr base: main
+pr head: codex-fix-index-limits-navigation-v1
+pr status: open
+===== CODEX_RESULT_END =====
+
+===== CODEX_RESULT_BEGIN =====
 TASK_ID: CODEX_RESULT_SELF_REFERENCE_GUARD_V1
 TITLE: CodexExec.result 自己参照ずれ防止ルール追加 指示書 v1.0
 EXECUTED_AT: 2026-04-21T01:19:59.3155545+09:00
