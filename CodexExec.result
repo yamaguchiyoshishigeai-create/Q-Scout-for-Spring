@@ -1,4 +1,40 @@
 ===== CODEX_RESULT_BEGIN =====
+TASK_ID: CODEX_RESULT_MERGE_GUARD_V1
+TITLE: CodexExec.result 競合低減設定 導入指示書 v1.0
+EXECUTED_AT: 2026-04-20T23:50:29.7358626+09:00
+STATUS: [FAIL]
+STEP: COMMIT_1_to_COMMIT_3_codex_result_merge_guard
+changed files:
+- docs/CodexExec.result運用ルール.md
+- .gitattributes
+- CodexExec.result
+
+summary:
+- `docs/CodexExec.result運用ルール.md` に、通常作業では新規ログブロック 1 件の先頭追記以外を禁止する原則、専用修復タスク分離、union merge 許容、conflict marker 残存確認の追記を反映した
+- リポジトリルートに `.gitattributes` を追加し、`CodexExec.result merge=union` を設定した
+- `CodexExec.result` に残っていた既存の単独 `=======` marker を最小範囲で除去し、今回の主目的を超える旧ログ全体整形は行わなかった
+- `CodexExec.result`、運用ルール文書、`.gitattributes` について conflict marker 残存がないことを確認した
+
+reason:
+- GitHub への push が SSH 公開鍵認証エラーで失敗したため、Pull Request 作成へ進めなかった
+- last successful step: COMMIT 3 作成直前までのローカル変更反映と COMMIT 1 / COMMIT 2 作成
+- failed step: push
+- error: git@github.com: Permission denied (publickey). fatal: Could not read from remote repository.
+- pushed branch: none
+- compare url: none
+
+commit: same commit
+message: docs: CodexExec.result競合低減設定を反映
+message source: CodexExec.md 指示採用
+push: failed
+pr: none
+pr url: none
+pr base: main
+pr head: ドキュメント整理
+pr status: failed
+===== CODEX_RESULT_END =====
+
+===== CODEX_RESULT_BEGIN =====
 TASK_ID: JAVADOC_SCOPE_EXPANSION_V1
 TITLE: JavaDoc対象拡張フェーズ 実施指示書 v1.0
 EXECUTED_AT: 2026-04-20T16:48:55+09:00
@@ -129,7 +165,6 @@ pr head: codex-trusted-proxy-client-ip-v1
 pr status: open
 ===== CODEX_RESULT_END =====
 
-=======
 TASK_ID: JAVADOC_PREP_TRIAL_V1
 TITLE: JavaDoc導入準備 実施指示書 v1.0
 EXECUTED_AT: 2026-04-20T14:40:14+09:00
