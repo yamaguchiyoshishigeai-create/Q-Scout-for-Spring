@@ -13,6 +13,14 @@ import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+/**
+ * Web から受け取った ZIP アップロードの妥当性を検証するサービスである。
+ *
+ * <p>ファイル形式、サイズ、ZIP エントリ数、危険なアーカイブ構造を検査し、
+ * 展開前に不正入力を早期に弾く。</p>
+ *
+ * <p>実解析や結果生成は扱わず、解析実行前の入力検証に責務を限定する。</p>
+ */
 @Service
 public class UploadValidationService {
     public static final long MAX_UPLOAD_SIZE_BYTES = ZipSecurityLimits.MAX_UPLOAD_SIZE_BYTES;
@@ -27,6 +35,13 @@ public class UploadValidationService {
         this.messageSource = messageSource;
     }
 
+    /**
+     * 解析対象として受け取った ZIP ファイルを検証する。
+     *
+     * @param file ユーザーがアップロードした解析対象 ZIP
+     * @throws InvalidUploadException ZIP 形式や構造が要件を満たさない場合
+     * @throws UploadTooLargeException 許容サイズを超える場合
+     */
     public void validate(MultipartFile file) {
         if (file == null || file.isEmpty()) {
             throw new InvalidUploadException(message("error.invalidUpload.empty"));

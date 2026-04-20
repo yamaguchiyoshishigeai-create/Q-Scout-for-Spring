@@ -6,10 +6,24 @@ import org.springframework.web.util.HtmlUtils;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Markdown 成果物をプレビュー表示向けの HTML へ変換する補助サービスである。
+ *
+ * <p>見出し、段落、箇条書き、コードブロック、リンクなどの最小限の表現を
+ * Web プレビュー用に整形する。</p>
+ *
+ * <p>解析や成果物生成の本体責務は持たず、既に生成済み Markdown の表示補助に専念する。</p>
+ */
 @Service
 public class MarkdownPreviewRenderer {
     private static final Pattern LINK_PATTERN = Pattern.compile("\\[([^\\]]+)]\\(([^)]+)\\)");
 
+    /**
+     * Markdown テキストをプレビュー表示用の HTML へ変換する。
+     *
+     * @param markdown 生成済み成果物として保持された Markdown テキスト
+     * @return プレビュー画面へ埋め込む HTML 文字列
+     */
     public String render(String markdown) {
         String normalized = markdown.replace("\r\n", "\n");
         StringBuilder html = new StringBuilder();
