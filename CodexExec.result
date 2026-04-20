@@ -1,4 +1,33 @@
 ===== CODEX_RESULT_BEGIN =====
+TASK_ID: CODEX_RESULT_SELF_REFERENCE_GUARD_V1
+TITLE: CodexExec.result 自己参照ずれ防止ルール追加 指示書 v1.0
+EXECUTED_AT: 2026-04-21T01:19:59.3155545+09:00
+STATUS: [OK]
+STEP: COMMIT_1_to_COMMIT_3_codex_result_self_reference_guard
+changed files:
+- docs/CodexExec.result運用ルール.md
+- CodexExec.result
+
+summary:
+- `docs/CodexExec.result運用ルール.md` に、最新ブロックが自分自身を含む最終コミットを記録する場合は `commit: same commit` を優先するルールを追加した
+- `push` / `pr` の確定値が必要な場合は、`CodexExec.result` 先頭追記を最終専用コミットとして分離する標準順序を追記した
+- 成功時出力例と再発防止の最終原則にも同じ考え方を補強し、過去ログ本文には手を広げていない
+
+untouched:
+- .gitattributes
+
+commit: same commit
+message: docs: CodexExec.result自己参照ずれ防止を反映
+message source: CodexExec.md 指示採用
+push: success
+pr: #6
+pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/6
+pr base: main
+pr head: ドキュメント整理
+pr status: open
+===== CODEX_RESULT_END =====
+
+===== CODEX_RESULT_BEGIN =====
 TASK_ID: PR6_CODEX_RESULT_COMMIT_FIX_V1
 TITLE: PR #6 最新CodexExec.result commit欄修正 指示書 v1.0
 EXECUTED_AT: 2026-04-21T00:55:13.2630881+09:00
