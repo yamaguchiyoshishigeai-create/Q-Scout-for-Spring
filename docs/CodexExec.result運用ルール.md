@@ -211,7 +211,7 @@ summary:
 untouched:
 - other files unchanged
 
-commit: abc1234
+commit: same commit
 message: 不要物自動除外付き安全解凍を実装
 message source: CodexExec.md 指示採用
 push: success
@@ -336,3 +336,5 @@ pr status: failed
 - **過去ブロック修正は専用修復タスクに分離する**
 - **union merge は競合低減策であり、旧ログ全体整形の許可ではない**
 - **conflict marker を残したまま push / PR 作成してはならない**
+- **最新ブロックが自分自身を含む最終コミットを記録する場合、`commit` は `same commit` を優先する**
+- **`push` / `pr` の確定値が必要な場合、`CodexExec.result` 追記は最終専用コミットとして分離する**
