@@ -1,3 +1,57 @@
+===== CODEX_RESULT_BEGIN =====
+TASK_ID: DOCS_ALL_LAYER_REVIEW_MINOR_FIX_V1
+TITLE: 全層通読整合レビュー後 微修正指示書 v1.0
+EXECUTED_AT: 2026-04-20T12:40:23+09:00
+STATUS: [OK]
+STEP: COMMIT_1_to_COMMIT_3_docs_minor_alignment
+changed files:
+- README.md
+- docs/README.md
+- docs/20_要件定義/20_要件定義ガイド.md
+- CodexExec.result
+
+commit units:
+- COMMIT 1
+  - sha: 74b2f79
+  - message: docs: READMEの現行導線説明を微調整
+  - message source: CodexExec.md 指示採用
+- COMMIT 2
+  - sha: 5a95c54
+  - message: docs: 42_UI差分設計の命名補足をREADMEへ追加
+  - message source: CodexExec.md 指示採用
+- COMMIT 3
+  - sha: 0bb01f0
+  - message: docs: 20から30と40への接続導線を補強
+  - message source: CodexExec.md 指示採用
+
+commit summaries:
+- COMMIT 1 で README の技術的見どころを、Web 主体 + CLI 維持 + CLI 由来資産の現行整理へ微調整した
+- COMMIT 2 で docs 全体入口に `42_UI差分設計/` の `00_...` / `Hxx_...` 運用補足を追加した
+- COMMIT 3 で `20_要件定義ガイド.md` に 20 から 30 と 40 への接続導線を追加した
+
+summary:
+- README では、解析基盤が CLI 由来資産を基に発展していることを残しつつ、現行の主要利用導線が Web アプリケーションであり、CLI 実行も継続して維持している文意へ寄せた
+- `docs/README.md` には、`42_UI差分設計/` で `00_...` を現行参照先、`Hxx_...` を履歴文書として扱い、詳細な読書順や位置づけは `docs/40_詳細設計/詳細設計.md` を参照する補足を追加した
+- `docs/20_要件定義/20_要件定義ガイド.md` には、要件群把握後の全体骨格確認先を `docs/30_基本設計/基本設計.md`、個別 UI 差分や運用差分の確認先を `docs/40_詳細設計/詳細設計.md` とする接続導線を追加した
+
+41 detail master:
+- 未修正
+
+reason:
+- `docs/40_詳細設計/41_詳細設計正本/詳細設計正本.md` には、現時点では `../42_UI差分設計/` を含む当面の参照先が既に明示されており、今回求められた「現時点では 42 が実参照先」である補足目的は既存記述で充足していると判断した
+
+unimplemented:
+- `docs/40_詳細設計/41_詳細設計正本/詳細設計正本.md` への追記は見送った
+- docs 全面統合、40 系ガイド再設計、42_UI差分設計配下本文の再整理は今回の対象外として未実施
+
+concerns:
+- 既存の `CodexExec.result` は旧形式のログを含むが、今回は既存内容を保持したまま先頭に新規ブロックを追加した
+
+commit: same commit
+message: docs: CodexExec.resultを更新
+message source: 自動生成
+===== CODEX_RESULT_END =====
+
 [OK] DOCS_42_UI_DIFF_RENAME_DONE
 STEP: COMMIT_1_to_COMMIT_3_docs_42_ui_diff_rename
 changed files:
