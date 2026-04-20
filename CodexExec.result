@@ -1,5 +1,4 @@
 ===== CODEX_RESULT_BEGIN =====
-<<<<<<< HEAD
 TASK_ID: JAVADOC_SCOPE_EXPANSION_V1
 TITLE: JavaDoc対象拡張フェーズ 実施指示書 v1.0
 EXECUTED_AT: 2026-04-20T16:48:55+09:00
@@ -91,7 +90,6 @@ pr status: open
 ===== CODEX_RESULT_END =====
 
 ===== CODEX_RESULT_BEGIN =====
-=======
 TASK_ID: TRUSTED_PROXY_CLIENT_IP_V1
 TITLE: 信頼済みプロキシ限定IP解決方式 v1.0
 EXECUTED_AT: 2026-04-20T16:50:15.0762724+09:00
@@ -132,7 +130,6 @@ pr status: open
 ===== CODEX_RESULT_END =====
 
 =======
->>>>>>> codex-trusted-proxy-client-ip-v1
 TASK_ID: JAVADOC_PREP_TRIAL_V1
 TITLE: JavaDoc導入準備 実施指示書 v1.0
 EXECUTED_AT: 2026-04-20T14:40:14+09:00
