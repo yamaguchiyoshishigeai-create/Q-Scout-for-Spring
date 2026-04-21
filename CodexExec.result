@@ -1,4 +1,50 @@
 ===== CODEX_RESULT_BEGIN =====
+TASK_ID: MAVEN_WRAPPER_AND_INSPECTION_ZIP_HARDENING_V1
+TITLE: Maven Wrapper 導入と inspection ZIP 除外強化
+EXECUTED_AT: 2026-04-21T15:07:15.4555612+09:00
+STATUS: [OK]
+STEP: COMMIT_PUSH_PR_MAVEN_WRAPPER_AND_INSPECTION_ZIP_HARDENING_V1
+changed files:
+- .mvn/wrapper/maven-wrapper.properties
+- mvnw
+- mvnw.cmd
+- scripts/create-inspection-zip.ps1
+- README.md
+- CodexExec.result
+
+summary:
+- リポジトリ直下へ Maven Wrapper を追加し、`mvnw` / `mvnw.cmd` で Maven 3.9.12 を使えるようにした
+- `create-inspection-zip.ps1` の top-level 除外に `.m2home`、`.m2home-link`、`.tmp` を追加し、Maven キャッシュ混入と repo root 指定時の staging 再帰取り込みを防いだ
+- README のビルド導線を Wrapper 優先へ最小更新し、Windows と Unix 系の実行例を追記した
+
+untouched:
+- `pom.xml` と `src/main/java/**` / `src/test/java/**` / `src/main/resources/**` は変更していない
+- Render 設定と `Dockerfile` は変更していない
+- 未追跡の `samples/bookstore/`、`samples/spring-boot-monolith/`、`samples/spring-petclinic/` は今回の作業対象に含めていない
+
+notes:
+- 実装コミット: `976e39f` `build: Maven Wrapper導入とZIP除外を整備`
+- 実行コマンド: `$env:MAVEN_USER_HOME='C:\academia\src\Q-Scout-for-Spring\.m2home-link'; cmd /c mvnw.cmd -s .codex-maven-settings.xml test`
+- 結果: 146 tests passed
+- 実行コマンド: `$env:MAVEN_USER_HOME='C:\academia\src\Q-Scout-for-Spring\.m2home-link'; cmd /c mvnw.cmd -s .codex-maven-settings.xml -q -DskipTests package`
+- 結果: package 成功
+- 実行コマンド: `powershell -ExecutionPolicy Bypass -File .\scripts\create-inspection-zip.ps1 -ProjectPath '.' -OutputZipPath 'samples\qscout-root-inspection.zip'`
+- 結果: source 695.49 MB / staged 207.58 MB / zip 160.24 MB
+- ZIP 確認: `.m2home` / `.m2home-link` は未含有、`.mvn/wrapper/maven-wrapper.properties` は含有
+- 検証では sandbox 制約回避のため一時 settings ファイルを使用し、確認後に削除した
+
+commit: same commit
+message: docs: Maven Wrapper整備結果を記録
+message source: 自動生成
+push: success
+pr: 10
+pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/10
+pr base: main
+pr head: codex-maven-wrapper-inspection-zip-hardening-v1
+pr status: open
+===== CODEX_RESULT_END =====
+
+===== CODEX_RESULT_BEGIN =====
 TASK_ID: TRUSTED_PROXY_RENDER_OBSERVATION_V1
 TITLE: TRUSTED_PROXY_RENDER_OBSERVATION_V1 実装指示書 v1.1
 EXECUTED_AT: 2026-04-21T13:46:28.1227321+09:00
