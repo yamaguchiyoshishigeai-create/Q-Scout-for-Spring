@@ -1,4 +1,42 @@
 ===== CODEX_RESULT_BEGIN =====
+TASK_ID: REPO_ROOT_INSPECTION_ZIP_FEASIBILITY_CHECK_V1
+TITLE: repo root inspection ZIP 除外 feasibility 実測
+EXECUTED_AT: 2026-04-21T16:05:13.2531708+09:00
+STATUS: [OK]
+STEP: MEASURE_REPO_ROOT_INSPECTION_ZIP_FEASIBILITY_V1
+changed files:
+- CodexExec.result
+
+summary:
+- 現 working tree を repo root として一時 staging 方式で ZIP 実測し、`PATTERN_A` は staged 207.58 MB / zip 160.39 MB で 20MB 制限外だった
+- 必須比較では `PATTERN_B` (`samples` 除外) は zip 0.34 MB、`PATTERN_C` は root 直下 `sample-output` が存在しないため B と同値、`PATTERN_D` (`docs/90_アーカイブ` 追加除外) は zip 0.31 MB で、docs 側の寄与は軽微だった
+- 補助比較では `PATTERN_E` (`samples/*.zip` と `samples/sample-output` 相当のみ除外) は zip 66.62 MB、`PATTERN_F` (さらに nested `.git` / `target` 除外) は zip 27.58 MB で未達、`PATTERN_G` (さらに `samples/bookstore/src/main/resources/data/books.jsonlines` 除外) は zip 2.56 MB で制限内だった
+- 20MB 制限内に収める現実的な最小案としては、簡便策なら `samples` 丸ごと除外、保持範囲を広くしたいなら `samples/*.zip` + `samples/sample-output` + `samples/*/.git` + `samples/*/target` + `samples/bookstore/src/main/resources/data/books.jsonlines` の組み合わせが候補と判断した
+
+untouched:
+- `scripts/create-inspection-zip.ps1`、`README.md`、`.gitignore`、`pom.xml`、`src/**` を含む tracked 実装ファイルは変更していない
+- 未追跡の `samples/bookstore/`、`samples/spring-boot-monolith/`、`samples/spring-petclinic/` は現 working tree のまま計測対象として扱った
+
+notes:
+- 実測結果の共有用ブランチ: `codex-repo-root-zip-feasibility-v1`
+- 実測記録コミット: `de393bc` `docs: record repo root ZIP feasibility results`
+- 計測は repo root を `.tmp` 配下へ一時 staging して ZIP 化する PowerShell をその場実行し、script の既定 top-level 除外 (`.git`, `.github`, `.vscode`, `.tmp`, `target`, `build`, `node_modules`, `.gradle`, `.gemini`, `.m2home`, `.m2home-link`) と既定 relative 除外 (`docker`, `deployment`, `src/main/resources/data/books.jsonlines`) を前提にした
+- `samples` 配下の主因は `samples/bookstore/src/main/resources/data/books.jsonlines` 約 67.04 MB、`samples/bookstore/.git` 約 27.42 MB、`samples/spring-petclinic/.git` 約 11.00 MB、top-level `samples/*.zip` 合計約 93.97 MB だった
+- `docs/90_アーカイブ` は約 0.06 MB で、20MB 判定への影響は実質的に無視できた
+- 一時作成物 `.tmp\\repo-root-zip-feasibility-check*` と一時 ZIP は削除済みで、作業後に `.tmp` 非残存を確認した
+
+commit: same commit
+message: docs: CodexExec.resultにPR情報を反映
+message source: 自動生成
+push: success
+pr: 12
+pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/12
+pr base: main
+pr head: codex-repo-root-zip-feasibility-v1
+pr status: open
+===== CODEX_RESULT_END =====
+
+===== CODEX_RESULT_BEGIN =====
 TASK_ID: MAVEN_WRAPPER_AND_INSPECTION_ZIP_HARDENING_V1
 TITLE: Maven Wrapper 導入と inspection ZIP 除外強化
 EXECUTED_AT: 2026-04-21T15:07:15.4555612+09:00
