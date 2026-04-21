@@ -1,4 +1,51 @@
 ===== CODEX_RESULT_BEGIN =====
+TASK_ID: STARTUP_PROMPT_V3_REFRESH_V2_V1
+TITLE: 開始時プロンプト更新版 v2 反映
+EXECUTED_AT: 2026-04-21T15:59:21.6388620+09:00
+STATUS: [OK]
+STEP: COMMIT_PUSH_PR_STARTUP_PROMPT_V3_REFRESH_V2_V1
+changed files:
+- Q-Scout-for-Spring_開始時プロンプト_完全版.md
+- CodexExec.result
+
+commit units:
+- COMMIT 1
+  - sha: f70298f
+  - message: docs: 開始時プロンプト更新版v2を反映
+  - message source: 自動生成
+- COMMIT 2
+  - sha: same commit
+  - message: docs: CodexExec.resultを更新
+  - message source: 自動生成
+
+summary:
+- `Q-Scout-for-Spring_開始時プロンプト_完全版.md` を添付の更新版 v2 に同期し、docs 構造の現在地へ `00_プロジェクト管理/` と `30_基本設計/` の説明を反映した
+- preview / download の署名付き URL 前提、`CodexExec.result` 起点の確認順序、開始時のテスト状況説明を更新版に合わせて明確化した
+- `docs/00_プロジェクト管理/05_横断運用規程/CodexExec.result運用ルール.md` を前提とした参照導線を維持したまま、開始時プロンプト本文を最新版へそろえた
+
+untouched:
+- docs/README.md
+- docs/00_プロジェクト管理/05_横断運用規程/CodexExec.result運用ルール.md
+- src/main/java/**
+- src/test/java/**
+- src/main/resources/**
+
+notes:
+- 文書更新のみのためコードテストは未実施
+- 既存ブランチ指定に従い `ドキュメント整理` ブランチで作業した
+
+commit: same commit
+message: docs: CodexExec.resultを更新
+message source: 自動生成
+push: success
+pr: #11
+pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/11
+pr base: main
+pr head: ドキュメント整理
+pr status: open
+===== CODEX_RESULT_END =====
+
+===== CODEX_RESULT_BEGIN =====
 TASK_ID: MAVEN_WRAPPER_AND_INSPECTION_ZIP_HARDENING_V1
 TITLE: Maven Wrapper 導入と inspection ZIP 除外強化
 EXECUTED_AT: 2026-04-21T15:07:15.4555612+09:00
