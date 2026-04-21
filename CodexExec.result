@@ -1,4 +1,49 @@
 ===== CODEX_RESULT_BEGIN =====
+TASK_ID: DOCS_PROJECT_MANAGEMENT_RULES_V1
+TITLE: 00_プロジェクト管理新設と実装系文書配置規程追加 指示書 v1.0
+EXECUTED_AT: 2026-04-21T12:37:48.2586302+09:00
+STATUS: [OK]
+STEP: COMMIT_PUSH_PR_DOCS_PROJECT_MANAGEMENT_RULES_V1
+changed files:
+- docs/README.md
+- docs/00_プロジェクト管理/05_横断運用規程/実装系文書配置規程.md
+- CodexExec.result
+
+commit units:
+- COMMIT 1
+  - sha: 94dcd1b
+  - message: docs: 00_プロジェクト管理配下に横断運用規程を追加
+  - message source: CodexExec.md 指示採用
+- COMMIT 2
+  - sha: same commit
+  - message: docs: CodexExec.resultを更新
+  - message source: 自動生成
+
+summary:
+- `docs/README.md` に docs 直下の基本方針を追記し、`00_プロジェクト管理/05_横断運用規程/` を docs 全体または複数工程に横断する正式規程の集約先として位置づけた
+- `docs/00_プロジェクト管理/05_横断運用規程/実装系文書配置規程.md` を新設し、`44_実装指示書/`、`50_実装/`、横断運用規程の住み分けと配置判断手順を定義した
+- `docs/CodexExec.result運用ルール.md` は現位置のままとし、将来的な整理候補であることだけを `docs/README.md` で案内した
+
+untouched:
+- docs/CodexExec.result運用ルール.md
+- docs/40_詳細設計/44_実装指示書/
+- docs/50_実装/実装.txt
+
+notes:
+- 文書更新のみのためコードテストは未実施
+
+commit: same commit
+message: docs: CodexExec.resultを更新
+message source: 自動生成
+push: success
+pr: #8
+pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/8
+pr base: main
+pr head: codex-docs-project-management-rules-v1
+pr status: open
+===== CODEX_RESULT_END =====
+
+===== CODEX_RESULT_BEGIN =====
 TASK_ID: INDEX_LIMITS_NAVIGATION_FIX_V1
 TITLE: index再描画 limits 安定化と解析後遷移修正 v1.1
 EXECUTED_AT: 2026-04-21T03:42:32.7281409+09:00
