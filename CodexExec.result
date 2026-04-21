@@ -1,4 +1,46 @@
 ===== CODEX_RESULT_BEGIN =====
+TASK_ID: MAVEN_WRAPPER_AND_INSPECTION_ZIP_HARDENING_V1
+TITLE: Maven Wrapper 導入と inspection ZIP 除外強化
+EXECUTED_AT: 2026-04-21T15:07:15.4555612+09:00
+STATUS: [OK]
+STEP: COMMIT_PUSH_PR_MAVEN_WRAPPER_AND_INSPECTION_ZIP_HARDENING_V1
+changed files:
+- .mvn/wrapper/maven-wrapper.properties
+- mvnw
+- mvnw.cmd
+- scripts/create-inspection-zip.ps1
+- README.md
+- CodexExec.result
+
+summary:
+- リポジトリ直下へ Maven Wrapper を追加し、`mvnw` / `mvnw.cmd` で Maven 3.9.12 を使えるようにした
+- `create-inspection-zip.ps1` の top-level 除外に `.m2home`、`.m2home-link`、`.tmp` を追加し、Maven キャッシュ混入と repo root 指定時の staging 再帰取り込みを防いだ
+- README のビルド導線を Wrapper 優先へ最小更新し、Windows と Unix 系の実行例を追記した
+
+untouched:
+- `pom.xml` と `src/main/java/**` / `src/test/java/**` / `src/main/resources/**` は変更していない
+- Render 設定と `Dockerfile` は変更していない
+- 未追跡の `samples/bookstore/`、`samples/spring-boot-monolith/`、`samples/spring-petclinic/` は今回の作業対象に含めていない
+
+notes:
+- 実装コミット: `976e39f` `build: Maven Wrapper導入とZIP除外を整備`
+- 実行コマンド: `$env:MAVEN_USER_HOME='C:\academia\src\Q-Scout-for-Spring\.m2home-link'; cmd /c mvnw.cmd -s .codex-maven-settings.xml test`
+- 結果: 146 tests passed
+- 実行コマンド: `$env:MAVEN_USER_HOME='C:\academia\src\Q-Scout-for-Spring\.m2home-link'; cmd /c mvnw.cmd -s .codex-maven-settings.xml -q -DskipTests package`
+- 結果: package 成功
+- 実行コマンド: `powershell -ExecutionPolicy Bypass -File .\scripts\create-inspection-zip.ps1 -ProjectPath '.' -OutputZipPath 'samples\qscout-root-inspection.zip'`
+- 結果: source 695.49 MB / staged 207.58 MB / zip 160.24 MB
+- ZIP 確認: `.m2home` / `.m2home-link` は未含有、`.mvn/wrapper/maven-wrapper.properties` は含有
+- 検証では sandbox 制約回避のため一時 settings ファイルを使用し、確認後に削除した
+
+commit: same commit
+message: docs: Maven Wrapper整備結果を記録
+message source: 自動生成
+push: success
+pr: 10
+pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/10
+pr base: main
+pr head: codex-maven-wrapper-inspection-zip-hardening-v1
 TASK_ID: DOCS_PR8_MOVE_CODEXEXEC_RULES_V1
 TITLE: PR #8 継続修正 - CodexExec.result運用ルール.md を 05_横断運用規程 へ移設する指示書 v1.0
 EXECUTED_AT: 2026-04-21T14:53:34.6628479+09:00
@@ -46,52 +88,47 @@ pr: #8
 pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/8
 pr base: main
 pr head: codex-docs-project-management-rules-v1
-TASK_ID: MAVEN_WRAPPER_AND_INSPECTION_ZIP_HARDENING_V1
-TITLE: Maven Wrapper 導入と inspection ZIP 除外強化
-EXECUTED_AT: 2026-04-21T15:07:15.4555612+09:00
-STATUS: [OK]
-STEP: COMMIT_PUSH_PR_MAVEN_WRAPPER_AND_INSPECTION_ZIP_HARDENING_V1
-changed files:
-- .mvn/wrapper/maven-wrapper.properties
-- mvnw
-- mvnw.cmd
-- scripts/create-inspection-zip.ps1
-- README.md
-- CodexExec.result
-
-summary:
-- リポジトリ直下へ Maven Wrapper を追加し、`mvnw` / `mvnw.cmd` で Maven 3.9.12 を使えるようにした
-- `create-inspection-zip.ps1` の top-level 除外に `.m2home`、`.m2home-link`、`.tmp` を追加し、Maven キャッシュ混入と repo root 指定時の staging 再帰取り込みを防いだ
-- README のビルド導線を Wrapper 優先へ最小更新し、Windows と Unix 系の実行例を追記した
-
-untouched:
-- `pom.xml` と `src/main/java/**` / `src/test/java/**` / `src/main/resources/**` は変更していない
-- Render 設定と `Dockerfile` は変更していない
-- 未追跡の `samples/bookstore/`、`samples/spring-boot-monolith/`、`samples/spring-petclinic/` は今回の作業対象に含めていない
-
-notes:
-- 実装コミット: `976e39f` `build: Maven Wrapper導入とZIP除外を整備`
-- 実行コマンド: `$env:MAVEN_USER_HOME='C:\academia\src\Q-Scout-for-Spring\.m2home-link'; cmd /c mvnw.cmd -s .codex-maven-settings.xml test`
-- 結果: 146 tests passed
-- 実行コマンド: `$env:MAVEN_USER_HOME='C:\academia\src\Q-Scout-for-Spring\.m2home-link'; cmd /c mvnw.cmd -s .codex-maven-settings.xml -q -DskipTests package`
-- 結果: package 成功
-- 実行コマンド: `powershell -ExecutionPolicy Bypass -File .\scripts\create-inspection-zip.ps1 -ProjectPath '.' -OutputZipPath 'samples\qscout-root-inspection.zip'`
-- 結果: source 695.49 MB / staged 207.58 MB / zip 160.24 MB
-- ZIP 確認: `.m2home` / `.m2home-link` は未含有、`.mvn/wrapper/maven-wrapper.properties` は含有
-- 検証では sandbox 制約回避のため一時 settings ファイルを使用し、確認後に削除した
-
-commit: same commit
-message: docs: Maven Wrapper整備結果を記録
-message source: 自動生成
-push: success
-pr: 10
-pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/10
-pr base: main
-pr head: codex-maven-wrapper-inspection-zip-hardening-v1
 pr status: open
 ===== CODEX_RESULT_END =====
 
 ===== CODEX_RESULT_BEGIN =====
+TASK_ID: TRUSTED_PROXY_RENDER_OBSERVATION_V1
+TITLE: TRUSTED_PROXY_RENDER_OBSERVATION_V1 実装指示書 v1.1
+EXECUTED_AT: 2026-04-21T13:46:28.1227321+09:00
+STATUS: [OK]
+STEP: COMMIT_PUSH_PR_TRUSTED_PROXY_RENDER_OBSERVATION_V1
+changed files:
+- src/main/java/com/qscout/spring/web/service/ClientIpResolver.java
+- src/main/resources/application.properties
+- src/test/java/com/qscout/spring/web/WebSecurityHeadersTest.java
+- src/test/java/com/qscout/spring/web/controller/WebPageControllerTest.java
+- src/test/java/com/qscout/spring/web/service/ClientIpResolverTest.java
+- CodexExec.result
+
+summary:
+- `ClientIpResolver` に `qscout.client-ip.observation-log-enabled` を追加し、trusted proxy 判定や fallback の既存仕様を変えずに観測ログを opt-in で出せるようにした
+- 観測ログは `remoteAddr`、trusted proxy 一致有無、header 有無、抽出可否、解決元、マスク済み client IP のみを出力し、`X-Forwarded-For` 生値を記録しないようにした
+- resolver 単体テストへ観測ログ有効時の挙動不変と IPv4 / IPv6 マスク確認を追加し、フルテスト完走のため `WebSecurityHeadersTest` の redirect 前提を現行 PRG 仕様へ最小修正した
+
+untouched:
+- `TrustedProxyPolicy` の判定条件は変更していない
+- `WebPageController` のレート制限仕様は変更していない
+- 未追跡の `samples/bookstore/`、`samples/spring-boot-monolith/`、`samples/spring-petclinic/` は今回の作業対象に含めていない
+
+notes:
+- 実装コミット: `f94ada9` `security: trusted proxy観測ログを追加`
+- リポジトリに `./mvnw.cmd` が存在しないため、既存の Maven 実体で同等の `test` を実行した
+- 実行コマンド: `C:\Users\academia\.m2\wrapper\dists\apache-maven-3.9.12\59fe215c0ad6947fea90184bf7add084544567b927287592651fda3782e0e798\bin\mvn.cmd -Dmaven.repo.local=.m2home\repository test`
+- 結果: 146 tests passed
+
+commit: same commit
+message: docs: trusted proxy観測ログ結果を記録
+message source: 自動生成
+push: success
+pr: 9
+pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/9
+pr base: main
+pr head: codex-trusted-proxy-render-observation-v1
 TASK_ID: DOCS_PR8_PROJECT_PLAN_UNDER_00_V1
 TITLE: PR #8 継続修正 - 01_プロジェクト計画・管理 を 00_プロジェクト管理 配下へ吸収する指示書 v1.0
 EXECUTED_AT: 2026-04-21T14:37:48.7701838+09:00
@@ -230,43 +267,6 @@ pr: #8
 pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/8
 pr base: main
 pr head: codex-docs-project-management-rules-v1
-TASK_ID: TRUSTED_PROXY_RENDER_OBSERVATION_V1
-TITLE: TRUSTED_PROXY_RENDER_OBSERVATION_V1 実装指示書 v1.1
-EXECUTED_AT: 2026-04-21T13:46:28.1227321+09:00
-STATUS: [OK]
-STEP: COMMIT_PUSH_PR_TRUSTED_PROXY_RENDER_OBSERVATION_V1
-changed files:
-- src/main/java/com/qscout/spring/web/service/ClientIpResolver.java
-- src/main/resources/application.properties
-- src/test/java/com/qscout/spring/web/WebSecurityHeadersTest.java
-- src/test/java/com/qscout/spring/web/controller/WebPageControllerTest.java
-- src/test/java/com/qscout/spring/web/service/ClientIpResolverTest.java
-- CodexExec.result
-
-summary:
-- `ClientIpResolver` に `qscout.client-ip.observation-log-enabled` を追加し、trusted proxy 判定や fallback の既存仕様を変えずに観測ログを opt-in で出せるようにした
-- 観測ログは `remoteAddr`、trusted proxy 一致有無、header 有無、抽出可否、解決元、マスク済み client IP のみを出力し、`X-Forwarded-For` 生値を記録しないようにした
-- resolver 単体テストへ観測ログ有効時の挙動不変と IPv4 / IPv6 マスク確認を追加し、フルテスト完走のため `WebSecurityHeadersTest` の redirect 前提を現行 PRG 仕様へ最小修正した
-
-untouched:
-- `TrustedProxyPolicy` の判定条件は変更していない
-- `WebPageController` のレート制限仕様は変更していない
-- 未追跡の `samples/bookstore/`、`samples/spring-boot-monolith/`、`samples/spring-petclinic/` は今回の作業対象に含めていない
-
-notes:
-- 実装コミット: `f94ada9` `security: trusted proxy観測ログを追加`
-- リポジトリに `./mvnw.cmd` が存在しないため、既存の Maven 実体で同等の `test` を実行した
-- 実行コマンド: `C:\Users\academia\.m2\wrapper\dists\apache-maven-3.9.12\59fe215c0ad6947fea90184bf7add084544567b927287592651fda3782e0e798\bin\mvn.cmd -Dmaven.repo.local=.m2home\repository test`
-- 結果: 146 tests passed
-
-commit: same commit
-message: docs: trusted proxy観測ログ結果を記録
-message source: 自動生成
-push: success
-pr: 9
-pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/9
-pr base: main
-pr head: codex-trusted-proxy-render-observation-v1
 pr status: open
 ===== CODEX_RESULT_END =====
 
