@@ -1,4 +1,55 @@
 ===== CODEX_RESULT_BEGIN =====
+TASK_ID: DOCS_PR8_MOVE_CODEXEXEC_RULES_V1
+TITLE: PR #8 継続修正 - CodexExec.result運用ルール.md を 05_横断運用規程 へ移設する指示書 v1.0
+EXECUTED_AT: 2026-04-21T14:53:34.6628479+09:00
+STATUS: [OK]
+STEP: COMMIT_PUSH_PR8_MOVE_CODEXEXEC_RULES_V1
+changed files:
+- docs/00_プロジェクト管理/05_横断運用規程/CodexExec.result運用ルール.md
+- docs/CodexExec.result運用ルール.md
+- docs/README.md
+- Q-Scout-for-Spring_開始時プロンプト_完全版.md
+- CodexExec.result
+
+commit units:
+- COMMIT 1
+  - sha: 9cf065f
+  - message: docs: CodexExec.result運用ルールを横断運用規程へ移設
+  - message source: CodexExec_move_CodexExecRules.md 指示採用
+- COMMIT 2
+  - sha: same commit
+  - message: docs: CodexExec.resultを更新
+  - message source: 自動生成
+
+summary:
+- `docs/CodexExec.result運用ルール.md` を `docs/00_プロジェクト管理/05_横断運用規程/CodexExec.result運用ルール.md` へ移し、横断運用規程の代表文書として `実装系文書配置規程.md` と同じ配下へ揃えた
+- `docs/README.md` から旧パスを前提にした「将来的な整理候補」の記述を外し、`05_横断運用規程/` 配下に `CodexExec.result運用ルール.md` が既に整理済みである前提へ更新した
+- `Q-Scout-for-Spring_開始時プロンプト_完全版.md` の参照先も新パスへ追随させ、新規チャット開始時の確認導線と実体配置を一致させた
+
+untouched:
+- docs/00_プロジェクト管理/05_横断運用規程/実装系文書配置規程.md
+- docs/00_プロジェクト管理/01_プロジェクト計画/プロジェクト計画.txt
+- docs/50_実装/実装.txt
+- docs/60_単体テスト/単体テスト.txt
+- docs/70_結合テスト/結合テスト.txt
+- docs/40_詳細設計/44_実装指示書/
+
+notes:
+- 文書移設と参照更新のみのためコードテストは未実施
+- 既存 PR #8 を更新する方針とし、新規 PR は作成していない
+
+commit: same commit
+message: docs: CodexExec.resultを更新
+message source: 自動生成
+push: success
+pr: #8
+pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/8
+pr base: main
+pr head: codex-docs-project-management-rules-v1
+pr status: open
+===== CODEX_RESULT_END =====
+
+===== CODEX_RESULT_BEGIN =====
 TASK_ID: DOCS_PR8_PROJECT_PLAN_UNDER_00_V1
 TITLE: PR #8 継続修正 - 01_プロジェクト計画・管理 を 00_プロジェクト管理 配下へ吸収する指示書 v1.0
 EXECUTED_AT: 2026-04-21T14:37:48.7701838+09:00
