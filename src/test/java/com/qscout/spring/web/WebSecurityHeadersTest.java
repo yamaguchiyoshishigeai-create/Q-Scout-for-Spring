@@ -20,6 +20,7 @@ import java.util.zip.ZipOutputStream;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(properties = {
@@ -52,9 +53,10 @@ class WebSecurityHeadersTest {
         );
 
         MvcResult analyzeResult = mockMvc.perform(multipart("/analyze").file(zip).header("X-Forwarded-For", "198.51.100.200"))
-                .andExpect(status().isOk())
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/#result-summary"))
                 .andReturn();
-        WebAnalysisResponse response = (WebAnalysisResponse) analyzeResult.getModelAndView().getModel().get("response");
+        WebAnalysisResponse response = (WebAnalysisResponse) analyzeResult.getFlashMap().get("response");
 
         mockMvc.perform(get(response.humanPreviewUrl()))
                 .andExpect(status().isOk())

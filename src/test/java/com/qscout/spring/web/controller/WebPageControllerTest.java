@@ -202,11 +202,11 @@ class WebPageControllerTest {
     }
 
     private ClientIpResolver defaultClientIpResolver() {
-        return new ClientIpResolver(TrustedProxyPolicy.forTesting(false, "127.0.0.1", "::1"));
+        return new ClientIpResolver(TrustedProxyPolicy.forTesting(false, "127.0.0.1", "::1"), false);
     }
 
     private ClientIpResolver trustedForwardedResolver() {
-        return new ClientIpResolver(TrustedProxyPolicy.forTesting(true, "127.0.0.1", "::1"));
+        return new ClientIpResolver(TrustedProxyPolicy.forTesting(true, "127.0.0.1", "::1"), false);
     }
 
     private MockHttpServletRequest request(String remoteAddr) {
