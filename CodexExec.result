@@ -15,22 +15,25 @@ summary:
 
 untouched:
 - `scripts/create-inspection-zip.ps1`、`README.md`、`.gitignore`、`pom.xml`、`src/**` を含む tracked 実装ファイルは変更していない
-- commit / push / PR は実施していない
 - 未追跡の `samples/bookstore/`、`samples/spring-boot-monolith/`、`samples/spring-petclinic/` は現 working tree のまま計測対象として扱った
 
 notes:
+- 実測結果の共有用ブランチ: `codex-repo-root-zip-feasibility-v1`
+- 実測記録コミット: `de393bc` `docs: record repo root ZIP feasibility results`
 - 計測は repo root を `.tmp` 配下へ一時 staging して ZIP 化する PowerShell をその場実行し、script の既定 top-level 除外 (`.git`, `.github`, `.vscode`, `.tmp`, `target`, `build`, `node_modules`, `.gradle`, `.gemini`, `.m2home`, `.m2home-link`) と既定 relative 除外 (`docker`, `deployment`, `src/main/resources/data/books.jsonlines`) を前提にした
 - `samples` 配下の主因は `samples/bookstore/src/main/resources/data/books.jsonlines` 約 67.04 MB、`samples/bookstore/.git` 約 27.42 MB、`samples/spring-petclinic/.git` 約 11.00 MB、top-level `samples/*.zip` 合計約 93.97 MB だった
 - `docs/90_アーカイブ` は約 0.06 MB で、20MB 判定への影響は実質的に無視できた
 - 一時作成物 `.tmp\\repo-root-zip-feasibility-check*` と一時 ZIP は削除済みで、作業後に `.tmp` 非残存を確認した
 
-commit: none
-message: none
-message source: none
-push: none
-pr: none
-pr url: none
-pr status: none
+commit: same commit
+message: docs: CodexExec.resultにPR情報を反映
+message source: 自動生成
+push: success
+pr: 12
+pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/12
+pr base: main
+pr head: codex-repo-root-zip-feasibility-v1
+pr status: open
 ===== CODEX_RESULT_END =====
 
 ===== CODEX_RESULT_BEGIN =====
