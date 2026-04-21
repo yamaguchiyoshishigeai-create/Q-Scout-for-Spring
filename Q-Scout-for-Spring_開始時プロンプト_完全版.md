@@ -26,7 +26,7 @@
 1. 対象リポジトリと対象ブランチ
 2. `README.md`
 3. `docs/README.md`
-4. `docs/CodexExec.result運用ルール.md`
+4. `docs/00_プロジェクト管理/05_横断運用規程/CodexExec.result運用ルール.md`
 5. 必要に応じて `CodexExec.result`
 
 ### 2.2 次に確認するもの
@@ -53,7 +53,7 @@
 ### 3.1 最優先の索引・運用文書
 - `README.md`
 - `docs/README.md`
-- `docs/CodexExec.result運用ルール.md`
+- `docs/00_プロジェクト管理/05_横断運用規程/CodexExec.result運用ルール.md`
 
 ### 3.2 企画・将来構想
 - `docs/10_企画/Q-Scout-for-Spring-プロジェクト企画書-v2.0.md`
@@ -396,7 +396,7 @@ AI 向け Markdown は、現行実装では **英語固定** です。
 ### 15.1 Codex 実行手順
 - Codex 実装作業では、原則として **実装 → テスト → `CodexExec.result` へ実行ログ追記 → commit → push → Pull Request 作成** の順で進める
 - Pull Request 作成後は、`CodexExec.result` の該当ログブロックへ PR 情報を追記し、その更新も branch に反映する
-- 長文の実行ログ貼り付けは原則不要とし、詳細な出力ルールは `docs/CodexExec.result運用ルール.md` に従う
+- 長文の実行ログ貼り付けは原則不要とし、詳細な出力ルールは `docs/00_プロジェクト管理/05_横断運用規程/CodexExec.result運用ルール.md` に従う
 
 ### 15.2 `CodexExec.result` の必須記録項目
 - 各ログブロックには、従来項目に加えて `push` / `pr` / `pr url` / `pr base` / `pr head` / `pr status` を必須で記録する

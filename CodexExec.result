@@ -41,6 +41,53 @@ pr: 10
 pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/10
 pr base: main
 pr head: codex-maven-wrapper-inspection-zip-hardening-v1
+TASK_ID: DOCS_PR8_MOVE_CODEXEXEC_RULES_V1
+TITLE: PR #8 継続修正 - CodexExec.result運用ルール.md を 05_横断運用規程 へ移設する指示書 v1.0
+EXECUTED_AT: 2026-04-21T14:53:34.6628479+09:00
+STATUS: [OK]
+STEP: COMMIT_PUSH_PR8_MOVE_CODEXEXEC_RULES_V1
+changed files:
+- docs/00_プロジェクト管理/05_横断運用規程/CodexExec.result運用ルール.md
+- docs/CodexExec.result運用ルール.md
+- docs/README.md
+- Q-Scout-for-Spring_開始時プロンプト_完全版.md
+- CodexExec.result
+
+commit units:
+- COMMIT 1
+  - sha: 9cf065f
+  - message: docs: CodexExec.result運用ルールを横断運用規程へ移設
+  - message source: CodexExec_move_CodexExecRules.md 指示採用
+- COMMIT 2
+  - sha: same commit
+  - message: docs: CodexExec.resultを更新
+  - message source: 自動生成
+
+summary:
+- `docs/CodexExec.result運用ルール.md` を `docs/00_プロジェクト管理/05_横断運用規程/CodexExec.result運用ルール.md` へ移し、横断運用規程の代表文書として `実装系文書配置規程.md` と同じ配下へ揃えた
+- `docs/README.md` から旧パスを前提にした「将来的な整理候補」の記述を外し、`05_横断運用規程/` 配下に `CodexExec.result運用ルール.md` が既に整理済みである前提へ更新した
+- `Q-Scout-for-Spring_開始時プロンプト_完全版.md` の参照先も新パスへ追随させ、新規チャット開始時の確認導線と実体配置を一致させた
+
+untouched:
+- docs/00_プロジェクト管理/05_横断運用規程/実装系文書配置規程.md
+- docs/00_プロジェクト管理/01_プロジェクト計画/プロジェクト計画.txt
+- docs/50_実装/実装.txt
+- docs/60_単体テスト/単体テスト.txt
+- docs/70_結合テスト/結合テスト.txt
+- docs/40_詳細設計/44_実装指示書/
+
+notes:
+- 文書移設と参照更新のみのためコードテストは未実施
+- 既存 PR #8 を更新する方針とし、新規 PR は作成していない
+
+commit: same commit
+message: docs: CodexExec.resultを更新
+message source: 自動生成
+push: success
+pr: #8
+pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/8
+pr base: main
+pr head: codex-docs-project-management-rules-v1
 pr status: open
 ===== CODEX_RESULT_END =====
 
@@ -82,6 +129,144 @@ pr: 9
 pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/9
 pr base: main
 pr head: codex-trusted-proxy-render-observation-v1
+TASK_ID: DOCS_PR8_PROJECT_PLAN_UNDER_00_V1
+TITLE: PR #8 継続修正 - 01_プロジェクト計画・管理 を 00_プロジェクト管理 配下へ吸収する指示書 v1.0
+EXECUTED_AT: 2026-04-21T14:37:48.7701838+09:00
+STATUS: [OK]
+STEP: COMMIT_PUSH_PR8_PROJECT_PLAN_UNDER_00_V1
+changed files:
+- docs/README.md
+- docs/00_プロジェクト管理/01_プロジェクト計画/プロジェクト計画.txt
+- docs/01_プロジェクト計画・管理/プロジェクト計画.txt
+- CodexExec.result
+
+commit units:
+- COMMIT 1
+  - sha: 81d8b19
+  - message: docs: 00_プロジェクト管理配下へ計画プレースホルダを移設
+  - message source: CodexExec_PR8_next_step.md 指示採用
+- COMMIT 2
+  - sha: same commit
+  - message: docs: CodexExec.resultを更新
+  - message source: 自動生成
+
+summary:
+- `docs/01_プロジェクト計画・管理/プロジェクト計画.txt` を `docs/00_プロジェクト管理/01_プロジェクト計画/プロジェクト計画.txt` へ移し、管理系の親フォルダを `00_プロジェクト管理/` に一本化した
+- `docs/README.md` から docs 直下の大分類としての `01_プロジェクト計画・管理/` を外し、`00_プロジェクト管理/` 配下に `01_プロジェクト計画/` と `05_横断運用規程/` を持つ構成へ案内を更新した
+- 空になった旧 `docs/01_プロジェクト計画・管理/` ディレクトリを削除し、docs 直下の一覧でも 01 が残らない状態に整えた
+
+untouched:
+- docs/00_プロジェクト管理/05_横断運用規程/実装系文書配置規程.md
+- docs/CodexExec.result運用ルール.md
+- docs/50_実装/実装.txt
+- docs/60_単体テスト/単体テスト.txt
+- docs/70_結合テスト/結合テスト.txt
+- docs/40_詳細設計/44_実装指示書/
+
+notes:
+- 文書再編のみのためコードテストは未実施
+- 既存 PR #8 を更新する方針とし、新規 PR は作成していない
+
+commit: same commit
+message: docs: CodexExec.resultを更新
+message source: 自動生成
+push: success
+pr: #8
+pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/8
+pr base: main
+pr head: codex-docs-project-management-rules-v1
+pr status: open
+===== CODEX_RESULT_END =====
+
+===== CODEX_RESULT_BEGIN =====
+TASK_ID: DOCS_PR8_README_MANAGEMENT_AXIS_FIX_V1
+TITLE: PR #8 README管理系主軸明確化 修正指示書 v1.0
+EXECUTED_AT: 2026-04-21T13:49:02.1951159+09:00
+STATUS: [OK]
+STEP: COMMIT_PUSH_PR8_README_MANAGEMENT_AXIS_FIX_V1
+changed files:
+- docs/README.md
+- CodexExec.result
+
+commit units:
+- COMMIT 1
+  - sha: a4e2124
+  - message: docs: READMEで00_プロジェクト管理を主軸化
+  - message source: CodexExec.md 指示採用
+- COMMIT 2
+  - sha: same commit
+  - message: docs: CodexExec.resultを更新
+  - message source: 自動生成
+
+summary:
+- `docs/README.md` の `docs 直下の基本方針` で、管理系文書と横断運用規程の現行主軸を `00_プロジェクト管理/` と明記した
+- `大分類フォルダの位置づけ` で、`00_プロジェクト管理/` を現行主配置先、`01_プロジェクト計画・管理/` を過渡的なプレースホルダかつ将来整理対象として整理した
+- `現行補助仕様` と `未作成プレースホルダ文書` の節も微修正し、`05_横断運用規程/` への導線と `01_プロジェクト計画・管理/` の非主軸扱いが矛盾しないよう整えた
+
+untouched:
+- docs/00_プロジェクト管理/05_横断運用規程/実装系文書配置規程.md
+- docs/CodexExec.result運用ルール.md
+- docs/40_詳細設計/44_実装指示書/
+- docs/50_実装/実装.txt
+- その他の docs 配下本文群
+
+notes:
+- 文書更新のみのためコードテストは未実施
+- 既存 PR #8 を更新する方針とし、新規 PR は作成していない
+
+commit: same commit
+message: docs: CodexExec.resultを更新
+message source: 自動生成
+push: success
+pr: #8
+pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/8
+pr base: main
+pr head: codex-docs-project-management-rules-v1
+pr status: open
+===== CODEX_RESULT_END =====
+
+===== CODEX_RESULT_BEGIN =====
+TASK_ID: DOCS_PROJECT_MANAGEMENT_RULES_V1
+TITLE: 00_プロジェクト管理新設と実装系文書配置規程追加 指示書 v1.0
+EXECUTED_AT: 2026-04-21T12:37:48.2586302+09:00
+STATUS: [OK]
+STEP: COMMIT_PUSH_PR_DOCS_PROJECT_MANAGEMENT_RULES_V1
+changed files:
+- docs/README.md
+- docs/00_プロジェクト管理/05_横断運用規程/実装系文書配置規程.md
+- CodexExec.result
+
+commit units:
+- COMMIT 1
+  - sha: 94dcd1b
+  - message: docs: 00_プロジェクト管理配下に横断運用規程を追加
+  - message source: CodexExec.md 指示採用
+- COMMIT 2
+  - sha: same commit
+  - message: docs: CodexExec.resultを更新
+  - message source: 自動生成
+
+summary:
+- `docs/README.md` に docs 直下の基本方針を追記し、`00_プロジェクト管理/05_横断運用規程/` を docs 全体または複数工程に横断する正式規程の集約先として位置づけた
+- `docs/00_プロジェクト管理/05_横断運用規程/実装系文書配置規程.md` を新設し、`44_実装指示書/`、`50_実装/`、横断運用規程の住み分けと配置判断手順を定義した
+- `docs/CodexExec.result運用ルール.md` は現位置のままとし、将来的な整理候補であることだけを `docs/README.md` で案内した
+
+untouched:
+- docs/CodexExec.result運用ルール.md
+- docs/40_詳細設計/44_実装指示書/
+- docs/50_実装/実装.txt
+
+notes:
+- 文書更新のみのためコードテストは未実施
+
+commit: same commit
+message: docs: CodexExec.resultを更新
+message source: 自動生成
+push: success
+pr: #8
+pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/8
+pr base: main
+pr head: codex-docs-project-management-rules-v1
 pr status: open
 ===== CODEX_RESULT_END =====
 
