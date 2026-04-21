@@ -1,4 +1,51 @@
 ===== CODEX_RESULT_BEGIN =====
+TASK_ID: DOCS_PR8_README_MANAGEMENT_AXIS_FIX_V1
+TITLE: PR #8 README管理系主軸明確化 修正指示書 v1.0
+EXECUTED_AT: 2026-04-21T13:49:02.1951159+09:00
+STATUS: [OK]
+STEP: COMMIT_PUSH_PR8_README_MANAGEMENT_AXIS_FIX_V1
+changed files:
+- docs/README.md
+- CodexExec.result
+
+commit units:
+- COMMIT 1
+  - sha: a4e2124
+  - message: docs: READMEで00_プロジェクト管理を主軸化
+  - message source: CodexExec.md 指示採用
+- COMMIT 2
+  - sha: same commit
+  - message: docs: CodexExec.resultを更新
+  - message source: 自動生成
+
+summary:
+- `docs/README.md` の `docs 直下の基本方針` で、管理系文書と横断運用規程の現行主軸を `00_プロジェクト管理/` と明記した
+- `大分類フォルダの位置づけ` で、`00_プロジェクト管理/` を現行主配置先、`01_プロジェクト計画・管理/` を過渡的なプレースホルダかつ将来整理対象として整理した
+- `現行補助仕様` と `未作成プレースホルダ文書` の節も微修正し、`05_横断運用規程/` への導線と `01_プロジェクト計画・管理/` の非主軸扱いが矛盾しないよう整えた
+
+untouched:
+- docs/00_プロジェクト管理/05_横断運用規程/実装系文書配置規程.md
+- docs/CodexExec.result運用ルール.md
+- docs/40_詳細設計/44_実装指示書/
+- docs/50_実装/実装.txt
+- その他の docs 配下本文群
+
+notes:
+- 文書更新のみのためコードテストは未実施
+- 既存 PR #8 を更新する方針とし、新規 PR は作成していない
+
+commit: same commit
+message: docs: CodexExec.resultを更新
+message source: 自動生成
+push: success
+pr: #8
+pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/8
+pr base: main
+pr head: codex-docs-project-management-rules-v1
+pr status: open
+===== CODEX_RESULT_END =====
+
+===== CODEX_RESULT_BEGIN =====
 TASK_ID: DOCS_PROJECT_MANAGEMENT_RULES_V1
 TITLE: 00_プロジェクト管理新設と実装系文書配置規程追加 指示書 v1.0
 EXECUTED_AT: 2026-04-21T12:37:48.2586302+09:00
