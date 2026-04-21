@@ -1,4 +1,54 @@
 ===== CODEX_RESULT_BEGIN =====
+TASK_ID: DOCS_PR8_PROJECT_PLAN_UNDER_00_V1
+TITLE: PR #8 継続修正 - 01_プロジェクト計画・管理 を 00_プロジェクト管理 配下へ吸収する指示書 v1.0
+EXECUTED_AT: 2026-04-21T14:37:48.7701838+09:00
+STATUS: [OK]
+STEP: COMMIT_PUSH_PR8_PROJECT_PLAN_UNDER_00_V1
+changed files:
+- docs/README.md
+- docs/00_プロジェクト管理/01_プロジェクト計画/プロジェクト計画.txt
+- docs/01_プロジェクト計画・管理/プロジェクト計画.txt
+- CodexExec.result
+
+commit units:
+- COMMIT 1
+  - sha: 81d8b19
+  - message: docs: 00_プロジェクト管理配下へ計画プレースホルダを移設
+  - message source: CodexExec_PR8_next_step.md 指示採用
+- COMMIT 2
+  - sha: same commit
+  - message: docs: CodexExec.resultを更新
+  - message source: 自動生成
+
+summary:
+- `docs/01_プロジェクト計画・管理/プロジェクト計画.txt` を `docs/00_プロジェクト管理/01_プロジェクト計画/プロジェクト計画.txt` へ移し、管理系の親フォルダを `00_プロジェクト管理/` に一本化した
+- `docs/README.md` から docs 直下の大分類としての `01_プロジェクト計画・管理/` を外し、`00_プロジェクト管理/` 配下に `01_プロジェクト計画/` と `05_横断運用規程/` を持つ構成へ案内を更新した
+- 空になった旧 `docs/01_プロジェクト計画・管理/` ディレクトリを削除し、docs 直下の一覧でも 01 が残らない状態に整えた
+
+untouched:
+- docs/00_プロジェクト管理/05_横断運用規程/実装系文書配置規程.md
+- docs/CodexExec.result運用ルール.md
+- docs/50_実装/実装.txt
+- docs/60_単体テスト/単体テスト.txt
+- docs/70_結合テスト/結合テスト.txt
+- docs/40_詳細設計/44_実装指示書/
+
+notes:
+- 文書再編のみのためコードテストは未実施
+- 既存 PR #8 を更新する方針とし、新規 PR は作成していない
+
+commit: same commit
+message: docs: CodexExec.resultを更新
+message source: 自動生成
+push: success
+pr: #8
+pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/8
+pr base: main
+pr head: codex-docs-project-management-rules-v1
+pr status: open
+===== CODEX_RESULT_END =====
+
+===== CODEX_RESULT_BEGIN =====
 TASK_ID: DOCS_PR8_README_MANAGEMENT_AXIS_FIX_V1
 TITLE: PR #8 README管理系主軸明確化 修正指示書 v1.0
 EXECUTED_AT: 2026-04-21T13:49:02.1951159+09:00
