@@ -1,4 +1,12 @@
 ===== CODEX_RESULT_BEGIN =====
+TASK_ID: LOCAL_DEV_SECRET_FALLBACK_V1
+TITLE: ローカル起動用署名トークン秘密鍵フォールバック追加
+EXECUTED_AT: 2026-04-23T13:42:41.9948061+09:00
+STATUS: [OK]
+STEP: COMMIT_PUSH_PR_LOCAL_DEV_SECRET_FALLBACK_V1
+changed files:
+- src/main/java/com/qscout/spring/web/service/RequestAccessTokenService.java
+- src/test/java/com/qscout/spring/web/service/RequestAccessTokenServiceLocalExecutionTest.java
 TASK_ID: SCORE_BAND_BACKGROUND_UI_V1
 TITLE: スコア帯別背景色UI修正 Codex指示書 v1.0
 EXECUTED_AT: 2026-04-23T12:37:25.5653058+09:00
@@ -28,6 +36,9 @@ changed files:
 
 commit units:
 - COMMIT 1
+  - sha: 4c5784a
+  - message: fix: ローカル起動時の署名トークン秘密鍵を補完
+  - message source: 自動生成
   - sha: fbd42d8
   - message: feat: スコア帯別背景色UIを追加
   - message source: ユーザー指示採用
@@ -37,6 +48,19 @@ commit units:
   - message source: 自動生成
 
 summary:
+- `RequestAccessTokenService` にローカル実行判定を追加し、`target/classes` からの起動時だけ一時 secret を自動補完するようにした
+- 明示 secret 設定済み、および `qscout.artifact-token.allow-insecure-dev-secret=true` の既存経路は維持したまま、IDE 直起動のローカル実行だけを救済した
+- `RequestAccessTokenServiceLocalExecutionTest` を追加し、`target/classes` は許可し packaged jar は許可しない境界を検証した
+
+untouched:
+- `src/main/resources/application.properties`
+- preview / download の署名付き URL 仕様
+- 本番向けの secret 必須方針
+
+notes:
+- 実行コマンド: `C:\Users\academia\.m2\wrapper\dists\apache-maven-3.9.12\59fe215c0ad6947fea90184bf7add084544567b927287592651fda3782e0e798\bin\mvn.cmd test`
+- 結果: 149 tests passed
+- 実行確認: `target/classes` から env 未設定で起動し、`LOCAL_DEV_SECRET_FALLBACK_ENABLED` 警告後に `Started QScoutWebApplication` を確認
 - Java 側で score band しきい値判定を共通化し、`WebAnalysisResponse` と `PreviewArtifactView` へ `scoreBandClass` を追加した
 - requestId ごとのワークスペースへ score band を保存し、summary と human / ai preview が同じ帯色を使うようにした
 - `summary.html` と `preview.html` に class 付与を追加し、`home.css` / `app.css` へ淡色背景と白寄せカードの UI を実装した
@@ -54,6 +78,68 @@ commit: same commit
 message: docs: CodexExec.resultを更新
 message source: 自動生成
 push: success
+pr: 15
+pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/15
+pr base: main
+pr head: codex-local-dev-secret-fallback-v1
+pr status: open
+===== CODEX_RESULT_END =====
+
+===== CODEX_RESULT_BEGIN =====
+TASK_ID: REPO_ROOT_INSPECTION_ZIP_SAMPLES_DEFAULT_EXCLUDE_V1
+TITLE: REPO_ROOT_INSPECTION_ZIP_SAMPLES_DEFAULT_EXCLUDE_V1 実装指示書 v1.0
+EXECUTED_AT: 2026-04-23T12:02:40.0650723+09:00
+STATUS: [OK]
+STEP: COMMIT_PUSH_PR_REPO_ROOT_INSPECTION_ZIP_SAMPLES_DEFAULT_EXCLUDE_V1
+changed files:
+- scripts/create-inspection-zip.ps1
+- README.md
+- CodexExec.result
+
+commit units:
+- COMMIT 1
+  - sha: ddbedb4
+  - message: build: repo root inspection ZIP で samples を既定除外
+  - message source: 添付指示書採用
+- COMMIT 2
+  - sha: same commit
+  - message: docs: CodexExec.resultを更新
+  - message source: 自動生成
+
+summary:
+- `create-inspection-zip.ps1` に repo root 判定を追加し、repo root 指定時だけ `samples` を既定の project-relative 除外へ追加するようにした
+- 明示上書き用に `-IncludeSamples` を追加し、repo root 自己検証 ZIP でだけ既定除外を切り替えられるようにした
+- `README.md` に、`-ProjectPath '.'` では既定で `samples` を除外し、必要時は `-IncludeSamples` を使う旨を短く追記した
+
+untouched:
+- `pom.xml`
+- `src/main/java/**`
+- `src/test/java/**`
+- Render 設定
+- 既存の top-level 除外一覧
+
+notes:
+- 実行コマンド: `powershell -ExecutionPolicy Bypass -File .\scripts\create-inspection-zip.ps1 -ProjectPath '.' -OutputZipPath 'samples\qscout-root-inspection.zip'`
+- 結果: repo root mode enabled / source 3.53 MB / staged 0.99 MB / zip 0.34 MB
+- ZIP 確認: `sample_entry_count=0` で `samples/` 未含有、20MB 制限内
+- 実行コマンド: `powershell -ExecutionPolicy Bypass -File .\scripts\create-inspection-zip.ps1 -ProjectPath 'samples/sample-project' -OutputZipPath 'samples\sample-project-inspection.zip'`
+- 結果: repo root mode disabled / zip 1,672 bytes / `entry_count=5`
+- ZIP 確認: `pom.xml` と `src/**` を含み、個別サンプル指定の既存用途が維持されることを確認
+- `samples/bookstore` はこの checkout に存在しないため、同等確認は実在する `samples/sample-project` で代替した
+- 実行コマンド: `powershell -ExecutionPolicy Bypass -File .\scripts\create-inspection-zip.ps1 -ProjectPath '.' -OutputZipPath 'samples\qscout-root-inspection-with-samples.zip' -IncludeSamples`
+- 結果: repo root mode enabled / explicit override 有効 / zip 0.67 MB / `sample_entry_count=8`
+- 実行コマンド: `$env:MAVEN_USER_HOME='C:\academia\src\Q-Scout-for-Spring1\br_main\.m2home-link'; cmd /c mvnw.cmd test`
+- 結果: 146 tests passed
+- 初回 `mvnw.cmd test` は sandbox のネットワーク制限で wrapper 取得に失敗し、権限付き再実行で完走した
+
+commit: same commit
+message: docs: CodexExec.resultを更新
+message source: 自動生成
+push: success
+pr: 13
+pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/13
+pr base: main
+pr head: codex-repo-root-inspection-zip-samples-default-exclude-v1
 pr: 14
 pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/14
 pr base: main

@@ -9,7 +9,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.time.Clock;
@@ -42,13 +45,23 @@ public class RequestAccessTokenService {
             @Value("${qscout.artifact-token.allow-insecure-dev-secret:false}") boolean allowInsecureDevSecret,
             TempWorkspaceService tempWorkspaceService
     ) {
-        this(resolveSecret(configuredSecret, allowInsecureDevSecret),
+        this(resolveSecret(configuredSecret, allowInsecureDevSecret, isLocalDevelopmentExecution()),
                 tempWorkspaceService.retention(),
                 Clock.systemUTC());
     }
 
     RequestAccessTokenService(String configuredSecret, boolean allowInsecureDevSecret, Duration tokenTtl, Clock clock) {
-        this(resolveSecret(configuredSecret, allowInsecureDevSecret), tokenTtl, clock);
+        this(configuredSecret, allowInsecureDevSecret, false, tokenTtl, clock);
+    }
+
+    RequestAccessTokenService(
+            String configuredSecret,
+            boolean allowInsecureDevSecret,
+            boolean localDevelopmentExecution,
+            Duration tokenTtl,
+            Clock clock
+    ) {
+        this(resolveSecret(configuredSecret, allowInsecureDevSecret, localDevelopmentExecution), tokenTtl, clock);
     }
 
     private RequestAccessTokenService(byte[] secret, Duration tokenTtl, Clock clock) {
@@ -125,7 +138,11 @@ public class RequestAccessTokenService {
         }
     }
 
-    private static byte[] resolveSecret(String configuredSecret, boolean allowInsecureDevSecret) {
+    private static byte[] resolveSecret(
+            String configuredSecret,
+            boolean allowInsecureDevSecret,
+            boolean localDevelopmentExecution
+    ) {
         if (configuredSecret != null && !configuredSecret.isBlank()) {
             return configuredSecret.getBytes(StandardCharsets.UTF_8);
         }
@@ -134,8 +151,30 @@ public class RequestAccessTokenService {
             logger.warn("Artifact token secret is missing. reasonCode=INSECURE_DEV_SECRET_ENABLED");
             return ephemeralSecret.getBytes(StandardCharsets.UTF_8);
         }
+        if (localDevelopmentExecution) {
+            String ephemeralSecret = UUID.randomUUID().toString();
+            logger.warn("Artifact token secret is missing. reasonCode=LOCAL_DEV_SECRET_FALLBACK_ENABLED");
+            return ephemeralSecret.getBytes(StandardCharsets.UTF_8);
+        }
         throw new IllegalStateException(
                 "QSCOUT_ARTIFACT_TOKEN_SECRET must be set or qscout.artifact-token.allow-insecure-dev-secret=true must be enabled for local development."
         );
+    }
+
+    static boolean isLocalDevelopmentExecution() {
+        try {
+            URL location = RequestAccessTokenService.class.getProtectionDomain().getCodeSource().getLocation();
+            return isLocalDevelopmentClassesPath(Path.of(location.toURI()));
+        } catch (URISyntaxException | NullPointerException | IllegalArgumentException exception) {
+            return false;
+        }
+    }
+
+    static boolean isLocalDevelopmentClassesPath(Path location) {
+        if (location == null) {
+            return false;
+        }
+        String normalized = location.normalize().toString().replace('\\', '/');
+        return normalized.endsWith("/target/classes");
     }
 }
