@@ -328,6 +328,13 @@
     margin-top: 18px;
 }
 
+.result-dashboard:is(.score-band-high, .score-band-medium, .score-band-low) {
+    padding: 18px;
+    border-radius: 28px;
+    border: 1px solid var(--score-band-shell-border);
+    background: var(--score-band-shell);
+}
+
 .result-overview {
     display: grid;
     gap: 14px;
@@ -335,6 +342,11 @@
     border-radius: 22px;
     border: 1px solid rgba(77, 139, 99, 0.45);
     background: linear-gradient(135deg, rgba(237, 248, 241, 0.98), rgba(227, 241, 236, 0.95));
+}
+
+.result-dashboard:is(.score-band-high, .score-band-medium, .score-band-low) .result-overview {
+    border-color: var(--score-band-card-border);
+    background: var(--score-band-panel);
 }
 
 .result-overview strong {
@@ -362,6 +374,15 @@
     border-radius: 18px;
     border: 1px solid var(--line);
     background: rgba(255, 255, 255, 0.72);
+}
+
+.result-dashboard:is(.score-band-high, .score-band-medium, .score-band-low) .result-meta-card,
+.result-dashboard:is(.score-band-high, .score-band-medium, .score-band-low) .summary-card,
+.result-dashboard:is(.score-band-high, .score-band-medium, .score-band-low) .breakdown-card,
+.result-dashboard:is(.score-band-high, .score-band-medium, .score-band-low) .artifact-prompt,
+.result-dashboard:is(.score-band-high, .score-band-medium, .score-band-low) .severity-item {
+    border-color: var(--score-band-card-border);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), var(--score-band-card));
 }
 
 .result-meta-label,
@@ -393,6 +414,11 @@
     margin-bottom: 10px;
     color: var(--accent);
     font-size: 0.96rem;
+}
+
+.result-dashboard:is(.score-band-high, .score-band-medium, .score-band-low) .summary-card strong,
+.result-dashboard:is(.score-band-high, .score-band-medium, .score-band-low) .sample-note {
+    color: var(--score-band-accent);
 }
 
 .metric-breakdown-inline {

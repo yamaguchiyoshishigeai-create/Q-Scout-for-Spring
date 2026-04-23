@@ -38,6 +38,7 @@ class WebPageControllerTest {
         MockMultipartFile file = new MockMultipartFile("projectZip", "sample.zip", "application/zip", new byte[]{1});
         WebAnalysisResponse response = new WebAnalysisResponse(
                 "req-1", "sample.zip", "2026-04-13 10:30", 80, 3, 1, 1, 1,
+                "score-band-high",
                 new DownloadLinkView("download", "/download/req-1/human", "qscout-report.md"),
                 new DownloadLinkView("download", "/download/req-1/ai", "qscout-ai-input.md"),
                 "/preview/req-1/human?lang=ja",
@@ -69,6 +70,8 @@ class WebPageControllerTest {
         assertThat(model.getAttribute("sampleSummary")).isNotNull();
         assertThat(model.getAttribute("resultSummary")).isNull();
         assertThat(model.getAttribute("limits")).isNotNull();
+        SummaryDisplayView sampleSummary = (SummaryDisplayView) model.getAttribute("sampleSummary");
+        assertThat(sampleSummary.response().scoreBandClass()).isEqualTo("score-band-high");
     }
 
     @Test

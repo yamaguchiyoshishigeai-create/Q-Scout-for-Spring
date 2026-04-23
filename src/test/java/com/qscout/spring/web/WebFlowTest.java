@@ -64,6 +64,7 @@ class WebFlowTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("公開環境へ機密情報をアップロードしないでください")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("成果物サンプル")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("サンプル結果を表示しています。")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("result-dashboard score-band-high")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("bookstore.zip")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString(">84/100<")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString(">6<")))
@@ -300,6 +301,7 @@ class WebFlowTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("sample-project.zip")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("実行時刻：")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("総合スコア")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("result-dashboard score-band-medium")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString(">63/100<")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("100点満点")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("違反件数")))
@@ -314,6 +316,7 @@ class WebFlowTest {
 
         WebAnalysisResponse response = extractResponse(result);
         String requestId = response.requestId();
+        assertThat(response.scoreBandClass()).isEqualTo("score-band-medium");
         assertThat(response.humanPreviewUrl()).contains("/preview/" + requestId + "/human");
         assertThat(response.humanPreviewUrl()).contains("token=");
         assertThat(response.aiPreviewUrl()).contains("/preview/" + requestId + "/ai");
@@ -364,6 +367,7 @@ class WebFlowTest {
         mockMvc.perform(get(response.humanPreviewUrl()))
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("ユーザー向けMarkdownプレビュー")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("content-panel preview-hero score-band-medium")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("qscout-report.md")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("このMarkdownをダウンロード")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("/download/" + requestId + "/human")))
@@ -376,6 +380,7 @@ class WebFlowTest {
         mockMvc.perform(get(response.aiPreviewUrl()))
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("AI入力Markdownプレビュー")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("content-panel preview-hero score-band-medium")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("qscout-ai-input.md")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("このMarkdownをダウンロード")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("/download/" + requestId + "/ai")))
