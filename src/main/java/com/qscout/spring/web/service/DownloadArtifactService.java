@@ -61,7 +61,13 @@ public class DownloadArtifactService {
         ResolvedArtifact artifact = resolveArtifact(requestId, fileKey);
         try {
             String content = Files.readString(artifact.path(), StandardCharsets.UTF_8);
-            return new PreviewArtifact(artifact.fileKey(), artifact.fileName(), artifact.contentType(), content);
+            return new PreviewArtifact(
+                    artifact.fileKey(),
+                    artifact.fileName(),
+                    artifact.contentType(),
+                    content,
+                    tempWorkspaceService.readScoreBandClass(requestId)
+            );
         } catch (IOException exception) {
             throw new IllegalStateException("Failed to read preview artifact.", exception);
         }
@@ -125,7 +131,8 @@ public class DownloadArtifactService {
             String fileKey,
             String fileName,
             MediaType contentType,
-            String content
+            String content,
+            String scoreBandClass
     ) {
     }
 }

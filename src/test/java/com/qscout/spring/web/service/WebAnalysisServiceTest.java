@@ -75,9 +75,11 @@ class WebAnalysisServiceTest {
         assertThat(response.originalFileName()).isEqualTo("sample.zip");
         assertThat(response.executedAt()).isNotBlank();
         assertThat(response.finalScore()).isEqualTo(85);
+        assertThat(response.scoreBandClass()).isEqualTo("score-band-high");
         assertThat(response.autoExcludedMessage()).contains("除外件数");
         assertThat(response.humanDownloadLink().url()).isEqualTo("/download/req-123/human?expires=111&token=h");
         assertThat(response.humanPreviewUrl()).isEqualTo("/preview/req-123/human?lang=ja&expires=111&token=ph");
+        verify(tempWorkspaceService).storeScoreBandClass(workspace, "score-band-high");
     }
 
     @Test
@@ -119,6 +121,7 @@ class WebAnalysisServiceTest {
 
         assertThat(response.originalFileName()).isEqualTo("不明なzipファイル");
         assertThat(response.autoExcludedMessage()).isNull();
+        assertThat(response.scoreBandClass()).isEqualTo("score-band-high");
     }
 
     @Test

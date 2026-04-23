@@ -47,12 +47,14 @@ class DownloadArtifactServiceTest {
         Files.writeString(outputDir.resolve("qscout-ai-input.md"), "# preview\ncontent");
 
         when(tempWorkspaceService.resolveWorkspaceRoot("req-2")).thenReturn(workspaceRoot);
+        when(tempWorkspaceService.readScoreBandClass("req-2")).thenReturn("score-band-low");
 
         DownloadArtifactService.PreviewArtifact artifact = service.resolveForPreview("req-2", "ai");
 
         verify(tempWorkspaceService).assertActive("req-2");
         assertThat(artifact.fileName()).isEqualTo("qscout-ai-input.md");
         assertThat(artifact.content()).contains("# preview");
+        assertThat(artifact.scoreBandClass()).isEqualTo("score-band-low");
     }
 
     @Test

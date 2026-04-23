@@ -20,7 +20,7 @@
         </nav>
     </div>
 
-    <section class="content-panel preview-hero" data-figma-section="preview-panel">
+    <section class="content-panel preview-hero" data-figma-section="preview-panel" th:classappend="${preview.scoreBandClass}">
         <p class="section-eyebrow" th:text="${preview.fileKey == 'human'} ? #{preview.section.human} : #{preview.section.ai}">ユーザー向けMarkdownプレビュー</p>
         <h1 class="page-title" th:text="#{preview.page.title}">Markdown Preview</h1>
         <p class="page-copy preview-meta"><span th:text="#{preview.fileName.label}">ファイル</span><strong class="preview-file-name" th:text="${preview.fileName}">qscout-report.md</strong></p>

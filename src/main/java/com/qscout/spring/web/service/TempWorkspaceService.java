@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,6 +19,7 @@ import java.util.UUID;
 @Service
 public class TempWorkspaceService {
     private static final Logger logger = LoggerFactory.getLogger(TempWorkspaceService.class);
+    private static final String SCORE_BAND_FILE_NAME = "score-band.txt";
 
     private final Path baseDir = Path.of(System.getProperty("java.io.tmpdir"), "qscout");
 
@@ -42,11 +44,40 @@ public class TempWorkspaceService {
         deleteRecursively(workspace.rootDir());
     }
 
+    public void storeScoreBandClass(WorkspaceContext workspace, String scoreBandClass) {
+        if (workspace == null || scoreBandClass == null || scoreBandClass.isBlank()) {
+            return;
+        }
+        Path scoreBandPath = workspace.rootDir().resolve(SCORE_BAND_FILE_NAME).normalize();
+        if (!scoreBandPath.startsWith(workspace.rootDir())) {
+            throw new IllegalArgumentException("Invalid score band path.");
+        }
+        try {
+            Files.writeString(scoreBandPath, scoreBandClass, StandardCharsets.UTF_8);
+        } catch (IOException exception) {
+            throw new IllegalStateException("Failed to persist workspace score band.", exception);
+        }
+    }
+
     public Path resolveWorkspaceRoot(String requestId) {
         if (!isCanonicalRequestId(requestId)) {
             throw new IllegalArgumentException("Invalid request id.");
         }
         return baseDir.resolve(requestId).normalize();
+    }
+
+    public String readScoreBandClass(String requestId) {
+        Path rootDir = resolveWorkspaceRoot(requestId);
+        Path scoreBandPath = rootDir.resolve(SCORE_BAND_FILE_NAME).normalize();
+        if (!scoreBandPath.startsWith(rootDir) || !Files.exists(scoreBandPath) || !Files.isRegularFile(scoreBandPath)) {
+            return null;
+        }
+        try {
+            String scoreBandClass = Files.readString(scoreBandPath, StandardCharsets.UTF_8).trim();
+            return scoreBandClass.isBlank() ? null : scoreBandClass;
+        } catch (IOException exception) {
+            throw new IllegalStateException("Failed to read workspace score band.", exception);
+        }
     }
 
     public boolean isExpired(String requestId) {
