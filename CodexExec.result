@@ -1,4 +1,49 @@
 ===== CODEX_RESULT_BEGIN =====
+TASK_ID: SCORE_BAND_TASK_LEDGER_HOLD_V1
+TITLE: 改善タスク管理台帳_スコア帯背景色タスク更新指示 v1.0
+EXECUTED_AT: 2026-04-23T14:33:50.3997449+09:00
+STATUS: [OK]
+STEP: COMMIT_PUSH_PR_SCORE_BAND_TASK_LEDGER_HOLD_V1
+changed files:
+- docs/00_プロジェクト管理/02_改善タスク管理/改善タスク管理台帳.md
+- CodexExec.result
+
+commit units:
+- COMMIT 1
+  - sha: f85f141
+  - message: docs: スコア帯背景色タスクを保留更新
+  - message source: ユーザー指示採用
+- COMMIT 2
+  - sha: same commit
+  - message: docs: CodexExec.resultを更新
+  - message source: 自動生成
+
+summary:
+- `TSK-011` と `TSK-012` を未解決から保留へ更新し、結果サマリ / Markdown preview のスコア帯背景色は `PR #14` で実装済みであることを台帳へ反映した
+- 現時点では一旦ここまでとし、実運用で赤帯の危機感表現が不足すると判断された場合のみ再調整を再開する方針を表と詳細節の両方に明記した
+- 台帳全体の構成や他タスクの状態は変えず、対象2件だけを最小差分で更新した
+
+untouched:
+- `TSK-011` / `TSK-012` 以外の台帳項目
+- 台帳全体の構成、優先度、文体
+- 実装コード、テストコード、既存 PR #14 の内容
+
+notes:
+- docs 更新のみのためテストは未実施
+- `PR #14 / codex-score-band-background-ui-v1` を根拠として台帳へ追記した
+
+commit: same commit
+message: docs: CodexExec.resultを更新
+message source: 自動生成
+push: success
+pr: 16
+pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/16
+pr base: main
+pr head: codex-score-band-task-ledger-hold-v1
+pr status: open
+===== CODEX_RESULT_END =====
+
+===== CODEX_RESULT_BEGIN =====
 TASK_ID: LOCAL_DEV_SECRET_FALLBACK_V1
 TITLE: ローカル起動用署名トークン秘密鍵フォールバック追加
 EXECUTED_AT: 2026-04-23T13:42:41.9948061+09:00
