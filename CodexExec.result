@@ -1,4 +1,56 @@
 ===== CODEX_RESULT_BEGIN =====
+TASK_ID: TSK_001_ZIP_TOOLTIP_SPLIT_V1
+TITLE: TSK-001_ZIP作成の目安_吹き出し分割修正指示 v1.0
+EXECUTED_AT: 2026-04-23T20:49:48.0556229+09:00
+STATUS: [OK]
+STEP: COMMIT_PUSH_PR_TSK_001_ZIP_TOOLTIP_SPLIT_V1
+changed files:
+- src/main/resources/templates/index.html
+- src/main/resources/static/css/home.css
+- src/main/resources/messages_ja.properties
+- src/main/resources/messages_en.properties
+- src/test/java/com/qscout/spring/web/WebFlowTest.java
+- docs/00_プロジェクト管理/02_改善タスク管理/改善タスク管理台帳.md
+- CodexExec.result
+
+commit units:
+- COMMIT 1
+  - sha: b76773d
+  - message: fix: ZIP作成の目安を吹き出し表示へ調整
+  - message source: ユーザー指示採用
+- COMMIT 2
+  - sha: same commit
+  - message: docs: TSK-001結果を記録
+  - message source: 自動生成
+
+summary:
+- トップページの「対応形式」ノードを tooltip 化し、pom.xml が見える ZIP 構成と再圧縮再試行の案内を hover / focus 時だけ表示するようにした
+- トップページの「最大サイズ」ノードを tooltip 化し、`.git`、`target`、大容量データ、Docker 関連の除外案内を hover / focus 時だけ表示するようにした
+- 既存の 60秒制限 tooltip は維持し、日英メッセージ整合と `WebFlowTest` の確認観点を更新した
+- TSK-001 は引き続き `解決中` のままにし、`Codex作業完了(ユーザー確認待ち)` 前提の追記だけを最小差分で反映した
+
+untouched:
+- 60秒制限の仕様値と tooltip 挙動
+- help ページの ZIP 詳細説明構成
+- TSK-001 以外の台帳項目
+
+notes:
+- `./mvnw.cmd test` は初回に wrapper の書き込み権限と `JAVA_HOME` 未設定で停止したため、JDK 17 を `JAVA_HOME` に指定して再実行した
+- `./mvnw.cmd test` により 152 tests passed を確認した
+- 既存 PR #17 を更新対象として継続利用する
+
+commit: same commit
+message: docs: TSK-001結果を記録
+message source: 自動生成
+push: success
+pr: 17
+pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/17
+pr base: main
+pr head: codex-tsk-001-execution-limit-clarification-v1
+pr status: open
+===== CODEX_RESULT_END =====
+
+===== CODEX_RESULT_BEGIN =====
 TASK_ID: TSK_001_TOOLTIP_REWORK_V1
 TITLE: TSK-001_60秒実行制限説明_吹き出し再修正指示 v1.0
 EXECUTED_AT: 2026-04-23T16:37:00.9225135+09:00
