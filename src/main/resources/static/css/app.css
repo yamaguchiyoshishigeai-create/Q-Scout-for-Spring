@@ -30,12 +30,12 @@
 }
 
 .score-band-low {
-    --score-band-shell: linear-gradient(180deg, rgba(247, 220, 225, 0.98), rgba(252, 236, 239, 0.99));
-    --score-band-shell-border: rgba(169, 96, 107, 0.38);
-    --score-band-panel: linear-gradient(180deg, rgba(255, 247, 248, 0.98), rgba(248, 227, 231, 0.95));
-    --score-band-card: rgba(255, 245, 246, 0.94);
-    --score-band-card-border: rgba(169, 96, 107, 0.28);
-    --score-band-accent: #8a4a54;
+    --score-band-shell: linear-gradient(180deg, rgba(239, 184, 194, 0.99), rgba(248, 214, 220, 0.99));
+    --score-band-shell-border: rgba(156, 66, 82, 0.46);
+    --score-band-panel: linear-gradient(180deg, rgba(255, 241, 244, 0.99), rgba(243, 203, 211, 0.96));
+    --score-band-card: rgba(255, 238, 241, 0.95);
+    --score-band-card-border: rgba(156, 66, 82, 0.34);
+    --score-band-accent: #7e2f3e;
 }
 
 * {
