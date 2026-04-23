@@ -1,4 +1,38 @@
 ===== CODEX_RESULT_BEGIN =====
+TASK_ID: TSK_001_APPROVAL_LEDGER_UPDATE_V1
+TITLE: TSK-001承認反映_台帳更新指示 v1.0
+EXECUTED_AT: 2026-04-23T21:11:54.0915981+09:00
+STATUS: [OK]
+STEP: COMMIT_PUSH_PR_TSK_001_APPROVAL_LEDGER_UPDATE_V1
+changed files:
+- docs/00_プロジェクト管理/02_改善タスク管理/改善タスク管理台帳.md
+- CodexExec.result
+
+summary:
+- `TSK-001` を `解決中` から `解決済み` へ更新した
+- 理由として、PR #17 が 2026-04-23 にマージ済みであり、対象改修がユーザー承認済みであることを台帳へ反映した
+- 60秒実行制限説明の tooltip 化、ZIP 作成の目安の分割 tooltip 化、help の冗長説明整理、日英文言整合を承認済み完了事項として記録した
+
+untouched:
+- TSK-001 以外の台帳項目
+- 実装ファイル
+
+notes:
+- GitHub 上で PR #17 の `merged: true` を確認した
+- head branch `codex-tsk-001-execution-limit-clarification-v1` に対する open PR は存在しなかったため、新規 PR を作成した
+
+commit: same commit
+message: docs: TSK-001結果を記録
+message source: 自動生成
+push: pending
+pr: pending
+pr url: pending
+pr base: main
+pr head: codex-tsk-001-execution-limit-clarification-v1
+pr status: pending
+===== CODEX_RESULT_END =====
+
+===== CODEX_RESULT_BEGIN =====
 TASK_ID: TSK_001_ZIP_TOOLTIP_SPLIT_V1
 TITLE: TSK-001_ZIP作成の目安_吹き出し分割修正指示 v1.0
 EXECUTED_AT: 2026-04-23T20:49:48.0556229+09:00
