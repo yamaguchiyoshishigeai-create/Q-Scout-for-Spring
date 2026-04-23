@@ -68,11 +68,27 @@
                 <p class="section-copy" th:text="#{page.home.section.run.copy}">アップロードフォームと基本条件をこのセクションに集約し、詳細な対応範囲は help ページにまとめています。</p>
                 <div class="support-grid support-grid--spaced"><article class="support-card"><strong th:text="#{page.home.section.run.support.title}">対応プロジェクトの要点</strong><ul class="support-compact"><li th:text="#{page.home.support.framework.short}">Spring Boot / Maven の単一モジュール</li><li th:text="#{page.home.support.required.short}">ZIP直下で pom.xml を確認できる構成</li><li th:text="#{page.home.support.source.short}">Java ソースコードを含むこと</li></ul></article><article class="support-card"><strong th:text="#{page.home.section.run.unsupported.title}">現時点で対象外</strong><ul class="unsupported-list"><li th:text="#{page.home.unsupported.gradle}">Gradle プロジェクト</li><li th:text="#{page.home.unsupported.multimodule}">マルチモジュール構成</li><li th:text="#{page.home.unsupported.kotlin}">Kotlin 主体プロジェクト</li></ul><a class="info-link" th:href="@{/help(lang=${#locale.language})}" th:text="#{page.home.section.run.helpLink}">使い方・仕様で詳細を見る</a></article></div>
                 <form class="upload-form" method="post" th:action="@{/analyze}" enctype="multipart/form-data" id="analyzeForm" th:attr="data-max-upload-bytes=${limits != null ? limits.maxUploadSizeMb * 1024 * 1024 : 20 * 1024 * 1024},data-upload-too-large-title=#{error.upload.tooLarge.title},data-upload-too-large-body=#{error.upload.tooLarge.body},data-upload-too-large-retry=#{error.upload.tooLarge.retry}">
-                    <div class="limits"><div class="limit-card"><div th:text="#{form.upload.limit.type}">対応形式</div><strong th:text="${limits != null ? limits.allowedFileType : 'zip'}">zip</strong></div><div class="limit-card"><div th:text="#{form.upload.limit.size}">最大サイズ</div><strong><span th:text="${limits != null ? limits.maxUploadSizeMb : 20}">20</span>MB</strong></div><div class="limit-card"><div th:text="#{form.upload.limit.timeout}">解析時間の目安</div><strong><span th:text="${limits != null ? limits.maxExecutionSeconds : 60}">60</span><span th:text="${#locale.language == 'ja' ? '秒' : 's'}">秒</span></strong></div></div>
-                    <div class="notice">
-                        <strong th:text="#{form.upload.limit.note.title}">60秒の実行制限について</strong>
-                        <p th:text="#{form.upload.limit.note.body}">60秒はアップロードサイズではなく、解析処理にかかる時間の目安であり制限です。通常は60秒以内の完了を想定しています。</p>
-                        <p th:text="#{form.upload.limit.note.detail}">対象が大きい、または複雑な場合は60秒以内に完了しないことがあり、その場合は結果を取得できないことがあります。必要に応じて ZIP を小さくする、対象を絞るなどを検討してください。</p>
+                    <div class="limits">
+                        <div class="limit-card">
+                            <div th:text="#{form.upload.limit.type}">対応形式</div>
+                            <strong th:text="${limits != null ? limits.allowedFileType : 'zip'}">zip</strong>
+                        </div>
+                        <div class="limit-card">
+                            <div th:text="#{form.upload.limit.size}">最大サイズ</div>
+                            <strong><span th:text="${limits != null ? limits.maxUploadSizeMb : 20}">20</span>MB</strong>
+                        </div>
+                        <button type="button" class="limit-card limit-card--tooltip" aria-describedby="execution-limit-tooltip">
+                            <span class="limit-card__label-row">
+                                <span th:text="#{form.upload.limit.timeout}">解析時間上限</span>
+                                <span class="limit-tooltip-badge" aria-hidden="true">i</span>
+                            </span>
+                            <strong><span th:text="${limits != null ? limits.maxExecutionSeconds : 60}">60</span><span th:text="${#locale.language == 'ja' ? '秒' : 's'}">秒</span></strong>
+                            <span id="execution-limit-tooltip" class="limit-tooltip" role="tooltip">
+                                <span class="limit-tooltip__title" th:text="#{form.upload.limit.note.title}">60秒の実行制限について</span>
+                                <span class="limit-tooltip__paragraph" th:text="#{form.upload.limit.note.body}">60秒はシステムが解析処理に掛ける時間の許可上限です。通常は60秒以内の完了を想定しています。</span>
+                                <span class="limit-tooltip__paragraph" th:text="#{form.upload.limit.note.detail}">対象が大きい、または複雑な場合は60秒以内に完了しないことがあり、その場合は結果を取得できないことがあります。必要に応じて ZIP を小さくする、対象を絞るなどを検討してください。</span>
+                            </span>
+                        </button>
                     </div>
                     <p class="section-copy" th:text="#{form.upload.description}">zip 形式の Spring Boot / Maven プロジェクトを選択してください。</p>
                     <label for="projectZip" th:text="#{form.upload.label}">pom.xml を含む Spring Boot / Maven / 単一モジュールの zip を選択してください</label>
