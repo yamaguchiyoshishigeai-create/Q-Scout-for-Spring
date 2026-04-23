@@ -24,12 +24,12 @@ notes:
 commit: same commit
 message: docs: TSK-001結果を記録
 message source: 自動生成
-push: pending
-pr: pending
-pr url: pending
+push: success
+pr: 18
+pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/18
 pr base: main
 pr head: codex-tsk-001-execution-limit-clarification-v1
-pr status: pending
+pr status: open
 ===== CODEX_RESULT_END =====
 
 ===== CODEX_RESULT_BEGIN =====
