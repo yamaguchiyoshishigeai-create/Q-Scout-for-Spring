@@ -51,4 +51,16 @@ class TempWorkspaceServiceTest {
         assertThatThrownBy(() -> service.resolveWorkspaceRoot("not-a-uuid"))
                 .isInstanceOf(IllegalArgumentException.class);
     }
+
+    @Test
+    void storesAndReadsScoreBandClass() {
+        TempWorkspaceService.WorkspaceContext workspace = service.createWorkspace();
+        try {
+            service.storeScoreBandClass(workspace, "score-band-medium");
+
+            assertThat(service.readScoreBandClass(workspace.requestId())).isEqualTo("score-band-medium");
+        } finally {
+            service.cleanupNow(workspace);
+        }
+    }
 }

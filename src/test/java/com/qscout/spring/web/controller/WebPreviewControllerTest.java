@@ -1,13 +1,16 @@
 package com.qscout.spring.web.controller;
 
+import com.qscout.spring.web.dto.PreviewArtifactView;
 import com.qscout.spring.web.exception.ArtifactExpiredException;
 import com.qscout.spring.web.service.DownloadArtifactService;
 import com.qscout.spring.web.service.MarkdownPreviewRenderer;
 import com.qscout.spring.web.service.RequestAccessTokenService;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -27,16 +30,20 @@ class WebPreviewControllerTest {
         when(requestAccessTokenService.createSignedUrl("/preview/req-1/human", "req-1", "human", java.util.Map.of("lang", "ja"))).thenReturn("/preview/req-1/human?lang=ja&expires=456&token=ja");
         when(requestAccessTokenService.createSignedUrl("/preview/req-1/human", "req-1", "human", java.util.Map.of("lang", "en"))).thenReturn("/preview/req-1/human?lang=en&expires=456&token=en");
         when(downloadArtifactService.resolveForPreview("req-1", "human")).thenReturn(
-                new DownloadArtifactService.PreviewArtifact("human", "qscout-report.md", org.springframework.http.MediaType.TEXT_MARKDOWN, "# report")
+                new DownloadArtifactService.PreviewArtifact("human", "qscout-report.md", org.springframework.http.MediaType.TEXT_MARKDOWN, "# report", "score-band-high")
         );
         when(markdownPreviewRenderer.render("# report")).thenReturn("<h1>report</h1>");
         MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new WebPreviewController(downloadArtifactService, markdownPreviewRenderer, requestAccessTokenService)).build();
 
-        mockMvc.perform(get("/preview/req-1/human").param("expires", "123").param("token", "ok"))
+        MvcResult result = mockMvc.perform(get("/preview/req-1/human").param("expires", "123").param("token", "ok"))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Cache-Control", "no-store, no-cache, must-revalidate"))
                 .andExpect(view().name("preview"))
-                .andExpect(model().attributeExists("preview"));
+                .andExpect(model().attributeExists("preview"))
+                .andReturn();
+
+        PreviewArtifactView preview = (PreviewArtifactView) result.getModelAndView().getModel().get("preview");
+        assertThat(preview.scoreBandClass()).isEqualTo("score-band-high");
     }
 
     @Test

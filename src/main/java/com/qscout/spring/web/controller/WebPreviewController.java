@@ -76,6 +76,7 @@ public class WebPreviewController {
                     requestId,
                     artifact.fileKey(),
                     artifact.fileName(),
+                    artifact.scoreBandClass(),
                     artifact.content(),
                     requestAccessTokenService.createSignedUrl("/download/" + requestId + "/" + fileKey, requestId, fileKey),
                     requestAccessTokenService.createSignedUrl(

@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 <th:block th:fragment="summaryDashboard">
-    <div class="result-dashboard" th:if="${summaryDisplay != null}">
+    <div class="result-dashboard" th:if="${summaryDisplay != null}" th:classappend="${summaryDisplay.response.scoreBandClass}">
         <div class="result-overview">
             <div class="result-overview-head">
                 <strong th:text="${summaryDisplay.response.message}">解析が完了しました。</strong>

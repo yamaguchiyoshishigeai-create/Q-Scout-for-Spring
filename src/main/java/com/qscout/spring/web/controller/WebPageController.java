@@ -5,6 +5,7 @@ import com.qscout.spring.web.dto.ErrorViewModel;
 import com.qscout.spring.web.dto.ExecutionLimitView;
 import com.qscout.spring.web.dto.DownloadLinkView;
 import com.qscout.spring.web.dto.RateLimitDecision;
+import com.qscout.spring.web.dto.ScoreBandClassResolver;
 import com.qscout.spring.web.dto.SummaryDisplayView;
 import com.qscout.spring.web.dto.UploadErrorModalView;
 import com.qscout.spring.web.dto.WebAnalysisResponse;
@@ -155,6 +156,7 @@ public class WebPageController {
                             1,
                             2,
                             3,
+                            ScoreBandClassResolver.fromScore(84),
                             new DownloadLinkView(message("result.download.human"), "#artifacts", "qscout-report.md"),
                             new DownloadLinkView(message("result.download.ai"), "#artifacts", "qscout-ai-input.md"),
                             "#artifacts",

@@ -9,6 +9,7 @@ public record WebAnalysisResponse(
         int highCount,
         int mediumCount,
         int lowCount,
+        String scoreBandClass,
         DownloadLinkView humanDownloadLink,
         DownloadLinkView aiDownloadLink,
         String humanPreviewUrl,

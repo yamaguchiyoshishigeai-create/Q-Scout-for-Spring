@@ -4,6 +4,7 @@ public record PreviewArtifactView(
         String requestId,
         String fileKey,
         String fileName,
+        String scoreBandClass,
         String content,
         String downloadUrl,
         String japanesePreviewUrl,

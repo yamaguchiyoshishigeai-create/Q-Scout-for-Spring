@@ -4,6 +4,7 @@ import com.qscout.spring.application.SharedAnalysisService;
 import com.qscout.spring.domain.AnalysisRequest;
 import com.qscout.spring.i18n.MessageSources;
 import com.qscout.spring.web.dto.DownloadLinkView;
+import com.qscout.spring.web.dto.ScoreBandClassResolver;
 import com.qscout.spring.web.dto.WebAnalysisResponse;
 import com.qscout.spring.web.exception.AnalysisTimeoutException;
 import org.slf4j.Logger;
@@ -82,6 +83,8 @@ public class WebAnalysisService {
                     new AnalysisRequest(projectRoot, workspace.outputDir())
             );
             String language = MessageSources.resolveLocale().getLanguage();
+            String scoreBandClass = ScoreBandClassResolver.fromScore(result.scoreSummary().finalScore());
+            tempWorkspaceService.storeScoreBandClass(workspace, scoreBandClass);
             return new WebAnalysisResponse(
                     workspace.requestId(),
                     originalFileName(projectZip),
@@ -91,6 +94,7 @@ public class WebAnalysisService {
                     result.scoreSummary().highCount(),
                     result.scoreSummary().mediumCount(),
                     result.scoreSummary().lowCount(),
+                    scoreBandClass,
                     new DownloadLinkView(
                             message("result.download.human"),
                             requestAccessTokenService.createSignedUrl("/download/" + workspace.requestId() + "/human", workspace.requestId(), "human"),
