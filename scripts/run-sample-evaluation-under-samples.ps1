@@ -1,4 +1,4 @@
-# Purpose: clone public Spring samples, run light build checks, execute Q-Scout, and aggregate all outputs under samples/.
+# Purpose: clone public Spring samples, run light build checks, execute Q-Scout, and aggregate all outputs under samples.
 param()
 
 $ErrorActionPreference = "Stop"
@@ -12,9 +12,16 @@ $jarPath = Join-Path $repoRoot "target\q-scout-for-spring-0.1.0-SNAPSHOT.jar"
 $runCli = Join-Path $repoRoot "run-cli.bat"
 
 $targets = @(
-    [pscustomobject]@{ Name = "spring-petclinic"; Url = "https://github.com/spring-projects/spring-petclinic.git"; IntendedUse = "正常系ベースライン" },
-    [pscustomobject]@{ Name = "bookstore"; Url = "https://github.com/sivaprasadreddy/bookstore.git"; IntendedUse = "実務寄り評価用" },
-    [pscustomobject]@{ Name = "spring-boot-monolith"; Url = "https://github.com/mzubal/spring-boot-monolith.git"; IntendedUse = "構造揺さぶり評価用" }
+    [pscustomobject]@{ Name = "spring-petclinic"; Url = "https://github.com/spring-projects/spring-petclinic.git"; IntendedUse = "正常系ベースライン"; Tier = "Tier1" },
+    [pscustomobject]@{ Name = "spring-petclinic-microservices"; Url = "https://github.com/spring-petclinic/spring-petclinic-microservices.git"; IntendedUse = "分散構成・高難度検査"; Tier = "Tier3" },
+    [pscustomobject]@{ Name = "spring-boot-realworld-example-app"; Url = "https://github.com/gothinkster/spring-boot-realworld-example-app.git"; IntendedUse = "実務寄り評価用"; Tier = "Tier1" },
+    [pscustomobject]@{ Name = "sample-spring-modulith"; Url = "https://github.com/piomin/sample-spring-modulith.git"; IntendedUse = "モジュール境界・責務分離検査"; Tier = "Tier1" },
+    [pscustomobject]@{ Name = "spring-boot-monolith"; Url = "https://github.com/mzubal/spring-boot-monolith.git"; IntendedUse = "構造揺さぶり評価用"; Tier = "Tier1" },
+    [pscustomobject]@{ Name = "bookstore"; Url = "https://github.com/sivaprasadreddy/bookstore.git"; IntendedUse = "業務CRUD・JPA系評価用"; Tier = "Tier1" },
+    [pscustomobject]@{ Name = "gs-rest-service"; Url = "https://github.com/spring-guides/gs-rest-service.git"; IntendedUse = "最小REST API検査"; Tier = "Tier2" },
+    [pscustomobject]@{ Name = "gs-accessing-data-jpa"; Url = "https://github.com/spring-guides/gs-accessing-data-jpa.git"; IntendedUse = "JPA/Repository基本構成検査"; Tier = "Tier2" },
+    [pscustomobject]@{ Name = "gs-securing-web"; Url = "https://github.com/spring-guides/gs-securing-web.git"; IntendedUse = "Security構成検査"; Tier = "Tier2" },
+    [pscustomobject]@{ Name = "gs-reactive-rest-service"; Url = "https://github.com/spring-guides/gs-reactive-rest-service.git"; IntendedUse = "Reactive/WebFlux検査"; Tier = "Tier2" }
 )
 
 function Write-ResultLog {
@@ -87,8 +94,15 @@ function Get-RecommendedUse {
     param([string]$SampleName, [bool]$QScoutOk, [bool]$CompileOk)
     switch ($SampleName) {
         "spring-petclinic" { if ($QScoutOk) { return "正常系ベースライン向き" }; return "正常系ベースライン候補" }
-        "bookstore" { if ($QScoutOk) { return "実務寄り向き" }; return "実務寄り参考用" }
+        "spring-petclinic-microservices" { if ($QScoutOk) { return "分散構成検査向き" }; return "重量級構成の参考用" }
+        "spring-boot-realworld-example-app" { if ($QScoutOk) { return "実務寄りAPI評価向き" }; return "実務寄り参考用" }
+        "sample-spring-modulith" { if ($QScoutOk) { return "責務分離・モジュール境界評価向き" }; return "モジュール構成参考用" }
         "spring-boot-monolith" { if ($QScoutOk) { return "構造揺さぶり向き" }; return "構造揺さぶり参考用" }
+        "bookstore" { if ($QScoutOk) { return "業務CRUD/JPA評価向き" }; return "業務CRUD参考用" }
+        "gs-rest-service" { if ($QScoutOk) { return "軽量REST検査向き" }; return "軽量REST参考用" }
+        "gs-accessing-data-jpa" { if ($QScoutOk) { return "JPA/Repository基本検査向き" }; return "JPA基本構成参考用" }
+        "gs-securing-web" { if ($QScoutOk) { return "Security構成検査向き" }; return "Security構成参考用" }
+        "gs-reactive-rest-service" { if ($QScoutOk) { return "Reactive/WebFlux検査向き" }; return "Reactive構成参考用" }
         default { if ($CompileOk) { return "誤検知検証向き" }; return "参考用" }
     }
 }
@@ -200,6 +214,7 @@ foreach ($sample in $targets) {
 
     $rows.Add([pscustomobject]@{
         Sample = $sample.Name
+        Tier = $sample.Tier
         Clone = if ($cloneOk) { "OK" } else { "FAIL" }
         Pom = if ($pomOk) { "Yes" } else { "No" }
         Main = if ($mainSrcOk) { "Yes" } else { "No" }
@@ -218,15 +233,16 @@ foreach ($sample in $targets) {
 $summaryLines = New-Object System.Collections.Generic.List[string]
 $summaryLines.Add("# Sample Comparison Summary")
 $summaryLines.Add("")
-$summaryLines.Add("| Sample | Clone | pom.xml | Main Src | Test Src | Compile | Q-Scout | Score | Violations | Recommended Use | Recommendation |")
-$summaryLines.Add("|--------|-------|---------|----------|----------|---------|---------|-------|------------|-----------------|----------------|")
+$summaryLines.Add("| Sample | Tier | Clone | pom.xml | Main Src | Test Src | Compile | Q-Scout | Score | Violations | Recommended Use | Recommendation |")
+$summaryLines.Add("|--------|------|-------|---------|----------|----------|---------|---------|-------|------------|-----------------|----------------|")
 foreach ($row in $rows) {
-    $summaryLines.Add(("| {0} | {1} | {2} | {3} | {4} | {5} | {6} | {7} | {8} | {9} | {10} |" -f $row.Sample, $row.Clone, $row.Pom, $row.Main, $row.Test, $row.Compile, $row.QScout, $row.Score, $row.Violations, $row.RecommendedUse, $row.Recommendation))
+    $summaryLines.Add(("| {0} | {1} | {2} | {3} | {4} | {5} | {6} | {7} | {8} | {9} | {10} | {11} |" -f $row.Sample, $row.Tier, $row.Clone, $row.Pom, $row.Main, $row.Test, $row.Compile, $row.QScout, $row.Score, $row.Violations, $row.RecommendedUse, $row.Recommendation))
 }
 $summaryLines.Add("")
 
 foreach ($row in $rows) {
     $summaryLines.Add(("## {0}" -f $row.Sample))
+    $summaryLines.Add(("- tier: {0}" -f $row.Tier))
     $summaryLines.Add(("- clone: {0}" -f $row.Clone))
     $summaryLines.Add(("- source structure: pom.xml={0}, main={1}, test={2}" -f $row.Pom, $row.Main, $row.Test))
     $summaryLines.Add(("- compile: {0}" -f $row.Compile))
@@ -237,28 +253,38 @@ foreach ($row in $rows) {
     $summaryLines.Add("")
 }
 
-$adopted = $rows | Where-Object { $_.Recommendation -in @("A", "B") } | Select-Object -First 3
+$coreCandidates = $rows | Where-Object { $_.Recommendation -in @("A", "B") -and $_.Tier -eq "Tier1" } | Select-Object -First 3
+$supportCandidates = $rows | Where-Object { $_.Recommendation -in @("A", "B") -and $_.Tier -ne "Tier1" } | Select-Object -First 3
+$heavyCandidates = $rows | Where-Object { $_.Tier -eq "Tier3" } | Select-Object -First 2
+
 $summaryLines.Add("## Final Conclusion")
 $summaryLines.Add("")
-$summaryLines.Add("1. 今後の標準サンプルとして採用すべき 2〜3 本")
+$summaryLines.Add("1. 今後の標準サンプルとして採用すべき 5 本前後")
+$adopted = $rows | Where-Object { $_.Recommendation -in @("A", "B") } | Select-Object -First 5
 if ($adopted) {
     foreach ($item in $adopted) { $summaryLines.Add(("   - {0}" -f $item.Sample)) }
 } else {
     $summaryLines.Add("   - 現時点では継続採用候補なし")
 }
-$summaryLines.Add("2. その採用理由")
-if ($adopted) {
-    foreach ($item in $adopted) {
-        $summaryLines.Add(("   - {0}: Clone={1}, Compile={2}, Q-Scout={3} のため評価継続に向く" -f $item.Sample, $item.Clone, $item.Compile, $item.QScout))
-    }
+$summaryLines.Add("2. 中核採用候補 3 本")
+if ($coreCandidates) {
+    foreach ($item in $coreCandidates) { $summaryLines.Add(("   - {0}" -f $item.Sample)) }
 } else {
-    $summaryLines.Add("   - 取得または解析の安定性が不足しており、追加整備後に再判定が必要")
+    $summaryLines.Add("   - Tier1 の中核候補は再評価が必要")
 }
-$summaryLines.Add("3. Q-Scout のどの評価用途に向くか")
-foreach ($item in $rows) { $summaryLines.Add(("   - {0}: {1}" -f $item.Sample, $item.RecommendedUse)) }
-$summaryLines.Add("4. 次に追加取得すべきサンプルがあるか")
-$summaryLines.Add("   - ある。MVC 構成がより明確な中規模 Spring Boot サンプルと、マルチモジュール構成のサンプルを追加すると比較軸が増える。")
-$summaryLines.Add("5. 必要なら「意図的にアンチパターンを含む自作サンプル」を別途作るべきか")
+$summaryLines.Add("3. 技術特性確認用の補助候補")
+if ($supportCandidates) {
+    foreach ($item in $supportCandidates) { $summaryLines.Add(("   - {0}" -f $item.Sample)) }
+} else {
+    $summaryLines.Add("   - 補助候補は今回の結果から追加選定")
+}
+$summaryLines.Add("4. 重量級で常時実行には不向きな候補")
+if ($heavyCandidates) {
+    foreach ($item in $heavyCandidates) { $summaryLines.Add(("   - {0}" -f $item.Sample)) }
+} else {
+    $summaryLines.Add("   - 今回の一覧には重量級候補なし")
+}
+$summaryLines.Add("5. 今後、意図的アンチパターンサンプルを別途自作すべきか")
 $summaryLines.Add("   - 作るべき。公開サンプルだけでは誤検知・見逃しの境界条件を十分に揺さぶれないため。")
 $summaryLines.Add("")
 
@@ -271,7 +297,7 @@ if ($failedClone -gt 0 -or $failedQScout -gt 0) {
     $summaryLines.Add("- 未完了フェーズ: なし。ただし一部サンプルは失敗あり")
     $summaryLines.Add("- 失敗理由: clone 失敗や解析失敗の詳細は samples/CodexExec.result と samples/sample-output 配下ログを参照")
     $summaryLines.Add("- 再開時の開始地点: 失敗したサンプルのフェーズ2またはフェーズ4から再実行")
-    $tempRecommended = $rows | Sort-Object Recommendation, Sample | Select-Object -First 2
+    $tempRecommended = $rows | Sort-Object Recommendation, Sample | Select-Object -First 3
     $summaryLines.Add(("- 現時点での暫定推奨サンプル: {0}" -f (($tempRecommended | ForEach-Object { $_.Sample }) -join ", ")))
 }
 
