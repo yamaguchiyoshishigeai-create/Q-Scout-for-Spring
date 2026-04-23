@@ -2,6 +2,7 @@
 param(
     [string]$ProjectPath = "samples/bookstore",
     [string]$OutputZipPath,
+    [switch]$IncludeSamples,
     [string[]]$AdditionalExcludePaths = @()
 )
 
@@ -10,12 +11,18 @@ Add-Type -AssemblyName System.IO.Compression
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
+$resolvedRepoRoot = (Resolve-Path -LiteralPath $repoRoot).Path
 $resolvedProjectPath = if ([System.IO.Path]::IsPathRooted($ProjectPath)) {
     $ProjectPath
 } else {
     Join-Path $repoRoot $ProjectPath
 }
 $resolvedProjectPath = (Resolve-Path -LiteralPath $resolvedProjectPath).Path
+$isRepoRootProject = [string]::Equals(
+    $resolvedProjectPath.TrimEnd('\'),
+    $resolvedRepoRoot.TrimEnd('\'),
+    [System.StringComparison]::OrdinalIgnoreCase
+)
 
 if (-not $OutputZipPath) {
     $projectName = Split-Path -Leaf $resolvedProjectPath
@@ -57,6 +64,10 @@ $projectRelativeExcludes = @(
     "deployment",
     "src/main/resources/data/books.jsonlines"
 )
+
+if ($isRepoRootProject -and -not $IncludeSamples) {
+    $projectRelativeExcludes += "samples"
+}
 
 if ($AdditionalExcludePaths.Count -gt 0) {
     $projectRelativeExcludes += $AdditionalExcludePaths
@@ -143,6 +154,10 @@ $sourceSizeBytes = Get-DirectorySizeBytes -LiteralPath $resolvedProjectPath
 $stagedSizeBytes = Get-DirectorySizeBytes -LiteralPath $stagingPath
 
 Write-Host ("Created: {0}" -f $resolvedOutputZipPath)
+Write-Host ("Repo root mode: {0}" -f $(if ($isRepoRootProject) { "enabled" } else { "disabled" }))
+if ($isRepoRootProject -and $IncludeSamples) {
+    Write-Host "Included samples by explicit override."
+}
 Write-Host ("Source size : {0:N2} MB" -f ($sourceSizeBytes / 1MB))
 Write-Host ("Staged size : {0:N2} MB" -f ($stagedSizeBytes / 1MB))
 Write-Host ("ZIP size    : {0:N2} MB" -f ($zipSizeBytes / 1MB))

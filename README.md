@@ -129,6 +129,8 @@ Web 検査用に軽量 ZIP を作る場合:
 powershell -ExecutionPolicy Bypass -File .\scripts\create-inspection-zip.ps1
 ```
 
+repo root 自己検証として `-ProjectPath '.'` を指定した場合は、既定で `samples` を除外します。明示的に含めたい場合は `-IncludeSamples` を付けてください。
+
 出力先を任意のディレクトリに変更する場合:
 
 ```bat
