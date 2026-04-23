@@ -21,21 +21,21 @@
 }
 
 .score-band-medium {
-    --score-band-shell: linear-gradient(180deg, rgba(251, 246, 229, 0.97), rgba(252, 249, 240, 0.99));
-    --score-band-shell-border: rgba(182, 154, 98, 0.28);
-    --score-band-panel: linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(251, 248, 239, 0.94));
-    --score-band-card: rgba(255, 255, 255, 0.9);
-    --score-band-card-border: rgba(182, 154, 98, 0.22);
-    --score-band-accent: #8a6a2b;
+    --score-band-shell: linear-gradient(180deg, rgba(247, 235, 184, 0.98), rgba(252, 245, 220, 0.99));
+    --score-band-shell-border: rgba(176, 139, 54, 0.36);
+    --score-band-panel: linear-gradient(180deg, rgba(255, 251, 240, 0.98), rgba(248, 239, 204, 0.95));
+    --score-band-card: rgba(255, 248, 232, 0.94);
+    --score-band-card-border: rgba(176, 139, 54, 0.28);
+    --score-band-accent: #805f17;
 }
 
 .score-band-low {
-    --score-band-shell: linear-gradient(180deg, rgba(251, 239, 242, 0.97), rgba(252, 246, 247, 0.99));
-    --score-band-shell-border: rgba(176, 128, 133, 0.28);
-    --score-band-panel: linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(251, 244, 245, 0.94));
-    --score-band-card: rgba(255, 255, 255, 0.9);
-    --score-band-card-border: rgba(176, 128, 133, 0.2);
-    --score-band-accent: #8f5f63;
+    --score-band-shell: linear-gradient(180deg, rgba(247, 220, 225, 0.98), rgba(252, 236, 239, 0.99));
+    --score-band-shell-border: rgba(169, 96, 107, 0.38);
+    --score-band-panel: linear-gradient(180deg, rgba(255, 247, 248, 0.98), rgba(248, 227, 231, 0.95));
+    --score-band-card: rgba(255, 245, 246, 0.94);
+    --score-band-card-border: rgba(169, 96, 107, 0.28);
+    --score-band-accent: #8a4a54;
 }
 
 * {
