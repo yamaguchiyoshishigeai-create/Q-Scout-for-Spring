@@ -1,4 +1,62 @@
 ===== CODEX_RESULT_BEGIN =====
+TASK_ID: REPO_ROOT_INSPECTION_ZIP_SAMPLES_DEFAULT_EXCLUDE_V1
+TITLE: REPO_ROOT_INSPECTION_ZIP_SAMPLES_DEFAULT_EXCLUDE_V1 実装指示書 v1.0
+EXECUTED_AT: 2026-04-23T12:02:40.0650723+09:00
+STATUS: [OK]
+STEP: COMMIT_PUSH_PR_REPO_ROOT_INSPECTION_ZIP_SAMPLES_DEFAULT_EXCLUDE_V1
+changed files:
+- scripts/create-inspection-zip.ps1
+- README.md
+- CodexExec.result
+
+commit units:
+- COMMIT 1
+  - sha: ddbedb4
+  - message: build: repo root inspection ZIP で samples を既定除外
+  - message source: 添付指示書採用
+- COMMIT 2
+  - sha: same commit
+  - message: docs: CodexExec.resultを更新
+  - message source: 自動生成
+
+summary:
+- `create-inspection-zip.ps1` に repo root 判定を追加し、repo root 指定時だけ `samples` を既定の project-relative 除外へ追加するようにした
+- 明示上書き用に `-IncludeSamples` を追加し、repo root 自己検証 ZIP でだけ既定除外を切り替えられるようにした
+- `README.md` に、`-ProjectPath '.'` では既定で `samples` を除外し、必要時は `-IncludeSamples` を使う旨を短く追記した
+
+untouched:
+- `pom.xml`
+- `src/main/java/**`
+- `src/test/java/**`
+- Render 設定
+- 既存の top-level 除外一覧
+
+notes:
+- 実行コマンド: `powershell -ExecutionPolicy Bypass -File .\scripts\create-inspection-zip.ps1 -ProjectPath '.' -OutputZipPath 'samples\qscout-root-inspection.zip'`
+- 結果: repo root mode enabled / source 3.53 MB / staged 0.99 MB / zip 0.34 MB
+- ZIP 確認: `sample_entry_count=0` で `samples/` 未含有、20MB 制限内
+- 実行コマンド: `powershell -ExecutionPolicy Bypass -File .\scripts\create-inspection-zip.ps1 -ProjectPath 'samples/sample-project' -OutputZipPath 'samples\sample-project-inspection.zip'`
+- 結果: repo root mode disabled / zip 1,672 bytes / `entry_count=5`
+- ZIP 確認: `pom.xml` と `src/**` を含み、個別サンプル指定の既存用途が維持されることを確認
+- `samples/bookstore` はこの checkout に存在しないため、同等確認は実在する `samples/sample-project` で代替した
+- 実行コマンド: `powershell -ExecutionPolicy Bypass -File .\scripts\create-inspection-zip.ps1 -ProjectPath '.' -OutputZipPath 'samples\qscout-root-inspection-with-samples.zip' -IncludeSamples`
+- 結果: repo root mode enabled / explicit override 有効 / zip 0.67 MB / `sample_entry_count=8`
+- 実行コマンド: `$env:MAVEN_USER_HOME='C:\academia\src\Q-Scout-for-Spring1\br_main\.m2home-link'; cmd /c mvnw.cmd test`
+- 結果: 146 tests passed
+- 初回 `mvnw.cmd test` は sandbox のネットワーク制限で wrapper 取得に失敗し、権限付き再実行で完走した
+
+commit: same commit
+message: docs: CodexExec.resultを更新
+message source: 自動生成
+push: success
+pr: 13
+pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/13
+pr base: main
+pr head: codex-repo-root-inspection-zip-samples-default-exclude-v1
+pr status: open
+===== CODEX_RESULT_END =====
+
+===== CODEX_RESULT_BEGIN =====
 TASK_ID: STARTUP_PROMPT_V3_REFRESH_V2_V1
 TITLE: 開始時プロンプト更新版 v2 反映
 EXECUTED_AT: 2026-04-21T15:59:21.6388620+09:00
