@@ -353,26 +353,6 @@
     cursor: wait;
 }
 
-.upload-guidance {
-    margin: 18px 0 0;
-    padding: 16px 18px;
-    background: rgba(255, 255, 255, 0.78);
-    border: 1px solid var(--line);
-    border-radius: 16px;
-}
-
-.upload-guidance strong {
-    display: block;
-    margin-bottom: 8px;
-}
-
-.upload-guidance ul {
-    margin: 0;
-    padding-left: 20px;
-    color: var(--muted);
-    line-height: 1.8;
-}
-
 .notice,
 .result-banner {
     margin-top: 20px;
