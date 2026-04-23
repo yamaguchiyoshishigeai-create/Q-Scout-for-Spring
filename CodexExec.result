@@ -1,4 +1,51 @@
 ===== CODEX_RESULT_BEGIN =====
+TASK_ID: LOCAL_DEV_SECRET_FALLBACK_V1
+TITLE: ローカル起動用署名トークン秘密鍵フォールバック追加
+EXECUTED_AT: 2026-04-23T13:42:41.9948061+09:00
+STATUS: [OK]
+STEP: COMMIT_PUSH_PR_LOCAL_DEV_SECRET_FALLBACK_V1
+changed files:
+- src/main/java/com/qscout/spring/web/service/RequestAccessTokenService.java
+- src/test/java/com/qscout/spring/web/service/RequestAccessTokenServiceLocalExecutionTest.java
+- CodexExec.result
+
+commit units:
+- COMMIT 1
+  - sha: 4c5784a
+  - message: fix: ローカル起動時の署名トークン秘密鍵を補完
+  - message source: 自動生成
+- COMMIT 2
+  - sha: same commit
+  - message: docs: CodexExec.resultを更新
+  - message source: 自動生成
+
+summary:
+- `RequestAccessTokenService` にローカル実行判定を追加し、`target/classes` からの起動時だけ一時 secret を自動補完するようにした
+- 明示 secret 設定済み、および `qscout.artifact-token.allow-insecure-dev-secret=true` の既存経路は維持したまま、IDE 直起動のローカル実行だけを救済した
+- `RequestAccessTokenServiceLocalExecutionTest` を追加し、`target/classes` は許可し packaged jar は許可しない境界を検証した
+
+untouched:
+- `src/main/resources/application.properties`
+- preview / download の署名付き URL 仕様
+- 本番向けの secret 必須方針
+
+notes:
+- 実行コマンド: `C:\Users\academia\.m2\wrapper\dists\apache-maven-3.9.12\59fe215c0ad6947fea90184bf7add084544567b927287592651fda3782e0e798\bin\mvn.cmd test`
+- 結果: 149 tests passed
+- 実行確認: `target/classes` から env 未設定で起動し、`LOCAL_DEV_SECRET_FALLBACK_ENABLED` 警告後に `Started QScoutWebApplication` を確認
+
+commit: same commit
+message: docs: CodexExec.resultを更新
+message source: 自動生成
+push: success
+pr: 15
+pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/15
+pr base: main
+pr head: codex-local-dev-secret-fallback-v1
+pr status: open
+===== CODEX_RESULT_END =====
+
+===== CODEX_RESULT_BEGIN =====
 TASK_ID: REPO_ROOT_INSPECTION_ZIP_SAMPLES_DEFAULT_EXCLUDE_V1
 TITLE: REPO_ROOT_INSPECTION_ZIP_SAMPLES_DEFAULT_EXCLUDE_V1 実装指示書 v1.0
 EXECUTED_AT: 2026-04-23T12:02:40.0650723+09:00
