@@ -60,8 +60,10 @@
             <tr><th scope="row" th:text="#{page.home.support.required}">必須ファイル</th><td th:text="#{page.home.support.required.value}">ルートに pom.xml</td></tr>
             <tr><th scope="row" th:text="#{page.home.support.source}">ソース条件</th><td th:text="#{page.home.support.source.value}">Java ソースコードを含むこと</td></tr>
             <tr><th scope="row" th:text="#{page.home.support.maxSize}">最大サイズ</th><td th:text="#{page.home.support.maxSize.value}">20MB</td></tr>
+            <tr><th scope="row" th:text="#{page.home.support.executionTime}">解析時間上限</th><td th:text="#{page.home.support.executionTime.value}">60秒（解析処理の許可上限）</td></tr>
             </tbody>
         </table>
+        <p class="page-copy" th:text="#{help.executionLimit.short}">詳しい補足はトップページの 60 秒ノードにカーソルまたはフォーカスを合わせると確認できます。</p>
     </section>
 
     <section class="content-panel" data-figma-section="help-outputs">

@@ -21,6 +21,8 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 import org.springframework.ui.ConcurrentModel;
 
+import java.util.Locale;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -122,7 +124,8 @@ class WebPageControllerTest {
         when(requestRateLimiter.evaluate("127.0.0.1")).thenReturn(RateLimitDecision.allow(4));
         WebPageController controller = controller(webAnalysisService, requestRateLimiter, defaultClientIpResolver());
         MockMultipartFile file = new MockMultipartFile("projectZip", "slow.zip", "application/zip", new byte[]{1});
-        when(webAnalysisService.analyze(file)).thenThrow(new AnalysisTimeoutException("timeout", new RuntimeException("slow")));
+        String message = MessageSources.create().getMessage("error.analysis.timeout", null, Locale.JAPANESE);
+        when(webAnalysisService.analyze(file)).thenThrow(new AnalysisTimeoutException(message, new RuntimeException("slow")));
 
         ConcurrentModel model = new ConcurrentModel();
         RedirectAttributesModelMap redirectAttributes = new RedirectAttributesModelMap();
@@ -131,6 +134,26 @@ class WebPageControllerTest {
         assertThat(view).isEqualTo("redirect:/#run-analysis");
         ErrorViewModel error = (ErrorViewModel) redirectAttributes.getFlashAttributes().get("error");
         assertThat(error.detailCode()).isEqualTo("TIMEOUT");
+        assertThat(error.userMessage()).isEqualTo(message);
+    }
+
+    @Test
+    void keepsEnglishTimeoutMessageWhenProvided() {
+        WebAnalysisService webAnalysisService = mock(WebAnalysisService.class);
+        RequestRateLimiter requestRateLimiter = mock(RequestRateLimiter.class);
+        when(requestRateLimiter.evaluate("127.0.0.1")).thenReturn(RateLimitDecision.allow(4));
+        WebPageController controller = controller(webAnalysisService, requestRateLimiter, defaultClientIpResolver());
+        MockMultipartFile file = new MockMultipartFile("projectZip", "slow.zip", "application/zip", new byte[]{1});
+        String message = MessageSources.create().getMessage("error.analysis.timeout", null, Locale.ENGLISH);
+        when(webAnalysisService.analyze(file)).thenThrow(new AnalysisTimeoutException(message, new RuntimeException("slow")));
+
+        ConcurrentModel model = new ConcurrentModel();
+        RedirectAttributesModelMap redirectAttributes = new RedirectAttributesModelMap();
+        controller.analyze(file, model, request("127.0.0.1"), new MockHttpServletResponse(), redirectAttributes);
+
+        ErrorViewModel error = (ErrorViewModel) redirectAttributes.getFlashAttributes().get("error");
+        assertThat(error.detailCode()).isEqualTo("TIMEOUT");
+        assertThat(error.userMessage()).isEqualTo(message);
     }
 
     @Test

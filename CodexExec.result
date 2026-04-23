@@ -1,4 +1,163 @@
 ===== CODEX_RESULT_BEGIN =====
+TASK_ID: TSK_001_ZIP_TOOLTIP_SPLIT_V1
+TITLE: TSK-001_ZIP作成の目安_吹き出し分割修正指示 v1.0
+EXECUTED_AT: 2026-04-23T20:49:48.0556229+09:00
+STATUS: [OK]
+STEP: COMMIT_PUSH_PR_TSK_001_ZIP_TOOLTIP_SPLIT_V1
+changed files:
+- src/main/resources/templates/index.html
+- src/main/resources/static/css/home.css
+- src/main/resources/messages_ja.properties
+- src/main/resources/messages_en.properties
+- src/test/java/com/qscout/spring/web/WebFlowTest.java
+- docs/00_プロジェクト管理/02_改善タスク管理/改善タスク管理台帳.md
+- CodexExec.result
+
+commit units:
+- COMMIT 1
+  - sha: b76773d
+  - message: fix: ZIP作成の目安を吹き出し表示へ調整
+  - message source: ユーザー指示採用
+- COMMIT 2
+  - sha: same commit
+  - message: docs: TSK-001結果を記録
+  - message source: 自動生成
+
+summary:
+- トップページの「対応形式」ノードを tooltip 化し、pom.xml が見える ZIP 構成と再圧縮再試行の案内を hover / focus 時だけ表示するようにした
+- トップページの「最大サイズ」ノードを tooltip 化し、`.git`、`target`、大容量データ、Docker 関連の除外案内を hover / focus 時だけ表示するようにした
+- 既存の 60秒制限 tooltip は維持し、日英メッセージ整合と `WebFlowTest` の確認観点を更新した
+- TSK-001 は引き続き `解決中` のままにし、`Codex作業完了(ユーザー確認待ち)` 前提の追記だけを最小差分で反映した
+
+untouched:
+- 60秒制限の仕様値と tooltip 挙動
+- help ページの ZIP 詳細説明構成
+- TSK-001 以外の台帳項目
+
+notes:
+- `./mvnw.cmd test` は初回に wrapper の書き込み権限と `JAVA_HOME` 未設定で停止したため、JDK 17 を `JAVA_HOME` に指定して再実行した
+- `./mvnw.cmd test` により 152 tests passed を確認した
+- 既存 PR #17 を更新対象として継続利用する
+
+commit: same commit
+message: docs: TSK-001結果を記録
+message source: 自動生成
+push: success
+pr: 17
+pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/17
+pr base: main
+pr head: codex-tsk-001-execution-limit-clarification-v1
+pr status: open
+===== CODEX_RESULT_END =====
+
+===== CODEX_RESULT_BEGIN =====
+TASK_ID: TSK_001_TOOLTIP_REWORK_V1
+TITLE: TSK-001_60秒実行制限説明_吹き出し再修正指示 v1.0
+EXECUTED_AT: 2026-04-23T16:37:00.9225135+09:00
+STATUS: [OK]
+STEP: COMMIT_PUSH_PR_TSK_001_TOOLTIP_REWORK_V1
+changed files:
+- src/main/resources/templates/index.html
+- src/main/resources/templates/help.html
+- src/main/resources/messages_ja.properties
+- src/main/resources/messages_en.properties
+- src/main/resources/static/css/home.css
+- src/test/java/com/qscout/spring/web/WebFlowTest.java
+- docs/00_プロジェクト管理/02_改善タスク管理/改善タスク管理台帳.md
+- CodexExec.result
+
+commit units:
+- COMMIT 1
+  - sha: 7826885
+  - message: fix: 60秒制限説明を吹き出し表示へ再修正
+  - message source: ユーザー指示採用
+- COMMIT 2
+  - sha: same commit
+  - message: docs: TSK-001結果を記録
+  - message source: 自動生成
+
+summary:
+- トップページの 60 秒ノードを、常時長文表示から hover / focus 時だけ説明を出す tooltip 方式へ再修正した
+- 日本語 tooltip 文言をユーザー指定文言へ差し替え、英語も公開 UI として自然な表現へ揃えた
+- help は長文の常時表示をやめて簡潔な補足に整理し、トップと役割が重複しすぎないようにした
+- `TSK-001` を解決済みから是正して `解決中` に戻し、`Codex作業完了(ユーザー確認待ち)` と `PR #17` を台帳へ記録した
+
+untouched:
+- 60秒制限そのものの仕様値、timeout ロジック本体
+- upload 上限 20MB と署名付き URL の仕様
+- TSK-001 以外の台帳項目
+
+notes:
+- 画面確認はブラウザ手動操作ではなく、テンプレート描画と Web テスト中心で実施した
+- `C:\Users\academia\.m2\wrapper\dists\apache-maven-3.9.12\59fe215c0ad6947fea90184bf7add084544567b927287592651fda3782e0e798\bin\mvn.cmd test` を実行し、152 tests passed を確認した
+- `WebFlowTest` で tooltip ノード、日英文言、help の簡潔化、常時長文撤去を確認した
+- PR #17 のタイトルと本文も今回の tooltip 再修正内容に更新した
+
+commit: same commit
+message: docs: TSK-001結果を記録
+message source: 自動生成
+push: success
+pr: 17
+pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/17
+pr base: main
+pr head: codex-tsk-001-execution-limit-clarification-v1
+pr status: open
+===== CODEX_RESULT_END =====
+
+===== CODEX_RESULT_BEGIN =====
+TASK_ID: TSK_001_EXECUTION_LIMIT_CLARIFICATION_V1
+TITLE: TSK-001_60秒実行制限の意味明確化 Codex指示書 v1.0
+EXECUTED_AT: 2026-04-23T15:57:59.2739956+09:00
+STATUS: [OK]
+STEP: COMMIT_PUSH_PR_TSK_001_EXECUTION_LIMIT_CLARIFICATION_V1
+changed files:
+- src/main/resources/templates/index.html
+- src/main/resources/templates/help.html
+- src/main/resources/messages_ja.properties
+- src/main/resources/messages_en.properties
+- src/test/java/com/qscout/spring/web/WebFlowTest.java
+- src/test/java/com/qscout/spring/web/controller/WebPageControllerTest.java
+- docs/00_プロジェクト管理/02_改善タスク管理/改善タスク管理台帳.md
+- CodexExec.result
+
+commit units:
+- COMMIT 1
+  - sha: 87db302
+  - message: fix: 60秒実行制限の説明を明確化
+  - message source: ユーザー指示採用
+- COMMIT 2
+  - sha: same commit
+  - message: docs: TSK-001結果を記録
+  - message source: 自動生成
+
+summary:
+- トップページの実行条件欄に、60秒がアップロードサイズではなく解析処理の実行時間制限であることを日英で追記した
+- help に 60秒制限の補足セクションと対応範囲表の行を追加し、超過時の基本挙動と ZIP を絞る調整案を日英で整えた
+- timeout 文言を 60秒制限の意味が伝わる表現へ調整し、主要導線の日英整合を Web テストで確認した
+- `TSK-001` を解決済みへ更新し、`PR #17` を台帳へ記録した
+
+untouched:
+- 60秒制約そのものの仕様、タイムアウト値、解析ロジック本体
+- upload 上限 20MB と署名付き URL の仕様
+- 本件と無関係な UI 文言
+
+notes:
+- 画面確認は自動テスト中心で実施し、`mvn test` の 152 件成功を確認した
+- `mvnw.cmd` はこの環境パスで wrapper 起動に失敗したため、ローカル Maven キャッシュ上の `mvn.cmd` から `mvn test` を実行した
+- 日本語 / 英語のトップページ、help、timeout 表現の主要導線整合を確認した
+
+commit: same commit
+message: docs: TSK-001結果を記録
+message source: 自動生成
+push: success
+pr: 17
+pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/17
+pr base: main
+pr head: codex-tsk-001-execution-limit-clarification-v1
+pr status: open
+===== CODEX_RESULT_END =====
+
+===== CODEX_RESULT_BEGIN =====
 TASK_ID: SCORE_BAND_TASK_LEDGER_HOLD_V1
 TITLE: 改善タスク管理台帳_スコア帯背景色タスク更新指示 v1.0
 EXECUTED_AT: 2026-04-23T14:33:50.3997449+09:00
