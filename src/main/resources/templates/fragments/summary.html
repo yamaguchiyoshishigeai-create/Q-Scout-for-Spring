@@ -41,7 +41,7 @@
             <article class="breakdown-card">
                 <div>
                     <strong th:text="#{result.violations.breakdown}">内訳</strong>
-                    <small th:text="${summaryDisplay.sample} ? #{page.home.sample.summary.copy} : #{page.home.section.summary.copy}">解析後はここで対象ファイル、実行時刻、総合スコア、重大度内訳をまとめて確認できます。</small>
+                    <small th:text="${summaryDisplay.sample} ? #{page.home.sample.summary.copy} : (#locale.language == 'ja' ? '解析対象ファイル、実行開始時刻、総合スコア、重大度内訳を下記にまとめます。' : #messages.msg('page.home.section.summary.copy'))">解析対象ファイル、実行開始時刻、総合スコア、重大度内訳を下記にまとめます。</small>
                 </div>
                 <div class="severity-bar" aria-hidden="true">
                     <span class="high" th:style="'flex-grow:' + ${summaryDisplay.response.totalViolations > 0 ? summaryDisplay.response.highCount : 1}"></span>
