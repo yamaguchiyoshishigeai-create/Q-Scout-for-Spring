@@ -21,14 +21,22 @@ import java.util.Map;
 public class MarkdownReportGenerator implements ReportGenerator {
     private final MessageSource messageSource;
     private final RuleExplanationCatalog ruleExplanationCatalog;
+    private final ImprovementHintResolver improvementHintResolver;
 
     public MarkdownReportGenerator() {
-        this(MessageSources.create(), new InMemoryRuleExplanationCatalog());
+        this(MessageSources.create(), new InMemoryRuleExplanationCatalog(), new ImprovementHintResolver());
     }
 
     public MarkdownReportGenerator(MessageSource messageSource, RuleExplanationCatalog ruleExplanationCatalog) {
+        this(messageSource, ruleExplanationCatalog, new ImprovementHintResolver());
+    }
+
+    MarkdownReportGenerator(MessageSource messageSource,
+                            RuleExplanationCatalog ruleExplanationCatalog,
+                            ImprovementHintResolver improvementHintResolver) {
         this.messageSource = messageSource;
         this.ruleExplanationCatalog = ruleExplanationCatalog;
+        this.improvementHintResolver = improvementHintResolver;
     }
 
     @Override
@@ -106,15 +114,8 @@ public class MarkdownReportGenerator implements ReportGenerator {
         }
 
         builder.append("## ").append(message(locale, "report.section.improvementHints")).append(System.lineSeparator()).append(System.lineSeparator());
-        if (analysisResult.allViolations().isEmpty()) {
-            builder.append("- ").append(message(locale, "report.hint.none.1")).append(System.lineSeparator());
-            builder.append("- ").append(message(locale, "report.hint.none.2")).append(System.lineSeparator());
-        } else {
-            builder.append("- ").append(message(locale, "report.hint.1")).append(System.lineSeparator());
-            builder.append("- ").append(message(locale, "report.hint.2")).append(System.lineSeparator());
-            builder.append("- ").append(message(locale, "report.hint.3")).append(System.lineSeparator());
-            builder.append("- ").append(message(locale, "report.hint.4")).append(System.lineSeparator());
-            builder.append("- ").append(message(locale, "report.hint.5")).append(System.lineSeparator());
+        for (String hintKey : improvementHintResolver.resolveMessageKeys(analysisResult)) {
+            builder.append("- ").append(message(locale, hintKey)).append(System.lineSeparator());
         }
 
         return MarkdownWriter.write(outputDirectory, "qscout-report.md", builder.toString());

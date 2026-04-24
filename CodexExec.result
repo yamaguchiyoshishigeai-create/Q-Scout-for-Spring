@@ -1,4 +1,46 @@
 ===== CODEX_RESULT_BEGIN =====
+TASK_ID: TSK_002_RULE_LINKED_IMPROVEMENT_HINTS_V1
+TITLE: TSK-002_改善ヒント選択ロジックのルール連動化 Codex指示書 v1.0
+EXECUTED_AT: 2026-04-23T21:58:32.7554347+09:00
+STATUS: [OK]
+STEP: COMMIT_PUSH_PR_TSK_002_RULE_LINKED_IMPROVEMENT_HINTS_V1
+changed files:
+- src/main/java/com/qscout/spring/infrastructure/ImprovementHintResolver.java
+- src/main/java/com/qscout/spring/infrastructure/MarkdownReportGenerator.java
+- src/main/resources/messages_ja.properties
+- src/main/resources/messages_en.properties
+- src/test/java/com/qscout/spring/infrastructure/MarkdownReportGeneratorTest.java
+- docs/00_プロジェクト管理/02_改善タスク管理/改善タスク管理台帳.md
+- CodexExec.result
+
+summary:
+- 固定の `report.hint.1` から `report.hint.5` を一律表示する方式をやめ、違反した ruleId に応じて改善ヒントキーを選ぶ `ImprovementHintResolver` を追加した
+- `R001` から `R006` 向けのルール別改善ヒントを日英メッセージへ追加し、違反なし時は `report.hint.none.1` / `report.hint.none.2` を従来どおり維持した
+- `MarkdownReportGeneratorTest` を更新し、単一ルール、複数ルール、違反なし、重複排除、英日整合の観点を検証した
+- 改善タスク管理台帳の `TSK-002` を `解決中` へ更新した
+
+untouched:
+- ルール説明本文と詳細解説リンクの既存導線
+- 改善ヒント以外のレポートセクション構造
+- AI 向け Markdown 生成ロジック
+
+notes:
+- `MarkdownReportGeneratorTest`: 8 tests passed
+- `mvn test`: 154 tests passed
+- Maven 実行時は JDK 17 を `JAVA_HOME=C:\Program Files (x86)\Android\openjdk\jdk-17.0.14` として指定した
+
+commit: same commit
+message: docs: CodexExec.resultへTSK-002結果を追記
+message source: 自動生成
+push: success
+pr: 19
+pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/19
+pr base: main
+pr head: codex-tsk-002-improvement-hints-rule-linked-v1
+pr status: open
+===== CODEX_RESULT_END =====
+
+===== CODEX_RESULT_BEGIN =====
 TASK_ID: TSK_001_APPROVAL_LEDGER_UPDATE_V1
 TITLE: TSK-001承認反映_台帳更新指示 v1.0
 EXECUTED_AT: 2026-04-23T21:11:54.0915981+09:00

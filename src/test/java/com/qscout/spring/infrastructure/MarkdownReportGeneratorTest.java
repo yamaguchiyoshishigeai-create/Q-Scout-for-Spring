@@ -52,7 +52,9 @@ class MarkdownReportGeneratorTest {
             assertThat(content).contains("- パッケージ依存違反 (0) [詳細解説を見る](/help/rules/package-dependency-violation?lang=ja)");
             assertThat(content).contains("#### 指摘 1");
             assertThat(content).contains("Controller が Repository を直接参照しています。");
-            assertThat(content).contains("フィールドインジェクションの代わりにコンストラクタインジェクションを採用しましょう。");
+            assertThat(content).contains("Controller から Repository への直接アクセスは Service に責務を移し、リクエスト処理とユースケース処理を分離しましょう。");
+            assertThat(content).contains("フィールドインジェクションはやめ、依存関係が明確になるコンストラクタインジェクションへ統一しましょう。");
+            assertThat(content).doesNotContain("トランザクション開始位置を Controller ではなく Service に寄せ");
             assertThat(content).doesNotContain("### 例外握りつぶし (0)");
             assertThat(content).doesNotContain("詳細解説キー:");
         } finally {
@@ -85,7 +87,9 @@ class MarkdownReportGeneratorTest {
             assertThat(content).contains("- Exception Swallowing (0) [View detailed explanation](/help/rules/exception-swallowing?lang=en)");
             assertThat(content).contains("#### Finding 1");
             assertThat(content).contains("Controller reads from repository directly. Prefer service mediation to preserve separation of concerns and future extensibility.");
-            assertThat(content).contains("Replace field injection with constructor injection.");
+            assertThat(content).contains("Move controller-to-repository access behind a service so request handling and use-case logic stay separated.");
+            assertThat(content).contains("Replace field injection with constructor injection so dependencies stay explicit and testable.");
+            assertThat(content).doesNotContain("Define transaction boundaries in the service layer");
             assertThat(content).doesNotContain("### Exception Swallowing (0)");
             assertThat(content).doesNotContain("Detail key:");
             assertThat(content).doesNotContain("Q-Scout 診断レポート");
@@ -143,26 +147,60 @@ class MarkdownReportGeneratorTest {
             assertThat(content).contains("No immediate improvements required.");
             assertThat(content).contains("The project passed all current Q-Scout checks.");
             assertThat(content).contains("## Improvement Hints");
-            assertThat(content).doesNotContain("Replace field injection with constructor injection.");
-            assertThat(content).doesNotContain("フィールドインジェクションの代わりにコンストラクタインジェクションを採用しましょう。");
+            assertThat(content).doesNotContain("Replace field injection with constructor injection so dependencies stay explicit and testable.");
+            assertThat(content).doesNotContain("フィールドインジェクションはやめ、依存関係が明確になるコンストラクタインジェクションへ統一しましょう。");
         } finally {
             LocaleContextHolder.setLocale(previous);
         }
     }
 
     @Test
-    void keepsImprovementHintsForViolationReports() throws IOException {
+    void showsOnlySingleRuleHintForSingleViolationRule() throws IOException {
         Locale previous = LocaleContextHolder.getLocale();
         LocaleContextHolder.setLocale(Locale.ENGLISH);
         try {
-            Path reportPath = generator.generate(analysisResultWithViolationAndCheckedRules(), new ScoreSummary(100, 88, 0, 1, 1, 2), tempDir);
+            Path reportPath = generator.generate(analysisResultWithFieldInjectionViolation(), new ScoreSummary(100, 80, 0, 1, 0, 1), tempDir);
             String content = Files.readString(reportPath);
 
             assertThat(content).contains("## Improvement Hints");
-            assertThat(content).contains("Replace field injection with constructor injection.");
-            assertThat(content).contains("Keep transaction boundaries in the service layer.");
-            assertThat(content).contains("Prefer service mediation over controller-to-repository access.");
+            assertThat(content).contains("Replace field injection with constructor injection so dependencies stay explicit and testable.");
+            assertThat(content).doesNotContain("Move controller-to-repository access behind a service");
+            assertThat(content).doesNotContain("Define transaction boundaries in the service layer");
+            assertThat(content).doesNotContain("Do not swallow caught exceptions.");
             assertThat(content).doesNotContain("No immediate improvements required.");
+        } finally {
+            LocaleContextHolder.setLocale(previous);
+        }
+    }
+
+    @Test
+    void showsOnlyMatchedHintsForMultipleViolationRules() throws IOException {
+        Locale previous = LocaleContextHolder.getLocale();
+        LocaleContextHolder.setLocale(Locale.ENGLISH);
+        try {
+            Path reportPath = generator.generate(analysisResultWithControllerAndExceptionViolations(), new ScoreSummary(100, 85, 1, 1, 0, 2), tempDir);
+            String content = Files.readString(reportPath);
+
+            assertThat(content).contains("Move controller-to-repository access behind a service so request handling and use-case logic stay separated.");
+            assertThat(content).contains("Do not swallow caught exceptions. Log them, wrap them, or rethrow them so failures remain traceable.");
+            assertThat(content).doesNotContain("Replace field injection with constructor injection so dependencies stay explicit and testable.");
+            assertThat(content).doesNotContain("Define transaction boundaries in the service layer");
+            assertThat(content).doesNotContain("Add the missing tests first around the main use cases");
+        } finally {
+            LocaleContextHolder.setLocale(previous);
+        }
+    }
+
+    @Test
+    void deduplicatesHintsWhenSameRuleHasMultipleViolations() throws IOException {
+        Locale previous = LocaleContextHolder.getLocale();
+        LocaleContextHolder.setLocale(Locale.JAPANESE);
+        try {
+            Path reportPath = generator.generate(analysisResultWithDuplicatedFieldInjectionViolations(), new ScoreSummary(100, 90, 0, 2, 0, 2), tempDir);
+            String content = Files.readString(reportPath);
+
+            assertThat(content).contains("フィールドインジェクションはやめ、依存関係が明確になるコンストラクタインジェクションへ統一しましょう。");
+            assertThat(countOccurrences(content, "フィールドインジェクションはやめ、依存関係が明確になるコンストラクタインジェクションへ統一しましょう。")).isEqualTo(1);
         } finally {
             LocaleContextHolder.setLocale(previous);
         }
@@ -186,11 +224,38 @@ class MarkdownReportGeneratorTest {
         return new AnalysisResult(context, List.of(ruleResult), List.of(violation));
     }
 
+    private AnalysisResult analysisResultWithControllerAndExceptionViolations() {
+        ProjectContext context = new ProjectContext(Path.of("project"), Path.of("project/pom.xml"), List.of(), List.of());
+        Violation controllerViolation = new Violation("R001", "Controller To Repository Direct Access", Severity.MEDIUM, Path.of("SampleController.java"), 12, "message", "12: sampleRepository.findAll();");
+        Violation exceptionViolation = new Violation("R004", "Exception Swallowing", Severity.HIGH, Path.of("SampleService.java"), 20, "message", "20: catch (Exception ex) {}");
+        RuleResult controllerRule = new RuleResult("R001", "Controller To Repository Direct Access", List.of(controllerViolation));
+        RuleResult exceptionRule = new RuleResult("R004", "Exception Swallowing", List.of(exceptionViolation));
+        return new AnalysisResult(context, List.of(controllerRule, exceptionRule), List.of(controllerViolation, exceptionViolation));
+    }
+
+    private AnalysisResult analysisResultWithDuplicatedFieldInjectionViolations() {
+        ProjectContext context = new ProjectContext(Path.of("project"), Path.of("project/pom.xml"), List.of(), List.of());
+        Violation firstViolation = new Violation("R002", "Field Injection", Severity.MEDIUM, Path.of("SampleService.java"), 8, "Field injection detected. Prefer constructor injection.", "8: @Autowired");
+        Violation secondViolation = new Violation("R002", "Field Injection", Severity.MEDIUM, Path.of("AnotherService.java"), 10, "Field injection detected. Prefer constructor injection.", "10: @Autowired");
+        RuleResult ruleResult = new RuleResult("R002", "Field Injection", List.of(firstViolation, secondViolation));
+        return new AnalysisResult(context, List.of(ruleResult), List.of(firstViolation, secondViolation));
+    }
+
     private AnalysisResult emptyAnalysisResult() {
         return new AnalysisResult(
                 new ProjectContext(Path.of("project"), Path.of("project/pom.xml"), List.of(), List.of()),
                 List.of(),
                 List.of()
         );
+    }
+
+    private int countOccurrences(String content, String fragment) {
+        int count = 0;
+        int index = 0;
+        while ((index = content.indexOf(fragment, index)) >= 0) {
+            count++;
+            index += fragment.length();
+        }
+        return count;
     }
 }
