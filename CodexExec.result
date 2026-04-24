@@ -1,4 +1,60 @@
-﻿===== CODEX_RESULT_BEGIN =====
+===== CODEX_RESULT_BEGIN =====
+TASK_ID: TSK_002_SAMPLE_SCRIPT_POST_MERGE_VERIFICATION_V1
+TITLE: TSK-002 統合後サンプル評価スクリプト実行確認
+EXECUTED_AT: 2026-04-25T08:43:23.3771440+09:00
+STATUS: [OK]
+STEP: TSK_002_SAMPLE_SCRIPT_POST_MERGE_VERIFICATION_V1
+changed files:
+- CodexExec.result
+
+summary:
+- main 追随・衝突解消済みの scripts/run-sample-evaluation-under-samples.ps1 について実行確認を行った
+- PowerShell 構文確認結果: OK
+- package 作成結果: SKIPPED。`target/q-scout-for-spring-0.1.0-SNAPSHOT.jar` が既に存在した
+- スクリプト実行結果: OK。exit code 0 で完了した
+- samples/CodexExec.result 生成確認: OK
+- samples/sample-comparison-summary.md 生成確認: OK
+- F5_SUMMARY_DONE 到達確認: OK
+- complete/initial 自動選択確認: OK。Spring Guide 系 4 サンプルで `complete` 配下が `analysis root` と `run-cli.bat` 引数に反映された
+- Maven wrapper 分岐確認: OK。`samples/CodexExec.result` に `command=maven wrapper compile` が記録された
+- Gradle wrapper 分岐確認: OK。`spring-boot-realworld-example-app` で `command=gradle wrapper compile` が記録された
+- 外部コマンド失敗時の継続確認: OK。`JAVA_HOME` / `java` 不足で各 build・Q-Scout は失敗したが、後続サンプル処理と `F5_SUMMARY_DONE` まで継続した
+- samples/ 配下の公開サンプル実体はコミット対象外であることを確認した
+
+verification:
+- branch: codex-tsk-002-improvement-hints-rule-linked-v1
+- command: powershell -ExecutionPolicy Bypass -File .\scripts\run-sample-evaluation-under-samples.ps1
+- syntax check: `syntax ok`
+- package command: skipped because `.\target\q-scout-for-spring-0.1.0-SNAPSHOT.jar` was already present
+- script exit result: exit code 0
+- generated files:
+  - samples/CodexExec.result: present
+  - samples/sample-comparison-summary.md: present
+- summary markers:
+  - F5_SUMMARY_DONE: found
+  - Execution Summary: found
+  - Final Conclusion: found
+- git status after verification: untracked は `samples/` 配下の公開サンプル実体のみ。`sample-output` や samples 配下生成物は commit 対象に入っていない
+
+untouched:
+- samples/ 配下の公開サンプル実体
+- samples/sample-output 配下
+- samples/CodexExec.result
+- samples/sample-comparison-summary.md
+- 今回の確認と無関係な実装ファイル
+
+commit: same commit
+message: TSK-002統合後サンプル評価スクリプトの実行確認を記録
+message source: CodexExec.md 指示採用
+push: success
+pr: none
+pr url: none
+pr base: main
+pr head: codex-tsk-002-improvement-hints-rule-linked-v1
+pr status: none
+===== CODEX_RESULT_END =====
+
+===== CODEX_RESULT_BEGIN =====
 TASK_ID: TSK_002_MERGE_MAIN_CONFLICT_RESOLUTION_V1
 TITLE: TSK-002 公開サンプル評価スクリプト main 追随衝突解消
 EXECUTED_AT: 2026-04-25T08:32:11.7941310+09:00
