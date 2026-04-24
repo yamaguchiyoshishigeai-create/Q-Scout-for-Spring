@@ -1,4 +1,70 @@
 ===== CODEX_RESULT_BEGIN =====
+TASK_ID: IMPROVEMENT_TASK_LEDGER_SPLIT_V1
+TITLE: 改善タスク管理台帳分割再設計・解決済み分離 統合実行指示 v1.1
+EXECUTED_AT: 2026-04-24T11:42:58.6372805+09:00
+STATUS: [OK]
+STEP: COMMIT_PUSH_PR_IMPROVEMENT_TASK_LEDGER_SPLIT_V1
+changed files:
+- docs/00_プロジェクト管理/02_改善タスク管理/改善タスク管理ルール.md
+- docs/00_プロジェクト管理/02_改善タスク管理/改善タスク課題一覧.md
+- docs/00_プロジェクト管理/02_改善タスク管理/TSK-002.md
+- docs/00_プロジェクト管理/02_改善タスク管理/TSK-003.md
+- docs/00_プロジェクト管理/02_改善タスク管理/TSK-004.md
+- docs/00_プロジェクト管理/02_改善タスク管理/TSK-008.md
+- docs/00_プロジェクト管理/02_改善タスク管理/TSK-009.md
+- docs/00_プロジェクト管理/02_改善タスク管理/TSK-010.md
+- docs/00_プロジェクト管理/02_改善タスク管理/TSK-011.md
+- docs/00_プロジェクト管理/02_改善タスク管理/TSK-012.md
+- docs/00_プロジェクト管理/02_改善タスク管理/TSK-013.md
+- docs/00_プロジェクト管理/02_改善タスク管理/TSK-015.md
+- docs/00_プロジェクト管理/02_改善タスク管理/解決済み/TSK-001.md
+- docs/00_プロジェクト管理/02_改善タスク管理/解決済み/TSK-005.md
+- docs/00_プロジェクト管理/02_改善タスク管理/解決済み/TSK-006.md
+- docs/00_プロジェクト管理/02_改善タスク管理/解決済み/TSK-007.md
+- docs/00_プロジェクト管理/02_改善タスク管理/解決済み/TSK-014.md
+- docs/00_プロジェクト管理/02_改善タスク管理/改善タスク管理台帳.md
+- docs/README.md
+- CodexExec.result
+
+summary:
+- 改善タスク管理を固定ルール、一覧正本、個別タスク、解決済みフォルダへ分割し、大型単一台帳から小粒度更新可能な構成へ移行した
+- `改善タスク課題一覧.md` に全 TSK を残したまま、解決済みの `TSK-001`、`TSK-005`、`TSK-006`、`TSK-007`、`TSK-014` を `解決済み/` 配下へ分離した
+- 旧 `改善タスク管理台帳.md` は導線文書へ置換し、`docs/README.md` からも新構成へ辿れるよう入口を更新した
+
+untouched:
+- 実装コード
+- `docs/00_プロジェクト管理/02_改善タスク管理/公開サンプル個別検証_spring-boot-realworld-example-app.md`
+- 改善タスク内容そのものの状態値
+
+commit units:
+- COMMIT 1
+  - sha: f4950cf
+  - message: docs: split improvement task ledger into modular files
+  - message source: 自動生成
+- COMMIT 2
+  - sha: same commit
+  - message: docs: CodexExec.resultへ台帳分割結果を追記
+  - message source: 自動生成
+
+notes:
+- 新規作成ファイル: `改善タスク管理ルール.md`、`改善タスク課題一覧.md`、`TSK-002.md`、`TSK-003.md`、`TSK-004.md`、`TSK-008.md`、`TSK-009.md`、`TSK-010.md`、`TSK-011.md`、`TSK-012.md`、`TSK-013.md`、`TSK-015.md`、`解決済み/TSK-001.md`、`解決済み/TSK-005.md`、`解決済み/TSK-006.md`、`解決済み/TSK-007.md`、`解決済み/TSK-014.md`
+- 旧 `改善タスク管理台帳.md` は削除せず、分割移行済みの導線文書へ置換した
+- 実行コマンド: `git switch -c codex-improvement-task-ledger-split-v1`、`git add -- 'docs/00_プロジェクト管理/02_改善タスク管理' 'docs/README.md'`、`git commit -m "docs: split improvement task ledger into modular files"`、`git push -u origin codex-improvement-task-ledger-split-v1`
+- テストは未実施。docs 再編のみのため
+- 未完了事項: なし
+
+commit: same commit
+message: docs: CodexExec.resultへ台帳分割結果を追記
+message source: 自動生成
+push: success
+pr: 22
+pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/22
+pr base: main
+pr head: codex-improvement-task-ledger-split-v1
+pr status: open
+===== CODEX_RESULT_END =====
+
+===== CODEX_RESULT_BEGIN =====
 TASK_ID: TSK_002_RULE_LINKED_IMPROVEMENT_HINTS_V1
 TITLE: TSK-002_改善ヒント選択ロジックのルール連動化 Codex指示書 v1.0
 EXECUTED_AT: 2026-04-23T21:58:32.7554347+09:00
