@@ -1,4 +1,56 @@
 ===== CODEX_RESULT_BEGIN =====
+TASK_ID: PR27_SCROLLFIX_BACKUP_REFERENCE_CHECK
+TITLE: PR #27 旧バックアップ資産削除・未参照確認
+EXECUTED_AT: 2026-04-24T15:38:25.4941900+09:00
+STATUS: [OK]
+STEP: PR27_SCROLLFIX_BACKUP_REFERENCE_CHECK
+changed files:
+- CodexExec.result
+
+summary:
+- 対象PR #27 `docs: remove obsolete scrollfix backup assets` を確認した
+- PR差分は `src/main/resources/templates/index.html.bak_scrollfix` と `src/main/resources/static/js/home.js.bak_scrollfix` の削除2件のみだった
+- 正本ファイル `index.html`、`fragments/summary.html`、`help.html`、`home.js`、`messages_ja.properties`、`messages_en.properties` はPR差分に含まれていない
+- `rg` による `bak_scrollfix`、`index.html.bak_scrollfix`、`home.js.bak_scrollfix` のリポジトリ全体検索はヒットなしだった
+- `WebPageController` はトップページで `return "index"` のみを返し、`.bak_scrollfix` テンプレート名を返す実装はなかった
+- `index.html` は `@{/js/home.js}` のみを読み込み、`home.js.bak_scrollfix` の読み込みはなかった
+- 削除対象2ファイルは作業ブランチ上で存在せず、正本 `index.html` と `home.js` は存在することを確認した
+- 結論: PASS。削除対象は現行実装から未参照であり、PR #27 の削除自体に起因する問題は見つからなかった
+
+verification:
+- branch: docs/remove-scrollfix-backups
+- worktree: clean before CodexExec.result update
+- PR compare: base `377bca93ba1ab092b9ae4d397b7223b52b09c910` to head `7e858530ad588d30c3b0e89ac8913b95def1705e`
+- PR changed files: removed `src/main/resources/static/js/home.js.bak_scrollfix`; removed `src/main/resources/templates/index.html.bak_scrollfix`
+- reference search: no hits for `bak_scrollfix`, `index.html.bak_scrollfix`, or `home.js.bak_scrollfix`
+- Thymeleaf/static resource check: controller returns `index`; template loads `/js/home.js`; no `.bak_scrollfix` route or static reference found
+- `.\mvnw.cmd test`: wrapper startup failed with `Cannot index into a null array` / `Cannot start maven from wrapper`
+- cached Maven `mvn test`: executed and failed with 154 tests run, 13 errors, all due to Thymeleaf parse error in `src/main/resources/templates/fragments/summary.html:44`; that file is outside PR #27 diff and the failure is not caused by deleting `.bak_scrollfix` files
+- `mvn -DskipTests package`: success after approved network/local Maven repository access, using cached Maven 3.9.12 with `JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8 -Duser.home=C:\Users\academia`
+
+untouched:
+- implementation files
+- docs other than CodexExec.result
+- configuration files
+- PR #27 branch contents other than this result log
+
+notes:
+- 追加対応: PR #27 の削除・参照確認としては不要
+- 既存の `fragments/summary.html:44` Thymeleaf 式エラーは、必要なら別タスクで扱う対象
+- 今回は確認作業のため commit / push / PR 作成は未実施
+
+commit: none
+message: none
+message source: none
+push: none
+pr: 27
+pr url: https://github.com/yamaguchiyoshishigeai-create/Q-Scout-for-Spring/pull/27
+pr base: main
+pr head: docs/remove-scrollfix-backups
+pr status: open
+===== CODEX_RESULT_END =====
+
+===== CODEX_RESULT_BEGIN =====
 TASK_ID: IMPROVEMENT_TASK_LEDGER_SPLIT_V1
 TITLE: 改善タスク管理台帳分割再設計・解決済み分離 統合実行指示 v1.1
 EXECUTED_AT: 2026-04-24T11:42:58.6372805+09:00
