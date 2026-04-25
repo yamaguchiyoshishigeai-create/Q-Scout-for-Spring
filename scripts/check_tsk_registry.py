@@ -5,12 +5,15 @@ This script validates docs/00_プロジェクト管理/02_改善タスク管理/
 against individual TSK files.
 
 Checks include:
-- duplicate TSK IDs in the registry table
+- duplicate TSK IDs in the compact registry index
 - link path existence
 - solved tasks link to 解決済み/TSK-***.md
 - active tasks link to TSK-***.md
 - individual file status matches registry status
 - maximum TSK number display
+
+The checker supports both the current compact index format and the legacy
+11-column detailed table format while the repository is migrating.
 
 Usage:
     python scripts/check_tsk_registry.py
@@ -80,6 +83,16 @@ def split_markdown_row(line: str) -> list[str]:
     return [cell.strip() for cell in stripped.strip("|").split("|")]
 
 
+def row_status_and_link(cells: list[str]) -> tuple[str, str] | None:
+    if len(cells) == 4:
+        # Compact index: 管理ID / 状態 / 件名 / 個別ファイル
+        return cells[1], cells[3]
+    if len(cells) >= 11:
+        # Legacy detailed table: 管理ID / 区分 / 件名 / 状態 / ... / 個別ファイル
+        return cells[3], cells[-1]
+    return None
+
+
 def parse_registry(registry_path: Path) -> tuple[list[RegistryRow], list[Finding]]:
     findings: list[Finding] = []
     rows: list[RegistryRow] = []
@@ -87,13 +100,23 @@ def parse_registry(registry_path: Path) -> tuple[list[RegistryRow], list[Finding
 
     for line_number, line in enumerate(lines, start=1):
         cells = split_markdown_row(line)
-        if len(cells) < 11:
+        if len(cells) < 4:
             continue
         task_id = cells[0]
         if not ROW_ID_RE.match(task_id):
             continue
-        status = cells[3]
-        link_cell = cells[10]
+        parsed = row_status_and_link(cells)
+        if parsed is None:
+            findings.append(
+                Finding(
+                    "FAIL",
+                    "REGISTRY_ROW_FORMAT_UNSUPPORTED",
+                    f"{task_id} row has unsupported column count. line={line_number} columns={len(cells)}",
+                    "Use the compact 4-column index or the legacy 11-column detailed table format.",
+                )
+            )
+            continue
+        status, link_cell = parsed
         link_match = LINK_RE.search(link_cell)
         if not link_match:
             findings.append(
