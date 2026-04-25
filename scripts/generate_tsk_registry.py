@@ -2,15 +2,17 @@
 """Generate or check the TSK registry from individual TSK files.
 
 This script is the first implementation for TSK-043. It treats individual
-TSK-***.md files, including solved files under 解決済み/, as the source for
-core task metadata and can generate 改善タスク課題一覧.md from those files.
+TSK-***.md files, including solved files under 解決済み/, as the source used to
+validate task presence, status, and placement. During the migration period, it
+preserves existing registry row text for already-listed tasks so that the tool
+can be introduced before all individual TSK metadata is normalized.
 
 Current scope:
 - read individual TSK files
-- extract core metadata from the file title and leading '- key: value' lines
-- preserve overview / done condition / evidence columns from the existing
-  registry when available, because those columns are not yet normalized in all
-  individual files
+- extract task ID, status, title, and leading '- key: value' metadata
+- validate that file placement matches status
+- preserve existing registry rows for already-listed tasks
+- synthesize rows only for files that are not yet listed
 - generate a normalized Markdown registry table
 - check whether the committed registry already matches the generated output
 
@@ -76,6 +78,23 @@ class RegistryRow:
             f"{self.priority} | {self.actor} | {self.related_area} | {self.summary} | "
             f"{self.done_condition} | {self.evidence} | [{self.task_id}]({self.link_path}) |"
         )
+
+
+@dataclass(frozen=True)
+class TaskMetadata:
+    task_id: str
+    title: str
+    status: str
+    category: str
+    priority: str
+    actor: str
+    related_area: str
+    rel_path: str
+
+    @property
+    def number(self) -> int:
+        match = ROW_ID_RE.match(self.task_id)
+        return int(match.group("num")) if match else 0
 
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
@@ -156,7 +175,7 @@ def parse_metadata(text: str) -> dict[str, str]:
     return metadata
 
 
-def parse_task_file(path: Path, task_dir: Path, existing: RegistryRow | None) -> RegistryRow:
+def parse_task_metadata(path: Path, task_dir: Path) -> TaskMetadata:
     text = read_text(path)
     title_match = TITLE_RE.search(text)
     if not title_match:
@@ -174,19 +193,46 @@ def parse_task_file(path: Path, task_dir: Path, existing: RegistryRow | None) ->
     if rel_path != expected_path:
         raise ValueError(f"path/status mismatch for {task_id}: path={rel_path} expected={expected_path}")
 
-    return RegistryRow(
+    return TaskMetadata(
         task_id=task_id,
-        category=metadata.get("区分", existing.category if existing else ""),
         title=metadata.get("件名", title),
         status=status,
-        priority=metadata.get("優先度", existing.priority if existing else ""),
-        actor=metadata.get("実施主体", existing.actor if existing else ""),
-        related_area=metadata.get("関連箇所", existing.related_area if existing else ""),
-        summary=existing.summary if existing else "",
-        done_condition=existing.done_condition if existing else "",
-        evidence=existing.evidence if existing else "",
-        link_path=rel_path,
+        category=metadata.get("区分", ""),
+        priority=metadata.get("優先度", ""),
+        actor=metadata.get("実施主体", ""),
+        related_area=metadata.get("関連箇所", ""),
+        rel_path=rel_path,
     )
+
+
+def row_from_metadata(metadata: TaskMetadata) -> RegistryRow:
+    return RegistryRow(
+        task_id=metadata.task_id,
+        category=metadata.category,
+        title=metadata.title,
+        status=metadata.status,
+        priority=metadata.priority,
+        actor=metadata.actor,
+        related_area=metadata.related_area,
+        summary="",
+        done_condition="",
+        evidence="",
+        link_path=metadata.rel_path,
+    )
+
+
+def merge_existing_row(existing: RegistryRow | None, metadata: TaskMetadata) -> RegistryRow:
+    if existing is None:
+        return row_from_metadata(metadata)
+    if existing.status != metadata.status:
+        raise ValueError(
+            f"status mismatch for {metadata.task_id}: registry={existing.status} individual={metadata.status}"
+        )
+    if existing.link_path != metadata.rel_path:
+        raise ValueError(
+            f"link/path mismatch for {metadata.task_id}: registry={existing.link_path} individual={metadata.rel_path}"
+        )
+    return existing
 
 
 def collect_task_paths(task_dir: Path) -> list[Path]:
@@ -199,9 +245,17 @@ def collect_task_paths(task_dir: Path) -> list[Path]:
 
 def generate_rows(task_dir: Path, existing_rows: dict[str, RegistryRow]) -> list[RegistryRow]:
     rows: list[RegistryRow] = []
+    seen: set[str] = set()
     for path in collect_task_paths(task_dir):
-        task_id = path.stem
-        rows.append(parse_task_file(path, task_dir, existing_rows.get(task_id)))
+        metadata = parse_task_metadata(path, task_dir)
+        if metadata.task_id in seen:
+            raise ValueError(f"duplicate individual task file for {metadata.task_id}")
+        seen.add(metadata.task_id)
+        rows.append(merge_existing_row(existing_rows.get(metadata.task_id), metadata))
+
+    for task_id in sorted(set(existing_rows) - seen):
+        raise ValueError(f"registry row has no individual task file: {task_id}")
+
     return sorted(rows, key=lambda row: row.number)
 
 
