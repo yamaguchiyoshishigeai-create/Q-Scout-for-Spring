@@ -1,26 +1,15 @@
 #!/usr/bin/env python3
-"""Generate or check the TSK registry from individual TSK files.
+"""Generate or check the compact TSK registry index from individual TSK files.
 
-This script is the first implementation for TSK-043. It treats individual
-TSK-***.md files, including solved files under 解決済み/, as the source used to
-validate task presence, status, and placement. During the migration period, it
-preserves existing registry row text for already-listed tasks so that the tool
-can be introduced before all individual TSK metadata is normalized.
-
-Current scope:
-- read individual TSK files
-- extract task ID, status, title, and leading '- key: value' metadata
-- validate that file placement matches status
-- preserve existing registry rows for already-listed tasks
-- synthesize rows only for files that are not yet listed
-- generate a normalized Markdown registry table
-- check whether the committed registry already matches the generated output
-- report row-level and column-level differences when check fails
+TSK-043 migrated 改善タスク課題一覧.md from a large detailed table to a
+compact index. Individual TSK files are the detailed source. This script reads
+normal TSK-***.md files and solved files under 解決済み/, then generates a
+compact index with task ID, status, title, and link.
 
 Usage:
     python scripts/generate_tsk_registry.py --mode summary
     python scripts/generate_tsk_registry.py --mode check
-    python scripts/generate_tsk_registry.py --mode generate --output /tmp/改善タスク課題一覧.generated.md
+    python scripts/generate_tsk_registry.py --mode generate --output tmp/generated_tsk_registry.md
     python scripts/generate_tsk_registry.py --mode generate --write
 """
 
@@ -35,31 +24,12 @@ from pathlib import Path
 
 TASK_DIR = Path("docs/00_プロジェクト管理/02_改善タスク管理")
 REGISTRY_NAME = "改善タスク課題一覧.md"
+ARCHIVE_NAME = "アーカイブ/改善タスク課題一覧_詳細版_2026-04-26.md"
 SOLVED_DIR_NAME = "解決済み"
 SOLVED_STATUS = "解決済み"
 VALID_ACTIVE_STATUSES = {"未解決", "解決中", "確認待ち", "保留"}
 VALID_STATUSES = VALID_ACTIVE_STATUSES | {SOLVED_STATUS}
-COLUMNS = (
-    "管理ID",
-    "区分",
-    "件名",
-    "状態",
-    "優先度",
-    "実施主体",
-    "関連箇所",
-    "概要",
-    "完了条件",
-    "根拠 / 関連PR / 備考",
-    "個別ファイル",
-)
-
-HEADER = """# 改善タスク課題一覧
-
-改善タスクの俯瞰用一覧正本。各タスクの詳細は個別ファイルを参照すること。
-
-| 管理ID | 区分 | 件名 | 状態 | 優先度 | 実施主体 | 関連箇所 | 概要 | 完了条件 | 根拠 / 関連PR / 備考 | 個別ファイル |
-|---|---|---|---|---|---|---|---|---|---|---|
-"""
+COMPACT_COLUMNS = ("管理ID", "状態", "件名", "個別ファイル")
 
 ROW_ID_RE = re.compile(r"^TSK-(?P<num>\d{3})$")
 TITLE_RE = re.compile(r"^#\s+(?P<task_id>TSK-\d{3})\s+(?P<title>.+?)\s*$", re.MULTILINE)
@@ -70,15 +40,8 @@ LINK_RE = re.compile(r"\[(?P<label>[^\]]+)\]\((?P<path>[^)]+)\)")
 @dataclass(frozen=True)
 class RegistryRow:
     task_id: str
-    category: str
-    title: str
     status: str
-    priority: str
-    actor: str
-    related_area: str
-    summary: str
-    done_condition: str
-    evidence: str
+    title: str
     link_path: str
 
     @property
@@ -87,26 +50,10 @@ class RegistryRow:
         return int(match.group("num")) if match else 0
 
     def to_markdown(self) -> str:
-        return (
-            f"| {self.task_id} | {self.category} | {self.title} | {self.status} | "
-            f"{self.priority} | {self.actor} | {self.related_area} | {self.summary} | "
-            f"{self.done_condition} | {self.evidence} | [{self.task_id}]({self.link_path}) |"
-        )
+        return f"| {self.task_id} | {self.status} | {self.title} | [{self.task_id}]({self.link_path}) |"
 
     def cells(self) -> list[str]:
-        return [
-            self.task_id,
-            self.category,
-            self.title,
-            self.status,
-            self.priority,
-            self.actor,
-            self.related_area,
-            self.summary,
-            self.done_condition,
-            self.evidence,
-            f"[{self.task_id}]({self.link_path})",
-        ]
+        return [self.task_id, self.status, self.title, f"[{self.task_id}]({self.link_path})"]
 
 
 @dataclass(frozen=True)
@@ -114,10 +61,6 @@ class TaskMetadata:
     task_id: str
     title: str
     status: str
-    category: str
-    priority: str
-    actor: str
-    related_area: str
     rel_path: str
 
     @property
@@ -127,7 +70,7 @@ class TaskMetadata:
 
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Generate or check the TSK registry from individual TSK files.")
+    parser = argparse.ArgumentParser(description="Generate or check the compact TSK registry index.")
     parser.add_argument("--root", type=Path, default=Path("."), help="Repository root. Default: current directory.")
     parser.add_argument(
         "--mode",
@@ -166,26 +109,26 @@ def parse_registry_text(text: str) -> dict[str, RegistryRow]:
     rows: dict[str, RegistryRow] = {}
     for line in text.splitlines():
         cells = split_markdown_row(line)
-        if len(cells) < 11:
+        if len(cells) < 4:
             continue
         task_id = cells[0]
         if not ROW_ID_RE.match(task_id):
             continue
-        link_match = LINK_RE.search(cells[10])
-        link_path = link_match.group("path") if link_match else expected_link_path(task_id, cells[3])
-        rows[task_id] = RegistryRow(
-            task_id=task_id,
-            category=cells[1],
-            title=cells[2],
-            status=cells[3],
-            priority=cells[4],
-            actor=cells[5],
-            related_area=cells[6],
-            summary=cells[7],
-            done_condition=cells[8],
-            evidence=cells[9],
-            link_path=link_path,
-        )
+
+        # Compact index format: 管理ID / 状態 / 件名 / 個別ファイル
+        if len(cells) == 4:
+            status = cells[1]
+            title = cells[2]
+            link_cell = cells[3]
+        # Legacy detailed table format: 管理ID / 区分 / 件名 / 状態 / ... / 個別ファイル
+        else:
+            title = cells[2]
+            status = cells[3]
+            link_cell = cells[-1]
+
+        link_match = LINK_RE.search(link_cell)
+        link_path = link_match.group("path") if link_match else expected_link_path(task_id, status)
+        rows[task_id] = RegistryRow(task_id=task_id, status=status, title=title, link_path=link_path)
     return rows
 
 
@@ -230,42 +173,8 @@ def parse_task_metadata(path: Path, task_dir: Path) -> TaskMetadata:
         task_id=task_id,
         title=metadata.get("件名", title),
         status=status,
-        category=metadata.get("区分", ""),
-        priority=metadata.get("優先度", ""),
-        actor=metadata.get("実施主体", ""),
-        related_area=metadata.get("関連箇所", ""),
         rel_path=rel_path,
     )
-
-
-def row_from_metadata(metadata: TaskMetadata) -> RegistryRow:
-    return RegistryRow(
-        task_id=metadata.task_id,
-        category=metadata.category,
-        title=metadata.title,
-        status=metadata.status,
-        priority=metadata.priority,
-        actor=metadata.actor,
-        related_area=metadata.related_area,
-        summary="",
-        done_condition="",
-        evidence="",
-        link_path=metadata.rel_path,
-    )
-
-
-def merge_existing_row(existing: RegistryRow | None, metadata: TaskMetadata) -> RegistryRow:
-    if existing is None:
-        return row_from_metadata(metadata)
-    if existing.status != metadata.status:
-        raise ValueError(
-            f"status mismatch for {metadata.task_id}: registry={existing.status} individual={metadata.status}"
-        )
-    if existing.link_path != metadata.rel_path:
-        raise ValueError(
-            f"link/path mismatch for {metadata.task_id}: registry={existing.link_path} individual={metadata.rel_path}"
-        )
-    return existing
 
 
 def collect_task_paths(task_dir: Path) -> list[Path]:
@@ -276,7 +185,7 @@ def collect_task_paths(task_dir: Path) -> list[Path]:
     return sorted(paths, key=lambda path: path.name)
 
 
-def generate_rows(task_dir: Path, existing_rows: dict[str, RegistryRow]) -> list[RegistryRow]:
+def generate_rows(task_dir: Path) -> list[RegistryRow]:
     rows: list[RegistryRow] = []
     seen: set[str] = set()
     for path in collect_task_paths(task_dir):
@@ -284,28 +193,63 @@ def generate_rows(task_dir: Path, existing_rows: dict[str, RegistryRow]) -> list
         if metadata.task_id in seen:
             raise ValueError(f"duplicate individual task file for {metadata.task_id}")
         seen.add(metadata.task_id)
-        rows.append(merge_existing_row(existing_rows.get(metadata.task_id), metadata))
-
-    for task_id in sorted(set(existing_rows) - seen):
-        raise ValueError(f"registry row has no individual task file: {task_id}")
-
+        rows.append(
+            RegistryRow(
+                task_id=metadata.task_id,
+                status=metadata.status,
+                title=metadata.title,
+                link_path=metadata.rel_path,
+            )
+        )
     return sorted(rows, key=lambda row: row.number)
 
 
+def status_counts(rows: list[RegistryRow]) -> dict[str, int]:
+    counts = {status: 0 for status in sorted(VALID_STATUSES)}
+    for row in rows:
+        counts[row.status] = counts.get(row.status, 0) + 1
+    return counts
+
+
+def max_task_number(rows: list[RegistryRow]) -> int:
+    return max((row.number for row in rows), default=0)
+
+
 def render_registry(rows: list[RegistryRow]) -> str:
+    max_number = max_task_number(rows)
+    counts = status_counts(rows)
     body = "\n".join(row.to_markdown() for row in rows)
-    return normalize_text(HEADER + body + "\n")
+    text = f"""# 改善タスク課題一覧
+
+改善タスクの縮小索引。各タスクの詳細正本は個別 `TSK-***.md` および `解決済み/TSK-***.md` を参照すること。
+
+旧11列詳細表は履歴参照用として [`{ARCHIVE_NAME}`]({ARCHIVE_NAME}) に退避する。
+
+## 集計
+
+- 最大TSK番号: TSK-{max_number:03d}
+- 保留: {counts.get('保留', 0)}
+- 未解決: {counts.get('未解決', 0)}
+- 確認待ち: {counts.get('確認待ち', 0)}
+- 解決中: {counts.get('解決中', 0)}
+- 解決済み: {counts.get('解決済み', 0)}
+
+## 個別TSK索引
+
+| 管理ID | 状態 | 件名 | 個別ファイル |
+|---|---|---|---|
+{body}
+"""
+    return normalize_text(text)
 
 
 def print_summary(rows: list[RegistryRow]) -> None:
-    max_number = max((row.number for row in rows), default=0)
-    status_counts = {status: 0 for status in sorted(VALID_STATUSES)}
-    for row in rows:
-        status_counts[row.status] = status_counts.get(row.status, 0) + 1
+    max_number = max_task_number(rows)
+    counts = status_counts(rows)
     print(f"[INFO] generated registry rows: {len(rows)}")
     print(f"[INFO] max TSK number: TSK-{max_number:03d}" if max_number else "[INFO] max TSK number: none")
-    for status in sorted(status_counts):
-        print(f"[INFO] status {status}: {status_counts[status]}")
+    for status in sorted(counts):
+        print(f"[INFO] status {status}: {counts[status]}")
 
 
 def report_registry_diff(current: str, generated: str) -> None:
@@ -330,7 +274,7 @@ def report_registry_diff(current: str, generated: str) -> None:
         diffs = []
         for index, (current_cell, generated_cell) in enumerate(zip(current_cells, generated_cells)):
             if current_cell != generated_cell:
-                column = COLUMNS[index]
+                column = COMPACT_COLUMNS[index]
                 diffs.append((column, current_cell, generated_cell))
         if diffs:
             row_mismatch_found = True
@@ -376,8 +320,7 @@ def main(argv: list[str]) -> int:
         return 2
 
     try:
-        existing = parse_existing_registry(registry_path)
-        rows = generate_rows(task_dir, existing)
+        rows = generate_rows(task_dir)
         generated = render_registry(rows)
     except ValueError as exc:
         print(f"[FAIL] {exc}", file=sys.stderr)
