@@ -1,4 +1,64 @@
 ===== CODEX_RESULT_BEGIN =====
+TASK_ID: TSK_002_SAMPLE_SCRIPT_JDK17_REVERIFICATION_V1
+TITLE: TSK-002 統合後サンプル評価スクリプト JDK17 再検証
+EXECUTED_AT: 2026-04-25T09:07:34+09:00
+STATUS: [OK]
+STEP: TSK_002_SAMPLE_SCRIPT_JDK17_REVERIFICATION_V1
+changed files:
+- CodexExec.result
+
+summary:
+- ユーザー操作により PowerShell セッション上で JDK17 を一時設定し、統合後の scripts/run-sample-evaluation-under-samples.ps1 を再実行した
+- JAVA_HOME は C:\Program Files (x86)\Android\openjdk\jdk-17.0.14 に設定された
+- java -version は openjdk version "17.0.14" を表示した
+- .\mvnw.cmd -q -DskipTests package は成功した
+- サンプル評価スクリプトは実行完了し、samples/CodexExec.result に F5_SUMMARY_DONE が出力された
+- 前回記録された JAVA_HOME / java 不足による一括失敗状態は、JDK17 一時設定により解消された
+- 一部サンプルでは build または Q-Scout が失敗したが、スクリプト全体は停止せず最後まで継続した
+- samples/ 配下の公開サンプル実体は commit 対象外であることを確認した
+
+verification:
+- branch: codex-tsk-002-improvement-hints-rule-linked-v1
+- JAVA_HOME: C:\Program Files (x86)\Android\openjdk\jdk-17.0.14
+- java version: openjdk version "17.0.14"
+- package command: .\mvnw.cmd -q -DskipTests package
+- package result: success
+- script command: powershell -ExecutionPolicy Bypass -File .\scripts\run-sample-evaluation-under-samples.ps1
+- script result: completed
+- F5_SUMMARY_DONE: found
+- sample results:
+  - spring-petclinic: build OK / Q-Scout OK
+  - spring-petclinic-microservices: build OK / Q-Scout OK
+  - spring-boot-realworld-example-app: build OK / Q-Scout FAIL
+  - sample-spring-modulith: build FAIL / Q-Scout OK
+  - spring-boot-monolith: build FAIL / Q-Scout OK
+  - bookstore: build FAIL / Q-Scout OK
+  - gs-rest-service: build OK / Q-Scout OK
+  - gs-accessing-data-jpa: build OK / Q-Scout OK
+  - gs-securing-web: build OK / Q-Scout OK
+  - gs-reactive-rest-service: build OK / Q-Scout OK
+- git status after verification: untracked は samples/ 配下の公開サンプル実体のみ
+
+untouched:
+- scripts/run-sample-evaluation-under-samples.ps1
+- samples/ 配下の公開サンプル実体
+- samples/sample-output 配下
+- samples/CodexExec.result
+- samples/sample-comparison-summary.md
+- 今回の確認と無関係な実装ファイル
+
+commit: same commit
+message: TSK-002サンプル評価スクリプトのJDK17再検証結果を記録
+message source: CodexExec.md 指示採用
+push: success / failed / none
+pr: none
+pr url: none
+pr base: main
+pr head: codex-tsk-002-improvement-hints-rule-linked-v1
+pr status: none / failed
+===== CODEX_RESULT_END =====
+
+===== CODEX_RESULT_BEGIN =====
 TASK_ID: TSK_002_SAMPLE_SCRIPT_POST_MERGE_VERIFICATION_V1
 TITLE: TSK-002 統合後サンプル評価スクリプト実行確認
 EXECUTED_AT: 2026-04-25T08:43:23.3771440+09:00
