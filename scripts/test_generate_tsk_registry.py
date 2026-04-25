@@ -75,13 +75,12 @@ CASES: tuple[Case, ...] = (
         expected_substrings=("[PASS] generated TSK registry matches committed registry.", "generated registry rows: 2"),
     ),
     Case(
-        name="check_detects_registry_drift",
-        registry=HEADER
-        + registry_row("TSK-001", "未解決", "TSK-001.md", title="古い件名"),
-        files={"TSK-001.md": tsk_file("TSK-001", "未解決", title="新しい件名")},
+        name="check_detects_status_drift",
+        registry=HEADER + registry_row("TSK-001", "未解決", "TSK-001.md"),
+        files={"TSK-001.md": tsk_file("TSK-001", "解決中")},
         command_args=("--mode", "check"),
         expected_returncode=1,
-        expected_substrings=("[FAIL] generated TSK registry differs from committed registry.",),
+        expected_substrings=("status mismatch for TSK-001",),
     ),
     Case(
         name="summary_reports_counts",
