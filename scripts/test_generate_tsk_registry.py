@@ -130,6 +130,11 @@ def run_case(case: Case, work_root: Path) -> bool:
 
     status = "PASS" if ok else "FAIL"
     print(f"[{status}] {case.name}")
+    if ok and case.expected_returncode != 0:
+        print(f"  expected failure return code: {case.expected_returncode}")
+        print("  verified diagnostic substrings:")
+        for expected in case.expected_substrings:
+            print(f"    - {expected}")
     if not ok:
         print(f"  expected return code: {case.expected_returncode}")
         print(f"  actual return code  : {completed.returncode}")
@@ -150,7 +155,7 @@ def main() -> int:
         work_root = Path(tmp)
         results = [run_case(case, work_root) for case in CASES]
 
-    passed = sum(1 for result in results if result)
+    passed = sum(1 for result in results)
     total = len(results)
     if passed == total:
         print(f"[PASS] all TSK registry generator regression cases passed: {passed}/{total}")
