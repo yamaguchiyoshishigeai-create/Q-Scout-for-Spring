@@ -12,6 +12,11 @@
 /samples/sample-comparison-summary.md
 /samples/*.zip
 
+# Downloaded public sample repositories
+/samples/*/
+!/samples/README.md
+!/samples/.gitkeep
+
 # IDE and OS noise
 /.idea/
 /.vscode/
