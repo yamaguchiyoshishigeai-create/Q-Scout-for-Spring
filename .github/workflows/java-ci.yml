@@ -1,0 +1,43 @@
+name: Java CI
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "pom.xml"
+      - "src/**"
+      - ".github/workflows/java-ci.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "pom.xml"
+      - "src/**"
+      - ".github/workflows/java-ci.yml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    name: Maven package
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: "temurin"
+          java-version: "21"
+          cache: "maven"
+
+      - name: Build package
+        run: ./mvnw -B -DskipTests package
