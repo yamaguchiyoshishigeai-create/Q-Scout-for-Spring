@@ -12,6 +12,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 TEST_SCRIPTS = (
     REPO_ROOT / "scripts" / "test_generate_tsk_registry_basic.py",
     REPO_ROOT / "scripts" / "test_generate_tsk_registry_failures.py",
+    REPO_ROOT / "scripts" / "test_generate_tsk_registry_generation.py",
 )
 
 
