@@ -72,7 +72,29 @@ Codexプロンプト内に `codex_start_branch.ps1`、`codex_start_branch.sh`、
 
 この場合でも、直接Git書き込み指示は `FAIL` として扱う。
 
-## 7. 運用タイミング
+## 7. 回帰テスト
+
+チェッカー本体を変更した場合、または検査ルールを追加・修正した場合は、以下を実行する。
+
+    python scripts/test_codex_prompt_git_safety.py
+
+この回帰テストでは、以下の観点をまとめて確認する。
+
+- 安全なプロンプトが `PASS` になること
+- 必須ポリシー不足が検出されること
+- 必須ポリシー不足を警告扱いにできること
+- 直接Git書き込み指示が `FAIL` になること
+- PR作成指示が `FAIL` になること
+- `.git` 直接操作が `FAIL` になること
+- 権限昇格再実行を許可する表現が `FAIL` になること
+- 権限昇格再実行を禁止する安全文が誤検知されないこと
+- スクリプト雛形内のGit操作が、通常時は検出され、`--allow-script-blocks` 指定時は許可されること
+
+期待結果は以下である。
+
+    [PASS] all regression cases passed: 9/9
+
+## 8. 運用タイミング
 
 以下のタイミングで実行する。
 
@@ -81,8 +103,9 @@ Codexプロンプト内に `codex_start_branch.ps1`、`codex_start_branch.sh`、
 - Git書き込みやPR作成を含む作業指示を作成したとき
 - Codexプロンプト作成ルールを変更したとき
 - 過去プロンプトを再利用するとき
+- `scripts/check_codex_prompt_git_safety.py` を変更したとき
 
-## 8. 注意事項
+## 9. 注意事項
 
 このチェッカーは静的検査であり、文脈判断を完全には代替しない。
 
@@ -93,7 +116,7 @@ Codexプロンプト内に `codex_start_branch.ps1`、`codex_start_branch.sh`、
 - Codexへ渡す作業単位が適切か
 - 例外運用の妥当性
 
-## 9. 関連文書
+## 10. 関連文書
 
 - `docs/00_プロジェクト管理/05_横断運用規程/CodexPrompt_GitScriptEscalation_Rules.md`
 - `docs/00_プロジェクト管理/05_横断運用規程/Codex連携運用ルール.md`
