@@ -15,6 +15,7 @@ Current scope:
 - synthesize rows only for files that are not yet listed
 - generate a normalized Markdown registry table
 - check whether the committed registry already matches the generated output
+- report row-level and column-level differences when check fails
 
 Usage:
     python scripts/generate_tsk_registry.py --mode summary
@@ -38,6 +39,19 @@ SOLVED_DIR_NAME = "解決済み"
 SOLVED_STATUS = "解決済み"
 VALID_ACTIVE_STATUSES = {"未解決", "解決中", "確認待ち", "保留"}
 VALID_STATUSES = VALID_ACTIVE_STATUSES | {SOLVED_STATUS}
+COLUMNS = (
+    "管理ID",
+    "区分",
+    "件名",
+    "状態",
+    "優先度",
+    "実施主体",
+    "関連箇所",
+    "概要",
+    "完了条件",
+    "根拠 / 関連PR / 備考",
+    "個別ファイル",
+)
 
 HEADER = """# 改善タスク課題一覧
 
@@ -78,6 +92,21 @@ class RegistryRow:
             f"{self.priority} | {self.actor} | {self.related_area} | {self.summary} | "
             f"{self.done_condition} | {self.evidence} | [{self.task_id}]({self.link_path}) |"
         )
+
+    def cells(self) -> list[str]:
+        return [
+            self.task_id,
+            self.category,
+            self.title,
+            self.status,
+            self.priority,
+            self.actor,
+            self.related_area,
+            self.summary,
+            self.done_condition,
+            self.evidence,
+            f"[{self.task_id}]({self.link_path})",
+        ]
 
 
 @dataclass(frozen=True)
@@ -133,11 +162,9 @@ def split_markdown_row(line: str) -> list[str]:
     return [cell.strip() for cell in stripped.strip("|").split("|")]
 
 
-def parse_existing_registry(registry_path: Path) -> dict[str, RegistryRow]:
-    if not registry_path.exists():
-        return {}
+def parse_registry_text(text: str) -> dict[str, RegistryRow]:
     rows: dict[str, RegistryRow] = {}
-    for line in read_text(registry_path).splitlines():
+    for line in text.splitlines():
         cells = split_markdown_row(line)
         if len(cells) < 11:
             continue
@@ -160,6 +187,12 @@ def parse_existing_registry(registry_path: Path) -> dict[str, RegistryRow]:
             link_path=link_path,
         )
     return rows
+
+
+def parse_existing_registry(registry_path: Path) -> dict[str, RegistryRow]:
+    if not registry_path.exists():
+        return {}
+    return parse_registry_text(read_text(registry_path))
 
 
 def expected_link_path(task_id: str, status: str) -> str:
@@ -275,6 +308,49 @@ def print_summary(rows: list[RegistryRow]) -> None:
         print(f"[INFO] status {status}: {status_counts[status]}")
 
 
+def report_registry_diff(current: str, generated: str) -> None:
+    current_rows = parse_registry_text(current)
+    generated_rows = parse_registry_text(generated)
+
+    current_ids = set(current_rows)
+    generated_ids = set(generated_rows)
+    missing_ids = sorted(current_ids - generated_ids)
+    extra_ids = sorted(generated_ids - current_ids)
+
+    if missing_ids:
+        print(f"[DIFF] rows missing from generated registry: {', '.join(missing_ids)}")
+    if extra_ids:
+        print(f"[DIFF] rows only in generated registry: {', '.join(extra_ids)}")
+
+    common_ids = sorted(current_ids & generated_ids, key=lambda task_id: int(task_id.split('-')[1]))
+    row_mismatch_found = False
+    for task_id in common_ids:
+        current_cells = current_rows[task_id].cells()
+        generated_cells = generated_rows[task_id].cells()
+        diffs = []
+        for index, (current_cell, generated_cell) in enumerate(zip(current_cells, generated_cells)):
+            if current_cell != generated_cell:
+                column = COLUMNS[index]
+                diffs.append((column, current_cell, generated_cell))
+        if diffs:
+            row_mismatch_found = True
+            print(f"[DIFF] row mismatch: {task_id}")
+            for column, current_cell, generated_cell in diffs:
+                print(f"  - {column}: committed={current_cell!r} generated={generated_cell!r}")
+
+    if not missing_ids and not extra_ids and not row_mismatch_found:
+        current_lines = normalize_text(current).splitlines()
+        generated_lines = normalize_text(generated).splitlines()
+        for line_no, (current_line, generated_line) in enumerate(zip(current_lines, generated_lines), start=1):
+            if current_line != generated_line:
+                print(f"[DIFF] non-row text mismatch at line {line_no}")
+                print(f"  committed={current_line!r}")
+                print(f"  generated ={generated_line!r}")
+                return
+        if len(current_lines) != len(generated_lines):
+            print(f"[DIFF] line count mismatch: committed={len(current_lines)} generated={len(generated_lines)}")
+
+
 def check_registry(registry_path: Path, generated: str) -> int:
     if not registry_path.exists():
         print(f"[FAIL] registry not found: {registry_path}")
@@ -284,6 +360,7 @@ def check_registry(registry_path: Path, generated: str) -> int:
         print("[PASS] generated TSK registry matches committed registry.")
         return 0
     print("[FAIL] generated TSK registry differs from committed registry.")
+    report_registry_diff(current, generated)
     print("[INFO] Run with --mode generate --output <path> to inspect the generated registry.")
     return 1
 
