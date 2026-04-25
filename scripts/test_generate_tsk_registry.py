@@ -43,11 +43,7 @@ def registry(rows: list[tuple[str, str, str, str]]) -> str:
 
 
 def tsk(task_id: str, status: str, title: str = "件名") -> str:
-    return (
-        f"# {task_id} {title}\n\n"
-        f"- 件名: {title}\n"
-        f"- 状態: {status}\n"
-    )
+    return f"# {task_id} {title}\n\n- 件名: {title}\n- 状態: {status}\n"
 
 
 @dataclass(frozen=True)
@@ -75,7 +71,7 @@ CASES = (
         {"TSK-001.md": tsk("TSK-001", "解決中")},
         ("--mode", "check"),
         1,
-        ("path/status mismatch for TSK-001",),
+        ("[DIFF] row mismatch: TSK-001", "状態"),
     ),
     Case(
         "summary_reports_counts",
