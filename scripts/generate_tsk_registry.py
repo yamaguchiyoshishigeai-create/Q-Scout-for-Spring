@@ -223,7 +223,7 @@ def render_registry(rows: list[RegistryRow]) -> str:
 
 改善タスクの縮小索引。各タスクの詳細正本は個別 `TSK-***.md` および `解決済み/TSK-***.md` を参照すること。
 
-旧11列詳細表は履歴参照用として [`{ARCHIVE_NAME}`]({ARCHIVE_NAME}) に退避する。
+旧11列詳細表の履歴参照導線は [`{ARCHIVE_NAME}`]({ARCHIVE_NAME}) に残す。
 
 ## 集計
 
