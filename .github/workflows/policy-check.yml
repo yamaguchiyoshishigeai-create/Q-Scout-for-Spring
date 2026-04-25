@@ -1,0 +1,112 @@
+name: Policy Check
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  policy-check:
+    name: Repository policy checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Determine changed files
+        id: changed-files
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            base_sha="${{ github.event.pull_request.base.sha }}"
+            head_sha="${{ github.event.pull_request.head.sha }}"
+          else
+            base_sha="${{ github.event.before }}"
+            head_sha="${{ github.sha }}"
+          fi
+
+          if [[ -z "$base_sha" || "$base_sha" == "0000000000000000000000000000000000000000" ]]; then
+            git ls-files > changed-files.txt
+          else
+            git diff --name-only "$base_sha" "$head_sha" > changed-files.txt
+          fi
+
+          cat changed-files.txt
+
+      - name: Prevent tracked local execution results and generated sample artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          forbidden_regex='(^|/)CodexExec\.result$|^samples/sample-output/|^samples/sample-comparison-summary\.md$|^samples/[^/]+/.+'
+
+          if grep -E "$forbidden_regex" changed-files.txt; then
+            echo "::error::Policy violation: local execution results, generated sample artifacts, or downloaded sample repositories must not be committed."
+            exit 1
+          fi
+
+      - name: Prevent deprecated active policy files from returning
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          deprecated_paths=(
+            "docs/00_プロジェクト管理/05_横断運用規程/Codex実行結果管理ルール.md"
+            "docs/00_プロジェクト管理/05_横断運用規程/CodexExec.result運用ルール.md"
+          )
+
+          for path in "${deprecated_paths[@]}"; do
+            if [[ -e "$path" ]]; then
+              echo "::error::Policy violation: deprecated active policy file exists: $path"
+              exit 1
+            fi
+          done
+
+      - name: Verify PR template keeps AI_REPO_RESULT block
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          template=".github/pull_request_template.md"
+
+          if [[ ! -f "$template" ]]; then
+            echo "::error::Policy violation: PR template is missing."
+            exit 1
+          fi
+
+          if ! grep -q "AI_REPO_RESULT_BEGIN" "$template"; then
+            echo "::error::Policy violation: PR template must include AI_REPO_RESULT_BEGIN."
+            exit 1
+          fi
+
+      - name: Verify current AI traceability rule exists
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          rule="docs/00_プロジェクト管理/05_横断運用規程/AIリポジトリ作業証跡管理ルール.md"
+
+          if [[ ! -f "$rule" ]]; then
+            echo "::error::Policy violation: AI repository traceability rule is missing."
+            exit 1
+          fi
+
+          if ! grep -q "PRブランチ検証先行ルール" "$rule"; then
+            echo "::error::Policy violation: AI traceability rule must define PR branch verification rule."
+            exit 1
+          fi
