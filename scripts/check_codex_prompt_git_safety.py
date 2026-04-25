@@ -18,7 +18,6 @@ import re
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable
 
 
 @dataclass(frozen=True)
@@ -72,12 +71,6 @@ DIRECT_GIT_WRITE_RULES: tuple[Rule, ...] = (
         "Do not write to or manipulate .git directly.",
     ),
     Rule(
-        "DANGEROUS_DELETE_GIT",
-        re.compile(r"\brm\s+-rf\s+\.git\b|\bRemove-Item\b.*\.git\b", re.IGNORECASE),
-        "Deleting or directly modifying .git is prohibited.",
-        "Remove this instruction entirely.",
-    ),
-    Rule(
         "ELEVATION_RETRY",
         re.compile(r"(?:権限昇格|権限付き|sudo|管理者権限|再実行).*(?:git|同じ|同一)|(?:git|同じ|同一).*(?:権限昇格|権限付き|sudo|管理者権限|再実行)", re.IGNORECASE),
         "The prompt appears to allow retrying the same Git operation with elevated permissions.",
@@ -103,7 +96,7 @@ REQUIRED_POLICY_PATTERNS: tuple[tuple[str, re.Pattern[str], str], ...] = (
     ),
     (
         "NO_ELEVATION_RETRY",
-        re.compile(r"(?:失敗後|通常実行で失敗|同一コマンド).*?(?:権限付き|権限昇格|再実行).*?(?:禁止|してはいけません)|(?:権限付き|権限昇格).*?(?:同一コマンド|同じGit操作).*?(?:禁止|してはいけません)", re.IGNORECASE),
+        re.compile(r"(?:失敗後|通常実行で失敗|同一コマンド).*?(?:権限付き|権限昇格|再実行).*?(?:禁止|してはいけません|しないでください)|(?:権限付き|権限昇格).*?(?:同一コマンド|同じGit操作).*?(?:禁止|してはいけません|しないでください)", re.IGNORECASE),
         "Prohibit retrying the same failed Git write operation with elevated permissions.",
     ),
 )
@@ -113,6 +106,11 @@ SCRIPT_BLOCK_HINTS = (
     "codex_start_branch.sh",
     "codex_finish_pr.ps1",
     "codex_finish_pr.sh",
+)
+
+PROHIBITION_CONTEXT_PATTERN = re.compile(
+    r"(?:禁止|してはいけません|しないでください|試行しない|実行しない|must\s+not|do\s+not|禁止します)",
+    re.IGNORECASE,
 )
 
 
@@ -141,16 +139,17 @@ def read_text(path: Path) -> str:
         return path.read_text(encoding="utf-8-sig")
 
 
-def iter_lines(text: str) -> Iterable[tuple[int, str]]:
-    for line_no, line in enumerate(text.splitlines(), start=1):
-        yield line_no, line
-
-
 def is_script_context(lines: list[str], index: int) -> bool:
     start = max(0, index - 20)
     end = min(len(lines), index + 20)
     nearby = "\n".join(lines[start:end])
     return any(hint in nearby for hint in SCRIPT_BLOCK_HINTS)
+
+
+def is_prohibition_context(line: str) -> bool:
+    """Return true when a line clearly prohibits the risky action."""
+
+    return bool(PROHIBITION_CONTEXT_PATTERN.search(line))
 
 
 def check_direct_git_writes(text: str, allow_script_blocks: bool) -> list[Finding]:
@@ -161,17 +160,20 @@ def check_direct_git_writes(text: str, allow_script_blocks: bool) -> list[Findin
             continue
         for rule in DIRECT_GIT_WRITE_RULES:
             match = rule.pattern.search(line)
-            if match:
-                findings.append(
-                    Finding(
-                        severity=rule.severity,
-                        line_no=index + 1,
-                        rule_id=rule.rule_id,
-                        matched=match.group(0).strip(),
-                        message=rule.message,
-                        suggestion=rule.suggestion,
-                    )
+            if not match:
+                continue
+            if rule.rule_id == "ELEVATION_RETRY" and is_prohibition_context(line):
+                continue
+            findings.append(
+                Finding(
+                    severity=rule.severity,
+                    line_no=index + 1,
+                    rule_id=rule.rule_id,
+                    matched=match.group(0).strip(),
+                    message=rule.message,
+                    suggestion=rule.suggestion,
                 )
+            )
     return findings
 
 
