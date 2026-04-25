@@ -9,6 +9,14 @@ Q-Scout for Spring は、Spring アプリケーションのコードレビュー
 
 現在は Spring Boot Web アプリケーションとして動作しつつ、もともとの CLI 分析フローも維持しており、ローカル実行・自己分析・将来的な Web 展開の両方を見据えた構成になっています。
 
+## Public Free版としての位置づけ
+
+本リポジトリは、Q-Scout for Spring の Public Free 版として管理します。  
+Spring Boot 3.5.x 系までの安定対応、Maven 単一モジュール、基本診断ルール、Markdown レポート出力、Web UI を中心に整備します。
+
+Spring Boot 4.x、Spring Framework 7、Gradle、マルチモジュール、高度診断、商用向け機能は、将来的な Private Pro 版で管理する方針です。  
+詳細は [Public-Free版・Private-Pro版分離運用方針](docs/00_プロジェクト管理/01_プロジェクト計画/Public-Free版・Private-Pro版分離運用方針.md) を参照してください。
+
 ## 解決する課題
 
 - コードレビューの観点が担当者ごとにぶれ、品質判断が属人化しやすい
