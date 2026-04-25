@@ -19,7 +19,9 @@
 Thumbs.db
 .DS_Store
 
+# Local Codex execution result; archived history is under docs/90_アーカイブ/
+/CodexExec.result
+
 # Codex 実行結果
-# リポジトリルートの標準結果ファイルは追跡対象とする
 /samples/CodexExec.result
 

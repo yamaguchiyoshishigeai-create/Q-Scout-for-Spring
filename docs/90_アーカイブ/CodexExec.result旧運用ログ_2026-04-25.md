@@ -1,3 +1,17 @@
+# CodexExec.result 旧運用ログ
+
+このファイルは、Codex 実行結果をリポジトリルートの `CodexExec.result` に追記管理していた旧運用の履歴アーカイブである。
+
+現行運用では、ルート直下の `CodexExec.result` はユーザーが直近実行結果を確認するためのローカル作業ファイルとし、git 管理対象外とする。
+
+今後の Codex 実行結果は、原則として以下に記録する。
+
+- PRあり作業: PR本文またはPRコメントに実行結果要約を記録する
+- PRなし作業: コミットメッセージ本文に短縮記録を残す
+- 長大ログ: git管理せず、必要な要約と参照先のみ記録する
+
+---
+
 ===== CODEX_RESULT_BEGIN =====
 TASK_ID: TSK_002_SAMPLE_SCRIPT_JDK17_REVERIFICATION_V1
 TITLE: TSK-002 統合後サンプル評価スクリプト JDK17 再検証
