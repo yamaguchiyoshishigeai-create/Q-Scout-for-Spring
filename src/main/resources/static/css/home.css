@@ -311,6 +311,10 @@
     font-weight: 800;
 }
 
+.limit-tooltip__title--sub {
+    margin-top: 14px;
+}
+
 .limit-tooltip__paragraph + .limit-tooltip__paragraph {
     margin-top: 10px;
 }
@@ -336,8 +340,20 @@
     border-radius: 12px;
 }
 
+.upload-action-row {
+    display: flex;
+    align-items: stretch;
+    gap: 12px;
+}
+
+.upload-action-row input[type="file"] {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
 .upload-form button[type="submit"] {
-    margin-top: 16px;
+    flex: 0 0 auto;
+    min-width: 180px;
     border: 0;
     border-radius: 999px;
     padding: 14px 24px;
@@ -756,5 +772,13 @@
     .limit-card--tooltip:hover .limit-tooltip,
     .limit-card--tooltip:focus-visible .limit-tooltip {
         transform: translateY(0);
+    }
+
+    .upload-action-row {
+        flex-direction: column;
+    }
+
+    .upload-form button[type="submit"] {
+        width: 100%;
     }
 }
