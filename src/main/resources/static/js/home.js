@@ -6,6 +6,7 @@
 
     var fileInput = document.getElementById("projectZip");
     var fileField = document.querySelector(".custom-file-field");
+    var fileButton = document.querySelector(".custom-file-button");
     var fileName = document.getElementById("projectZipFileName");
     var button = document.getElementById("submitButton");
     var running = document.getElementById("running");
@@ -23,6 +24,51 @@
             return;
         }
         running.style.display = visible ? "block" : "none";
+    }
+
+    function applyCustomFileStyles() {
+        if (fileField) {
+            fileField.style.display = "flex";
+            fileField.style.alignItems = "stretch";
+            fileField.style.flex = "1 1 auto";
+            fileField.style.minWidth = "0";
+            fileField.style.width = "100%";
+            fileField.style.border = "1px solid #c9d7d8";
+            fileField.style.borderRadius = "12px";
+            fileField.style.background = "#fff";
+            fileField.style.overflow = "hidden";
+        }
+        if (fileInput) {
+            fileInput.style.position = "fixed";
+            fileInput.style.left = "-10000px";
+            fileInput.style.top = "auto";
+            fileInput.style.width = "1px";
+            fileInput.style.height = "1px";
+        }
+        if (fileButton) {
+            fileButton.style.display = "inline-flex";
+            fileButton.style.alignItems = "center";
+            fileButton.style.justifyContent = "center";
+            fileButton.style.flex = "0 0 auto";
+            fileButton.style.margin = "0";
+            fileButton.style.padding = "0 18px";
+            fileButton.style.borderRight = "1px solid #c9d7d8";
+            fileButton.style.background = "#f6faf9";
+            fileButton.style.color = "var(--ink)";
+            fileButton.style.fontWeight = "700";
+            fileButton.style.cursor = "pointer";
+            fileButton.style.whiteSpace = "nowrap";
+        }
+        if (fileName) {
+            fileName.style.display = "block";
+            fileName.style.flex = "1 1 auto";
+            fileName.style.minWidth = "0";
+            fileName.style.padding = "14px";
+            fileName.style.color = "var(--muted)";
+            fileName.style.overflow = "hidden";
+            fileName.style.textOverflow = "ellipsis";
+            fileName.style.whiteSpace = "nowrap";
+        }
     }
 
     function getEmptyFileLabel() {
@@ -97,6 +143,7 @@
         helpers.bindEscapeClose(hideUploadError);
     }
 
+    applyCustomFileStyles();
     updateSelectedFileName();
 
     if (modal.dataset.open === "true") {
