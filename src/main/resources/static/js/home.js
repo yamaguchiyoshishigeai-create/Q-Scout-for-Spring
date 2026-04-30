@@ -39,11 +39,12 @@
             fileField.style.overflow = "hidden";
         }
         if (fileInput) {
-            fileInput.style.position = "fixed";
+            fileInput.style.position = "absolute";
             fileInput.style.left = "-10000px";
             fileInput.style.top = "auto";
             fileInput.style.width = "1px";
             fileInput.style.height = "1px";
+            fileInput.style.opacity = "0";
         }
         if (fileButton) {
             fileButton.style.display = "inline-flex";
@@ -78,11 +79,21 @@
         return "";
     }
 
-    function updateSelectedFileName() {
-        if (!fileName || !fileInput) {
+    function getSelectedFile(source) {
+        if (source && source.files && source.files.length > 0) {
+            return source.files[0];
+        }
+        if (fileInput && fileInput.files && fileInput.files.length > 0) {
+            return fileInput.files[0];
+        }
+        return null;
+    }
+
+    function updateSelectedFileName(source) {
+        if (!fileName) {
             return;
         }
-        var file = fileInput.files[0];
+        var file = getSelectedFile(source);
         fileName.textContent = file ? file.name : getEmptyFileLabel();
     }
 
@@ -110,20 +121,21 @@
             form.dataset.uploadTooLargeRetry
         );
         fileInput.value = "";
-        updateSelectedFileName();
+        updateSelectedFileName(fileInput);
     }
 
-    fileInput.addEventListener("change", function () {
-        var file = fileInput.files[0];
+    fileInput.addEventListener("change", function (event) {
+        var source = event.target;
+        var file = getSelectedFile(source);
         if (isTooLarge(file)) {
             handleTooLargeFile();
             return;
         }
-        updateSelectedFileName();
+        updateSelectedFileName(source);
     });
 
     form.addEventListener("submit", function (event) {
-        var file = fileInput.files[0];
+        var file = getSelectedFile(fileInput);
         if (isTooLarge(file)) {
             event.preventDefault();
             handleTooLargeFile();
@@ -144,7 +156,7 @@
     }
 
     applyCustomFileStyles();
-    updateSelectedFileName();
+    updateSelectedFileName(fileInput);
 
     if (modal.dataset.open === "true") {
         showUploadError(
