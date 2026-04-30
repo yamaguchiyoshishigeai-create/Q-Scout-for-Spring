@@ -5,6 +5,8 @@
     }
 
     var fileInput = document.getElementById("projectZip");
+    var fileField = document.querySelector(".custom-file-field");
+    var fileName = document.getElementById("projectZipFileName");
     var button = document.getElementById("submitButton");
     var running = document.getElementById("running");
     var modal = document.getElementById("uploadErrorModal");
@@ -21,6 +23,21 @@
             return;
         }
         running.style.display = visible ? "block" : "none";
+    }
+
+    function getEmptyFileLabel() {
+        if (fileField && fileField.dataset.emptyLabel) {
+            return fileField.dataset.emptyLabel;
+        }
+        return "";
+    }
+
+    function updateSelectedFileName() {
+        if (!fileName || !fileInput) {
+            return;
+        }
+        var file = fileInput.files[0];
+        fileName.textContent = file ? file.name : getEmptyFileLabel();
     }
 
     function hideUploadError() {
@@ -47,13 +64,16 @@
             form.dataset.uploadTooLargeRetry
         );
         fileInput.value = "";
+        updateSelectedFileName();
     }
 
     fileInput.addEventListener("change", function () {
         var file = fileInput.files[0];
         if (isTooLarge(file)) {
             handleTooLargeFile();
+            return;
         }
+        updateSelectedFileName();
     });
 
     form.addEventListener("submit", function (event) {
@@ -76,6 +96,8 @@
     if (helpers.bindEscapeClose) {
         helpers.bindEscapeClose(hideUploadError);
     }
+
+    updateSelectedFileName();
 
     if (modal.dataset.open === "true") {
         showUploadError(
