@@ -109,10 +109,10 @@
                     </div>
                     <label for="projectZip" th:text="#{form.upload.label}">pom.xml を含む Spring Boot / Maven / 単一モジュールの zip を選択してください</label>
                     <div class="upload-action-row">
-                        <div class="custom-file-field" th:attr="data-empty-label=${#locale.language == 'ja' ? '選択されていません' : 'No file selected'}">
-                            <input id="projectZip" class="native-file-input" type="file" name="projectZip" accept=".zip,application/zip" aria-describedby="projectZipFileName">
-                            <label class="custom-file-button" for="projectZip" th:text="${#locale.language == 'ja' ? 'ファイルを選択' : 'Choose File'}">ファイルを選択</label>
-                            <span id="projectZipFileName" class="custom-file-name" aria-live="polite" th:text="${#locale.language == 'ja' ? '選択されていません' : 'No file selected'}">選択されていません</span>
+                        <div class="custom-file-field" style="display:flex;align-items:stretch;flex:1 1 auto;min-width:0;width:100%;border:1px solid #c9d7d8;border-radius:12px;background:#fff;overflow:hidden;" th:attr="data-empty-label=${#locale.language == 'ja' ? '選択されていません' : 'No file selected'}">
+                            <input id="projectZip" class="native-file-input" style="position:absolute;left:-10000px;top:auto;width:1px;height:1px;padding:0;margin:0;border:0;opacity:0;" type="file" name="projectZip" accept=".zip,application/zip" aria-describedby="projectZipFileName">
+                            <label class="custom-file-button" style="display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;margin:0;padding:0 18px;border-right:1px solid #c9d7d8;background:#f6faf9;color:var(--ink);font-weight:700;cursor:pointer;white-space:nowrap;" for="projectZip" th:text="${#locale.language == 'ja' ? 'ファイルを選択' : 'Choose File'}">ファイルを選択</label>
+                            <span id="projectZipFileName" class="custom-file-name" style="display:block;flex:1 1 auto;min-width:0;padding:14px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" aria-live="polite" th:text="${#locale.language == 'ja' ? '選択されていません' : 'No file selected'}">選択されていません</span>
                         </div>
                         <button id="submitButton" type="submit" th:text="#{form.upload.button}">解析を実行する</button>
                     </div>
