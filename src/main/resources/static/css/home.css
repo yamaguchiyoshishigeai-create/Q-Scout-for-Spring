@@ -203,6 +203,61 @@
     flex-wrap: wrap;
 }
 
+.artifact-actions {
+    margin-top: 14px;
+}
+
+.artifact-action-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 128px;
+    border-radius: 999px;
+    padding: 12px 18px;
+    border: 1px solid rgba(17, 100, 102, 0.28);
+    background: rgba(255, 255, 255, 0.88);
+    color: var(--accent);
+    font-weight: 800;
+    text-align: center;
+    text-decoration: none;
+    box-shadow: 0 8px 18px rgba(31, 42, 46, 0.08);
+    transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease, color 0.16s ease;
+}
+
+.artifact-action-button--preview {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+}
+
+.artifact-action-button--download {
+    background: rgba(255, 255, 255, 0.94);
+}
+
+.artifact-action-button:hover,
+.artifact-action-button:focus-visible {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 24px rgba(31, 42, 46, 0.14);
+    text-decoration: none;
+}
+
+.artifact-action-button--preview:hover,
+.artifact-action-button--preview:focus-visible {
+    background: #0f585a;
+    color: #fff;
+}
+
+.artifact-action-button--download:hover,
+.artifact-action-button--download:focus-visible {
+    background: var(--accent-soft);
+    color: var(--accent);
+}
+
+.artifact-action-button:focus-visible {
+    outline: 3px solid rgba(17, 100, 102, 0.28);
+    outline-offset: 3px;
+}
+
 .limits {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -788,6 +843,10 @@
     }
 
     .artifact-prompt .cta-link {
+        width: 100%;
+    }
+
+    .artifact-action-button {
         width: 100%;
     }
 
