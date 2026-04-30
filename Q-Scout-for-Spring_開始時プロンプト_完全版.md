@@ -1,4 +1,4 @@
-# 提案名：Q-Scout for Spring 新規チャット開始時プロンプト v3.0
+# 提案名：Q-Scout for Spring 新規チャット開始時プロンプト v3.1
 
 以下の前提で、本プロジェクト「Q-Scout for Spring」の引継ぎ担当として作業してください。
 
@@ -11,8 +11,9 @@
 
 - 本プロジェクトでは、**リポジトリ連携を利用して現行状態を確認すること**を前提とする
 - 文書だけで判断せず、**README / docs / src / templates / tests / scripts を照合**する
-- docs は整理済みであり、**docs 全体索引 → 企画 → 将来構想 → 要件定義 → 詳細設計** の順で読む
-- Codex 作業結果確認は、原則として **リポジトリルートの `CodexExec.result` を起点にし、`pr url` がある場合は PR 差分を最優先で確認** する
+- docs は整理済みであり、**docs 全体索引 → 企画 → 将来構想 → 要件定義 → 基本設計 → 詳細設計** の順で読む
+- AIリポジトリ作業結果確認は、原則として **PR本文、PRコメント、コミットメッセージ本文、PR差分** を優先する
+- Codex 実行直後の補助確認では、必要に応じてリポジトリルートの `CodexExec.result` を参照する。ただし `CodexExec.result` は正式履歴ではなく、ローカル直近確認用ファイルとして扱う
 - 文書と実装がズレる場合は、**ズレを明示した上で現行実装を優先**する
 - 既存 CLI 資産を活かし、**Web 層は薄く、解析コア共有**の原則を崩さない
 
@@ -26,24 +27,26 @@
 1. 対象リポジトリと対象ブランチ
 2. `README.md`
 3. `docs/README.md`
-4. `docs/00_プロジェクト管理/05_横断運用規程/CodexExec.result運用ルール.md`
-5. 必要に応じて `CodexExec.result`
+4. `docs/00_プロジェクト管理/05_横断運用規程/Codex連携運用ルール.md`
+5. `docs/00_プロジェクト管理/05_横断運用規程/AIリポジトリ作業証跡管理ルール.md`
+6. 必要に応じて `CodexExec.result`
 
 ### 2.2 次に確認するもの
-6. `docs/10_企画/Q-Scout-for-Spring-プロジェクト企画書-v2.0.md`
-7. `docs/10_企画/15_将来構想/Q-Scout-AI利用戦略-v1.0.md`
-8. `docs/20_要件定義/20_要件定義ガイド.md`
-9. `docs/20_要件定義/` 配下の現行正本
-10. `docs/20_要件定義/` 配下の現行補助仕様
-11. 必要に応じて `docs/40_詳細設計/`
-12. `pom.xml`
-13. `src/main/resources/application.properties`
-14. 必要な `src/main/java`, `src/test/java`, `src/main/resources/templates`, `scripts`
+7. `docs/10_企画/Q-Scout-for-Spring-プロジェクト企画書-v2.0.md`
+8. `docs/10_企画/15_将来構想/Q-Scout-AI利用戦略-v1.0.md`
+9. `docs/20_要件定義/20_要件定義ガイド.md`
+10. `docs/20_要件定義/` 配下の現行正本
+11. `docs/20_要件定義/` 配下の現行補助仕様
+12. `docs/30_基本設計/基本設計.md`
+13. 必要に応じて `docs/40_詳細設計/`
+14. `pom.xml`
+15. `src/main/resources/application.properties`
+16. 必要な `src/main/java`, `src/test/java`, `src/main/resources/templates`, `scripts`
 
 ### 2.3 精査時の原則
 - docs の構成理解は、**個別ファイルの丸読み前に索引ファイルを読む**
 - 現状確認は、**README とコードとテストで裏取り**する
-- 未解決課題や途中作業の確認には、必要に応じて **`CodexExec.result`** を参照する
+- 未解決課題や途中作業の確認には、必要に応じて **PR、コミット、`CodexExec.result`** を参照する
 - 旧版開始時プロンプトに書かれていた固定ファイル一覧を鵜呑みにせず、**現行リポジトリ内の実在ファイルを優先**する
 
 ---
@@ -53,7 +56,8 @@
 ### 3.1 最優先の索引・運用文書
 - `README.md`
 - `docs/README.md`
-- `docs/00_プロジェクト管理/05_横断運用規程/CodexExec.result運用ルール.md`
+- `docs/00_プロジェクト管理/05_横断運用規程/Codex連携運用ルール.md`
+- `docs/00_プロジェクト管理/05_横断運用規程/AIリポジトリ作業証跡管理ルール.md`
 
 ### 3.2 企画・将来構想
 - `docs/10_企画/Q-Scout-for-Spring-プロジェクト企画書-v2.0.md`
@@ -71,11 +75,15 @@
 - `docs/20_要件定義/Q-Scout-for-Spring-Web化フェーズ-最小Webアーキテクチャ設計書-v1.0.md`
 - `docs/20_要件定義/ControllerToRepositoryDirectAccessRule_見直し方針書.md`
 
-### 3.5 詳細設計
+### 3.5 基本設計
+- `docs/30_基本設計/基本設計.md`
+
+### 3.6 詳細設計
+- `docs/40_詳細設計/詳細設計.md`
 - `docs/40_詳細設計/` 配下の現行 `.md` / `.txt`
 - 特に UI 差分設計・画面改善系の `.md`
 
-### 3.6 実装確認用
+### 3.7 実装確認用
 - `pom.xml`
 - `src/main/resources/application.properties`
 - `src/main/java/**`
@@ -91,7 +99,7 @@
 
 - `docs/00_プロジェクト管理/`  
   プロジェクト全体または docs 全体に横断的に効く管理文書、運用文書、規程文書の親フォルダです。  
-  特に `05_横断運用規程/` は、`CodexExec.result` 関連運用を含む正式な横断運用規程の集約先です。
+  特に `05_横断運用規程/` は、Codex連携、AIリポジトリ作業証跡管理、ChatGPTリポジトリ編集運用などを含む正式な横断運用規程の集約先です。
 
 - `docs/10_企画/`  
   プロジェクトの背景、目的、提供価値、将来構想の起点となる企画文書群です。
@@ -154,7 +162,7 @@ Q-Scout for Spring は、**Spring Boot / Spring Framework 系 Java プロジェ�
 
 ### 6.2 技術スタック
 - Java 17
-- Spring Boot 3.3.4
+- Spring Boot 3.5.14
 - `spring-boot-starter-web`
 - `spring-boot-starter-thymeleaf`
 - `spring-boot-starter-test`
@@ -167,7 +175,7 @@ Q-Scout for Spring は、**Spring Boot / Spring Framework 系 Java プロジェ�
 - `domain`: DTO / 集計結果 / 成果物定義
 - `infrastructure`: スキャナ、ルール実行、スコア計算、Markdown生成
 - `web.controller`: 画面、download、preview、rule-help の入口
-- `web.service`: upload 検証、一時作業領域、zip 解凍、Web 分析、成果物解決、preview 変換
+- `web.service`: upload 検証、一時作業領域、zip 解凍、Web 分析、成果物解決、preview 変換、署名付き成果物URL生成
 - `web.dto`: 画面表示用 DTO
 - `config`: Web / i18n 設定
 - `i18n`: MessageSource 補助
@@ -356,8 +364,8 @@ AI 向け Markdown は、現行実装では **英語固定** です。
 
 ### 12.1 テスト状況
 開始時には、可能なら現行ブランチでテスト状況を再確認してください。  
-直近時点では `CodexExec.result` 上で **`mvn test` または `mvnw.cmd test` 相当の成功記録** が確認されており、**146 tests passed** の実績があります。  
-ただし、新規チャットでは固定値を鵜呑みにせず、**最新の `CodexExec.result`、必要に応じて PR、さらに現行ブランチでの再確認** を優先してください。
+過去の `CodexExec.result`、PR本文、PRコメント、コミットメッセージ本文には `mvn test` または `mvnw.cmd test` 相当の成功記録が残っている場合があります。  
+ただし、新規チャットでは過去のテスト件数や固定値を鵜呑みにせず、**最新の PR、コミット、必要に応じて `CodexExec.result`、さらに現行ブランチでの再確認** を優先してください。
 
 ### 12.2 テストで担保されている主な観点
 - CLI 引数解析
@@ -389,7 +397,7 @@ AI 向け Markdown は、現行実装では **英語固定** です。
 5. ルール詳細解説ページまで実装済み
 6. トップページ UX 改善も一定反映済み
 7. これからの中心課題は、対応範囲拡張・精度改善・運用強化
-8. docs は、企画 / 将来構想 / 要件定義 / 詳細設計 / アーカイブの構造へ再整理済み
+8. docs は、企画 / 将来構想 / 要件定義 / 基本設計 / 詳細設計 / アーカイブの構造へ再整理済み
 
 つまり、**「これから Web 化する段階」ではなく、「Web 化済みの MVP を改善していく段階」**です。
 
@@ -419,34 +427,39 @@ AI 向け Markdown は、現行実装では **英語固定** です。
 
 ## 15. Codex 連携時の運用前提
 
-### 15.1 Codex 実行手順
-- Codex 実装作業では、原則として **実装 → テスト → `CodexExec.result` へ実行ログ追記 → commit → push → Pull Request 作成** の順で進める
-- Pull Request 作成後は、`CodexExec.result` の該当ログブロックへ PR 情報を追記し、その更新も branch に反映する
-- 長文の実行ログ貼り付けは原則不要とし、詳細な出力ルールは `docs/00_プロジェクト管理/05_横断運用規程/CodexExec.result運用ルール.md` に従う
+### 15.1 入口文書
+Codex 関連作業では、原則として次を入口に確認してください。
 
-### 15.2 `CodexExec.result` の必須記録項目
-- 各ログブロックには、従来項目に加えて `push` / `pr` / `pr url` / `pr base` / `pr head` / `pr status` を必須で記録する
-- Pull Request 作成に失敗した場合は、その時点で停止し、成功した最終工程・失敗工程・エラーメッセージ・push 済み branch 名・compare URL を可能な範囲で記録する
+1. `docs/00_プロジェクト管理/05_横断運用規程/Codex連携運用ルール.md`
+2. `docs/00_プロジェクト管理/05_横断運用規程/AIリポジトリ作業証跡管理ルール.md`
 
-### 15.3 ChatGPT の確認順序
-- まず `CodexExec.result` から対象作業のログブロックを特定する
-- `pr url` がある場合は **Pull Request 差分を最優先で確認** する
-- `CodexExec.result` 本文は、PR 差分確認を補助する根拠として扱う
-- `pr url` がない場合のみ、変更対象ファイルや commit を直接確認する
-- 「直近ブロックだから正しい」とは限らないため、**`TASK_ID` / `TITLE` / `EXECUTED_AT` の一致確認を優先**する
+旧 `CodexExec.result` 先頭追記型運用や旧 `CodexExec.result運用ルール.md` は、現行運用の判断基準として使用しません。旧運用履歴が必要な場合のみ `docs/90_アーカイブ/` を参照してください。
 
-### 15.4 指示文作成時
+### 15.2 Codex プロンプト作成時
+- Codex にリポジトリ作業を依頼する場合は、`Codex連携運用ルール.md` を入口に関連ルールを確認する
+- Git 書き込み操作、branch 作成、commit、push、PR 作成を通常コマンド経路で直接実行させず、専用 `ps1` / `sh` スクリプト経由に限定する
+- Codex 向けプロンプトをファイル化した場合は、原則として `scripts/check_codex_prompt_git_safety.py` で投入前チェックできる形にする
+- Codex節約型運用中は、ChatGPT(会話内) または ChatGPT(リポジトリ編集) で先行できる作業を切り出し、Codexへ渡す範囲を最小化する
+
+### 15.3 Codex 実行結果確認時
+- Codex 実行結果、commit、push、PR を確認する場合は、`AIリポジトリ作業証跡管理ルール.md` を正本とする
+- PR がある場合は、PR本文、PRコメント、PR差分、コミットメッセージ本文を優先して確認する
+- `CodexExec.result` はローカル直近確認用の補助ファイルであり、正式な履歴保管先ではない
+- 旧運用履歴が必要な場合のみ `docs/90_アーカイブ/` を参照する
+- PR merge 前のローカル確認が必要な場合は、main ではなく対象 PR ブランチ上で確認する
+
+### 15.4 証跡記録の原則
+- AI がリポジトリへ変更を加える場合は、PR本文またはPRコメントに作業結果を記録する
+- PRあり作業でも、コミットメッセージ本文に短縮記録を残す
+- PRなし作業では、コミットメッセージ本文に短縮記録を残す
+- 長大ログ、生成物、サンプル出力、ローカル実行結果ファイルは原則 git 管理しない
+- 証跡には、作業主体、`TASK_ID`、`STATUS`、changed files、summary、verification、commit、PR URL、未確認事項を含める
+
+### 15.5 指示文作成時
 - コミットコメントを指示文に内包する
 - 可能なら STEP 名を明示する
 - 空になって不要になったフォルダが生じる場合は、削除指示も含める
 - docs 作業では、変更対象を必要最小限に限定する
-
-### 15.5 確認時
-- `CodexExec.result` の該当ログブロック
-- `pr url` がある場合は当該 Pull Request
-- `pr url` がない場合は変更対象ファイルまたは commit
-- 必要に応じて `docs/README.md`
-を確認する
 
 ---
 
