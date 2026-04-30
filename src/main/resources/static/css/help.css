@@ -5,3 +5,41 @@
 .help-hero .page-lead {
     margin-bottom: 0;
 }
+
+.security-warning-card {
+    margin-top: 20px;
+    background: #fff1f1;
+    border: 1px solid #e24b4b;
+    color: #9f1239;
+    box-shadow: 0 12px 28px rgba(159, 18, 57, 0.12);
+}
+
+.security-warning-card strong {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #b00020;
+    font-weight: 800;
+}
+
+.security-warning-card strong::before {
+    content: "⚠";
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 999px;
+    background: #b00020;
+    color: #fff;
+    font-size: 0.92rem;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.security-warning-card p {
+    margin: 8px 0 0;
+    color: #9f1239;
+    font-weight: 700;
+    line-height: 1.75;
+}
