@@ -152,7 +152,7 @@
         </main>
     </div>
 </div>
-<div id="uploadErrorModal" class="modal-overlay" th:classappend="${uploadErrorModal != null} ? ' is-visible' : ''" th:attr="data-open=${uploadErrorModal != null},data-server-title=${uploadErrorModal != null ? uploadErrorModal.title() : ''},data-server-body=${uploadErrorModal != null ? uploadErrorModal.body() : ''},data-server-retry=${uploadErrorModal != null ? uploadErrorModal.retry() : ''},data-close-label=#{dialog.close}">
+<div id="uploadErrorModal" class="modal-overlay" th:classappend="${uploadErrorModal != null ? ' is-visible' : ''}" th:attr="data-open=${uploadErrorModal != null},data-server-title=${uploadErrorModal != null ? uploadErrorModal.title() : ''},data-server-body=${uploadErrorModal != null ? uploadErrorModal.body() : ''},data-server-retry=${uploadErrorModal != null ? uploadErrorModal.retry() : ''},data-close-label=#{dialog.close}">
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="uploadErrorTitle">
         <h3 id="uploadErrorTitle" th:text="${uploadErrorModal != null ? uploadErrorModal.title() : #messages.msg('error.upload.tooLarge.title')}">アップロードに失敗しました</h3>
         <p id="uploadErrorBody" th:text="${uploadErrorModal != null ? uploadErrorModal.body() : #messages.msg('error.upload.tooLarge.body')}">アップロードしたzipファイルが上限サイズ20MBを超えています。</p>
