@@ -17,6 +17,11 @@
 !/samples/README.md
 !/samples/.gitkeep
 
+# Python temporary files
+__pycache__/
+*.py[cod]
+*$py.class
+
 # IDE and OS noise
 /.idea/
 /.vscode/

@@ -41,7 +41,7 @@
             <article class="breakdown-card">
                 <div>
                     <strong th:text="#{result.violations.breakdown}">内訳</strong>
-                    <small th:text="${summaryDisplay.sample} ? #{page.home.sample.summary.copy} : (#locale.language == 'ja' ? '解析対象ファイル、実行開始時刻、総合スコア、重大度内訳を下記にまとめます。' : #messages.msg('page.home.section.summary.copy'))">解析対象ファイル、実行開始時刻、総合スコア、重大度内訳を下記にまとめます。</small>
+                    <small th:text="${summaryDisplay.sample ? #messages.msg('page.home.sample.summary.copy') : (#locale.language == 'ja' ? '解析対象ファイル、実行開始時刻、総合スコア、重大度内訳を下記にまとめます。' : #messages.msg('page.home.section.summary.copy'))}">解析対象ファイル、実行開始時刻、総合スコア、重大度内訳を下記にまとめます。</small>
                 </div>
                 <div class="severity-bar" aria-hidden="true">
                     <span class="high" th:style="'flex-grow:' + ${summaryDisplay.response.totalViolations > 0 ? summaryDisplay.response.highCount : 1}"></span>
@@ -66,13 +66,13 @@
             <article class="artifact-prompt">
                 <div>
                     <strong th:text="#{page.home.nav.artifacts}">成果物</strong>
-                    <small th:text="${summaryDisplay.sample} ? #{page.home.sample.summary.artifacts} : #{page.home.section.artifacts.copy}">診断結果は用途ごとに2種類の Markdown として整理されます。トップでは役割を確認し、全文は既存 preview ページで確認します。</small>
+                    <small th:text="${summaryDisplay.sample ? #messages.msg('page.home.sample.summary.artifacts') : #messages.msg('page.home.section.artifacts.copy')}">診断結果は用途ごとに2種類の Markdown として整理されます。トップでは役割を確認し、全文は既存 preview ページで確認します。</small>
                 </div>
                 <div class="metric-breakdown-inline">
                     <span class="metric-pill" th:text="#{result.artifact.human}">ユーザー向けMarkdown</span>
                     <span class="metric-pill" th:text="#{result.artifact.ai}">AI入力Markdown</span>
                 </div>
-                <a class="cta-link" th:href="${summaryDisplay.artifactHref}" th:text="${summaryDisplay.sample} ? #{page.home.sample.summary.cta} : #{page.home.section.summary.cta}">成果物を見る</a>
+                <a class="cta-link" th:href="${summaryDisplay.artifactHref}" th:text="${summaryDisplay.sample ? #messages.msg('page.home.sample.summary.cta') : #messages.msg('page.home.section.summary.cta')}">成果物を見る</a>
             </article>
         </div>
     </div>
