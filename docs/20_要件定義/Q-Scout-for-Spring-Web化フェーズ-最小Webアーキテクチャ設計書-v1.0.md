@@ -4,6 +4,7 @@
 > 本書は、Web 化フェーズ時点の最小構成を整理した補助設計資料である。
 > 現行の正式な基本設計は `docs/30_基本設計/基本設計.md` を参照すること。
 > 本書は、移行経緯や最小構成の意図を補助的に確認する用途で用いる。
+> 実装方式に踏み込む記述は、現行実装と矛盾する場合、現行実装および `docs/30_基本設計/基本設計.md` を優先する。
 
 ---
 
@@ -49,14 +50,16 @@
   ├ UploadValidationService
   ├ ZipExtractionService
   ├ TempWorkspaceService
+  ├ RequestAccessTokenService
+  ├ DownloadArtifactService
   ├ SharedAnalysisService
-  └ DownloadArtifactService
+  └ MarkdownPreviewRenderer
   ↓
 [既存解析コア]
   ↓
 [レポート生成]
   ↓
-[結果表示 / ダウンロード]
+[結果表示 / 署名付き preview / 署名付き download]
 ```
 
 ---
@@ -71,6 +74,7 @@
 
 Controller
 - WebPageController
+- WebPreviewController
 - WebDownloadController
 
 Service
@@ -78,7 +82,9 @@ Service
 - UploadValidationService
 - ZipExtractionService
 - TempWorkspaceService
+- RequestAccessTokenService
 - DownloadArtifactService
+- MarkdownPreviewRenderer
 
 共通
 - SharedAnalysisService
@@ -101,6 +107,7 @@ Service
 - 実行
 - 状態表示
 - 結果表示
+- preview
 - ダウンロード
 - エラー表示
 
@@ -123,7 +130,8 @@ Service
 - 未指定
 - 拡張子不正
 - サイズ超過
-- zip破損
+- ZIPとして読み取れない
+- ZIPエントリ数、パス、階層深度、単一ファイルサイズ、展開後合計サイズ、圧縮率等の安全制約違反
 
 ---
 
@@ -141,7 +149,13 @@ Service
 責務：
 - requestId生成
 - 作成
+- 成果物保持期限判定
 - cleanup
+
+保持方針：
+- 成功時は preview / download のため15分保持する
+- 期限切れ時は成果物期限切れとして扱い、再解析を促す
+- エラー時は即時 cleanup する
 
 ---
 
@@ -154,15 +168,26 @@ Service
 - 外部コマンド禁止
 - 展開先固定
 - 異常時エラー
+- 危険なZIPパス、過大ファイル、過大展開、過剰エントリ数、高圧縮率、深すぎる階層の拒否
+- `.git`、`.github`、`target`、`build`、`node_modules`、`.idea`、`.vscode` 等の解析不要・危険化しやすいディレクトリの自動除外
+
+ZIP安全制約：
+- アップロードサイズ上限：20MB
+- 展開後合計サイズ上限：100MB
+- エントリ数上限：5,000
+- 単一エントリサイズ上限：10MB
+- 階層深度上限：20
+- 圧縮率上限：100
 
 ---
 
 ## 9. ルート判定
 
 - extracted直下優先
-- pom.xml必須
-- 1階層補助探索
-- 複数候補はエラー
+- `pom.xml` 必須
+- extracted直下に `pom.xml` が存在する場合は extracted直下を project root とする
+- extracted直下に単一トップディレクトリがあり、その配下に `pom.xml` が存在する場合は当該ディレクトリを project root とする
+- 複数候補は、マルチモジュールまたは不明瞭な構成としてエラー扱いとする
 
 ---
 
@@ -209,18 +234,32 @@ Controller
 /tmp/qscout/{requestId}/output/
 ```
 
+成果物は永続保存せず、requestId 単位の一時ワークスペースに保存する。
+
 ---
 
-## 13. ダウンロード
+## 13. preview / download
 
-エンドポイント：
-- /download/{requestId}/human
-- /download/{requestId}/ai
+内部エンドポイント：
+- `/preview/{requestId}/{fileKey}`
+- `/download/{requestId}/{fileKey}`
+
+fileKey：
+- `human`: qscout-report.md
+- `ai`: qscout-ai-input.md
+
+利用者向けURL：
+- `expires` と `token` を含む署名付きURLとして生成する
+- 署名、有効期限、成果物保持状態を検証する
+- 署名検証に失敗した場合は 403 を返す
+- 期限切れの場合は 410 を返す
+- 対象成果物が存在しない場合は 404 を返す
 
 責務：
-- 検証
+- 署名検証
+- 保持期限検証
 - パス解決
-- レスポンス生成
+- preview / download レスポンス生成
 
 ---
 
@@ -228,9 +267,10 @@ Controller
 
 提案名：遅延削除
 
-- 即削除しない
-- 10〜15分保持
-- エラー時即削除
+- 成功時は即削除しない
+- 成果物保持期間は15分
+- 保持期限切れ時は成果物期限切れ扱いとし、再解析を促す
+- エラー時は即削除
 
 ---
 
@@ -242,6 +282,8 @@ Controller
 - 実行
 - タイムアウト
 - 期限切れ
+- 署名不正
+- 成果物なし
 
 方針：
 - 原因明示
@@ -265,7 +307,8 @@ com.qscout.spring
 - domain
 - rule
 - infrastructure
-- util
+- config
+- i18n
 ```
 
 ---
@@ -286,8 +329,8 @@ com.qscout.spring
 4. /tmp運用
 5. 共通解析サービス
 6. ファイル出力
-7. ダウンロードAPI
-8. 遅延削除
+7. 署名付き preview / download URL
+8. 15分保持後の遅延削除
 9. CLI資産維持
 
 ---
