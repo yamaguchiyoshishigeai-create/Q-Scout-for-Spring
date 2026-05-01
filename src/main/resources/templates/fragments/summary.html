@@ -38,31 +38,6 @@
             </article>
         </div>
         <div class="result-lower">
-            <article class="breakdown-card">
-                <div>
-                    <strong th:text="#{result.violations.breakdown}">内訳</strong>
-                    <small th:text="${summaryDisplay.sample ? #messages.msg('page.home.sample.summary.copy') : (#locale.language == 'ja' ? '解析対象ファイル、実行開始時刻、総合スコア、重大度内訳を下記にまとめます。' : #messages.msg('page.home.section.summary.copy'))}">解析対象ファイル、実行開始時刻、総合スコア、重大度内訳を下記にまとめます。</small>
-                </div>
-                <div class="severity-bar" aria-hidden="true">
-                    <span class="high" th:style="'flex-grow:' + ${summaryDisplay.response.totalViolations > 0 ? summaryDisplay.response.highCount : 1}"></span>
-                    <span class="medium" th:style="'flex-grow:' + ${summaryDisplay.response.totalViolations > 0 ? summaryDisplay.response.mediumCount : 1}"></span>
-                    <span class="low" th:style="'flex-grow:' + ${summaryDisplay.response.totalViolations > 0 ? summaryDisplay.response.lowCount : 1}"></span>
-                </div>
-                <div class="severity-list">
-                    <div class="severity-item">
-                        <small th:text="#{result.severity.high.short}">高</small>
-                        <strong th:text="${summaryDisplay.response.highCount}">0</strong>
-                    </div>
-                    <div class="severity-item">
-                        <small th:text="#{result.severity.medium.short}">中</small>
-                        <strong th:text="${summaryDisplay.response.mediumCount}">0</strong>
-                    </div>
-                    <div class="severity-item">
-                        <small th:text="#{result.severity.low.short}">低</small>
-                        <strong th:text="${summaryDisplay.response.lowCount}">0</strong>
-                    </div>
-                </div>
-            </article>
             <article class="artifact-prompt">
                 <div>
                     <strong th:text="#{page.home.nav.artifacts}">成果物</strong>
