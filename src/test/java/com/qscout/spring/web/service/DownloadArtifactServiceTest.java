@@ -1,5 +1,6 @@
 package com.qscout.spring.web.service;
 
+import com.qscout.spring.application.SharedAnalysisService;
 import com.qscout.spring.web.exception.ArtifactExpiredException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -34,6 +35,45 @@ class DownloadArtifactServiceTest {
 
         verify(tempWorkspaceService).assertActive("req-1");
         assertThat(artifact.fileName()).isEqualTo("qscout-report.md");
+        assertThat(((Resource) artifact.resource()).exists()).isTrue();
+    }
+
+    @Test
+    void resolvesLocalizedHumanPreviewContent() throws IOException {
+        TempWorkspaceService tempWorkspaceService = mock(TempWorkspaceService.class);
+        DownloadArtifactService service = new DownloadArtifactService(tempWorkspaceService);
+        Path workspaceRoot = tempDir.resolve("request-localized-preview");
+        Path outputDir = workspaceRoot.resolve("output");
+        Files.createDirectories(outputDir);
+        Files.writeString(outputDir.resolve(SharedAnalysisService.HUMAN_REPORT_JA_FILE_NAME), "# 日本語レポート");
+        Files.writeString(outputDir.resolve(SharedAnalysisService.HUMAN_REPORT_EN_FILE_NAME), "# English Report");
+
+        when(tempWorkspaceService.resolveWorkspaceRoot("req-ja-en")).thenReturn(workspaceRoot);
+        when(tempWorkspaceService.readScoreBandClass("req-ja-en")).thenReturn("score-band-high");
+
+        DownloadArtifactService.PreviewArtifact japanese = service.resolveForPreview("req-ja-en", "human", "ja");
+        DownloadArtifactService.PreviewArtifact english = service.resolveForPreview("req-ja-en", "human", "en");
+
+        assertThat(japanese.fileName()).isEqualTo(SharedAnalysisService.HUMAN_REPORT_JA_FILE_NAME);
+        assertThat(japanese.content()).contains("日本語レポート");
+        assertThat(english.fileName()).isEqualTo(SharedAnalysisService.HUMAN_REPORT_EN_FILE_NAME);
+        assertThat(english.content()).contains("English Report");
+    }
+
+    @Test
+    void resolvesLocalizedHumanDownloadArtifact() throws IOException {
+        TempWorkspaceService tempWorkspaceService = mock(TempWorkspaceService.class);
+        DownloadArtifactService service = new DownloadArtifactService(tempWorkspaceService);
+        Path workspaceRoot = tempDir.resolve("request-localized-download");
+        Path outputDir = workspaceRoot.resolve("output");
+        Files.createDirectories(outputDir);
+        Files.writeString(outputDir.resolve(SharedAnalysisService.HUMAN_REPORT_EN_FILE_NAME), "# English Report");
+
+        when(tempWorkspaceService.resolveWorkspaceRoot("req-download")).thenReturn(workspaceRoot);
+
+        DownloadArtifactService.DownloadArtifact artifact = service.resolveForDownload("req-download", "human", "en");
+
+        assertThat(artifact.fileName()).isEqualTo(SharedAnalysisService.HUMAN_REPORT_EN_FILE_NAME);
         assertThat(((Resource) artifact.resource()).exists()).isTrue();
     }
 
