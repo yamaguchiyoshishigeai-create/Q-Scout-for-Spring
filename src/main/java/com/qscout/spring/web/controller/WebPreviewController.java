@@ -1,5 +1,6 @@
 package com.qscout.spring.web.controller;
 
+import com.qscout.spring.i18n.MessageSources;
 import com.qscout.spring.web.dto.PreviewArtifactView;
 import com.qscout.spring.web.exception.ArtifactExpiredException;
 import com.qscout.spring.web.service.DownloadArtifactService;
@@ -62,6 +63,7 @@ public class WebPreviewController {
             @PathVariable String fileKey,
             @RequestParam long expires,
             @RequestParam String token,
+            @RequestParam(required = false) String lang,
             Model model,
             HttpServletResponse response
     ) {
@@ -70,7 +72,8 @@ public class WebPreviewController {
                 throw new ResponseStatusException(FORBIDDEN, "Invalid artifact access token.");
             }
             applyNoStore(response);
-            DownloadArtifactService.PreviewArtifact artifact = downloadArtifactService.resolveForPreview(requestId, fileKey);
+            String language = normalizeLanguage(lang);
+            DownloadArtifactService.PreviewArtifact artifact = downloadArtifactService.resolveForPreview(requestId, fileKey, language);
             String renderedHtml = "human".equals(artifact.fileKey()) ? markdownPreviewRenderer.render(artifact.content()) : null;
             model.addAttribute("preview", new PreviewArtifactView(
                     requestId,
@@ -78,7 +81,12 @@ public class WebPreviewController {
                     artifact.fileName(),
                     artifact.scoreBandClass(),
                     artifact.content(),
-                    requestAccessTokenService.createSignedUrl("/download/" + requestId + "/" + fileKey, requestId, fileKey),
+                    requestAccessTokenService.createSignedUrl(
+                            "/download/" + requestId + "/" + fileKey,
+                            requestId,
+                            fileKey,
+                            Map.of("lang", language)
+                    ),
                     requestAccessTokenService.createSignedUrl(
                             "/preview/" + requestId + "/" + fileKey,
                             requestId,
@@ -99,6 +107,13 @@ public class WebPreviewController {
         } catch (IllegalArgumentException exception) {
             throw new ResponseStatusException(NOT_FOUND, exception.getMessage(), exception);
         }
+    }
+
+    private String normalizeLanguage(String language) {
+        String normalized = language == null || language.isBlank()
+                ? MessageSources.resolveLocale().getLanguage()
+                : language;
+        return "en".equals(normalized) ? "en" : "ja";
     }
 
     private void applyNoStore(HttpServletResponse response) {
