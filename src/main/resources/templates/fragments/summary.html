@@ -30,7 +30,7 @@
                 <strong th:text="#{result.violations.label}">違反件数</strong>
                 <span class="metric-value" th:text="${summaryDisplay.response.totalViolations}">0</span>
                 <p class="metric-sub"><span th:text="#{result.violations.breakdown}">内訳</span></p>
-                <div class="severity-bar" aria-hidden="true">
+                <div class="severity-bar" aria-hidden="true" th:style="${'--severity-high:' + summaryDisplay.response.highCount + ';--severity-medium:' + summaryDisplay.response.mediumCount + ';--severity-low:' + summaryDisplay.response.lowCount + ';'}">
                     <span class="high"></span>
                     <span class="medium"></span>
                     <span class="low"></span>
