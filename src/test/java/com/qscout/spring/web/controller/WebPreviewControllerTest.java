@@ -51,7 +51,41 @@ class WebPreviewControllerTest {
         assertThat(preview.fileName()).isEqualTo("qscout-report-en.md");
         assertThat(preview.content()).contains("English report");
         assertThat(preview.downloadUrl()).contains("lang=en");
+        assertThat(preview.englishPreviewUrl()).contains("lang=en");
+        assertThat(preview.japanesePreviewUrl()).contains("lang=ja");
+        assertThat(preview.currentLanguage()).isEqualTo("en");
         assertThat(preview.scoreBandClass()).isEqualTo("score-band-high");
+    }
+
+    @Test
+    void previewLanguageSwitchUsesJapaneseMarkdownWhenLangIsJa() throws Exception {
+        DownloadArtifactService downloadArtifactService = mock(DownloadArtifactService.class);
+        MarkdownPreviewRenderer markdownPreviewRenderer = mock(MarkdownPreviewRenderer.class);
+        RequestAccessTokenService requestAccessTokenService = mock(RequestAccessTokenService.class);
+        when(requestAccessTokenService.isValid("req-1", "human", 123L, "ok")).thenReturn(true);
+        when(requestAccessTokenService.createSignedUrl("/download/req-1/human", "req-1", "human", Map.of("lang", "ja"))).thenReturn("/download/req-1/human?lang=ja&expires=456&token=next");
+        when(requestAccessTokenService.createSignedUrl("/preview/req-1/human", "req-1", "human", Map.of("lang", "ja"))).thenReturn("/preview/req-1/human?lang=ja&expires=456&token=ja");
+        when(requestAccessTokenService.createSignedUrl("/preview/req-1/human", "req-1", "human", Map.of("lang", "en"))).thenReturn("/preview/req-1/human?lang=en&expires=456&token=en");
+        when(downloadArtifactService.resolveForPreview("req-1", "human", "ja")).thenReturn(
+                new DownloadArtifactService.PreviewArtifact("human", "qscout-report-ja.md", org.springframework.http.MediaType.TEXT_MARKDOWN, "# 日本語レポート", "score-band-high")
+        );
+        when(markdownPreviewRenderer.render("# 日本語レポート")).thenReturn("<h1>日本語レポート</h1>");
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new WebPreviewController(downloadArtifactService, markdownPreviewRenderer, requestAccessTokenService)).build();
+
+        MvcResult result = mockMvc.perform(get("/preview/req-1/human")
+                        .param("expires", "123")
+                        .param("token", "ok")
+                        .param("lang", "ja"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("preview"))
+                .andExpect(model().attributeExists("preview"))
+                .andReturn();
+
+        PreviewArtifactView preview = (PreviewArtifactView) result.getModelAndView().getModel().get("preview");
+        assertThat(preview.fileName()).isEqualTo("qscout-report-ja.md");
+        assertThat(preview.content()).contains("日本語レポート");
+        assertThat(preview.downloadUrl()).contains("lang=ja");
+        assertThat(preview.currentLanguage()).isEqualTo("ja");
     }
 
     @Test
