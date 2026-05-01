@@ -50,13 +50,14 @@ public class WebDownloadController {
             @PathVariable String requestId,
             @PathVariable String fileKey,
             @RequestParam long expires,
-            @RequestParam String token
+            @RequestParam String token,
+            @RequestParam(required = false) String lang
     ) {
         try {
             if (!requestAccessTokenService.isValid(requestId, fileKey, expires, token)) {
                 throw new ResponseStatusException(FORBIDDEN, "Invalid artifact access token.");
             }
-            DownloadArtifactService.DownloadArtifact artifact = downloadArtifactService.resolveForDownload(requestId, fileKey);
+            DownloadArtifactService.DownloadArtifact artifact = downloadArtifactService.resolveForDownload(requestId, fileKey, lang);
             return ResponseEntity.ok()
                     .contentType(artifact.contentType())
                     .header(HttpHeaders.CONTENT_DISPOSITION,
