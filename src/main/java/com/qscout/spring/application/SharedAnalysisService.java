@@ -4,7 +4,14 @@ import com.qscout.spring.domain.AnalysisRequest;
 import com.qscout.spring.domain.AnalysisResult;
 import com.qscout.spring.domain.ReportArtifact;
 import com.qscout.spring.domain.ScoreSummary;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.Locale;
 
 /**
  * CLI / Web 共通で利用される解析実行の中核サービスである。
@@ -16,6 +23,10 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class SharedAnalysisService {
+    public static final String HUMAN_REPORT_FILE_NAME = "qscout-report.md";
+    public static final String HUMAN_REPORT_JA_FILE_NAME = "qscout-report-ja.md";
+    public static final String HUMAN_REPORT_EN_FILE_NAME = "qscout-report-en.md";
+
     private final ProjectScanner projectScanner;
     private final RuleEngine ruleEngine;
     private final ScoreCalculator scoreCalculator;
@@ -45,11 +56,36 @@ public class SharedAnalysisService {
     public SharedAnalysisResult execute(AnalysisRequest request) {
         AnalysisResult analysisResult = ruleEngine.analyze(projectScanner.scan(request));
         ScoreSummary scoreSummary = scoreCalculator.calculate(analysisResult);
+        generateLocalizedHumanReport(analysisResult, scoreSummary, request.outputDirectory(), Locale.JAPANESE, HUMAN_REPORT_JA_FILE_NAME);
+        generateLocalizedHumanReport(analysisResult, scoreSummary, request.outputDirectory(), Locale.ENGLISH, HUMAN_REPORT_EN_FILE_NAME);
         ReportArtifact reportArtifact = new ReportArtifact(
-                reportGenerator.generate(analysisResult, scoreSummary, request.outputDirectory()),
+                generateCurrentLocaleHumanReport(analysisResult, scoreSummary, request.outputDirectory()),
                 aiMarkdownGenerator.generate(analysisResult, request.outputDirectory())
         );
         return new SharedAnalysisResult(analysisResult, scoreSummary, reportArtifact);
+    }
+
+    private Path generateCurrentLocaleHumanReport(AnalysisResult analysisResult, ScoreSummary scoreSummary, Path outputDirectory) {
+        return reportGenerator.generate(analysisResult, scoreSummary, outputDirectory);
+    }
+
+    private void generateLocalizedHumanReport(
+            AnalysisResult analysisResult,
+            ScoreSummary scoreSummary,
+            Path outputDirectory,
+            Locale locale,
+            String localizedFileName
+    ) {
+        Locale previous = LocaleContextHolder.getLocale();
+        try {
+            LocaleContextHolder.setLocale(locale);
+            Path generatedPath = reportGenerator.generate(analysisResult, scoreSummary, outputDirectory);
+            Files.copy(generatedPath, outputDirectory.resolve(localizedFileName), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException exception) {
+            throw new IllegalStateException("Failed to generate localized human markdown report.", exception);
+        } finally {
+            LocaleContextHolder.setLocale(previous);
+        }
     }
 
     /**
