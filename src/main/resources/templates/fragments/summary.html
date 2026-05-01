@@ -30,10 +30,24 @@
                 <strong th:text="#{result.violations.label}">違反件数</strong>
                 <span class="metric-value" th:text="${summaryDisplay.response.totalViolations}">0</span>
                 <p class="metric-sub"><span th:text="#{result.violations.breakdown}">内訳</span></p>
-                <div class="metric-breakdown-inline">
-                    <span class="metric-pill is-high"><span th:text="#{result.severity.high.short}">高</span><span th:text="${summaryDisplay.response.highCount}">0</span></span>
-                    <span class="metric-pill is-medium"><span th:text="#{result.severity.medium.short}">中</span><span th:text="${summaryDisplay.response.mediumCount}">0</span></span>
-                    <span class="metric-pill is-low"><span th:text="#{result.severity.low.short}">低</span><span th:text="${summaryDisplay.response.lowCount}">0</span></span>
+                <div class="severity-bar" aria-hidden="true">
+                    <span class="high"></span>
+                    <span class="medium"></span>
+                    <span class="low"></span>
+                </div>
+                <div class="severity-list">
+                    <div class="severity-item">
+                        <small th:text="#{result.severity.high.short}">高</small>
+                        <strong th:text="${summaryDisplay.response.highCount}">0</strong>
+                    </div>
+                    <div class="severity-item">
+                        <small th:text="#{result.severity.medium.short}">中</small>
+                        <strong th:text="${summaryDisplay.response.mediumCount}">0</strong>
+                    </div>
+                    <div class="severity-item">
+                        <small th:text="#{result.severity.low.short}">低</small>
+                        <strong th:text="${summaryDisplay.response.lowCount}">0</strong>
+                    </div>
                 </div>
             </article>
         </div>
