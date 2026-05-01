@@ -1,5 +1,6 @@
 package com.qscout.spring.web.service;
 
+import com.qscout.spring.application.SharedAnalysisService;
 import com.qscout.spring.web.exception.ArtifactExpiredException;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -10,6 +11,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -23,7 +25,7 @@ import java.util.Map;
 @Service
 public class DownloadArtifactService {
     private static final Map<String, ArtifactDefinition> FILE_MAPPING = Map.of(
-            "human", new ArtifactDefinition("qscout-report.md", MediaType.TEXT_MARKDOWN),
+            "human", new ArtifactDefinition(SharedAnalysisService.HUMAN_REPORT_FILE_NAME, MediaType.TEXT_MARKDOWN),
             "ai", new ArtifactDefinition("qscout-ai-input.md", MediaType.TEXT_MARKDOWN)
     );
 
@@ -43,7 +45,19 @@ public class DownloadArtifactService {
      * @throws IllegalArgumentException fileKey または参照パスが不正な場合
      */
     public DownloadArtifact resolveForDownload(String requestId, String fileKey) {
-        ResolvedArtifact artifact = resolveArtifact(requestId, fileKey);
+        return resolveForDownload(requestId, fileKey, null);
+    }
+
+    /**
+     * ダウンロード応答で返す成果物ファイル情報を、必要に応じて表示言語に合わせて解決する。
+     *
+     * @param requestId 成果物保持先を識別する requestId
+     * @param fileKey 参照対象成果物を識別するキー
+     * @param language 表示言語。human 成果物の場合のみ ja / en を反映する。
+     * @return ダウンロード応答に必要なリソース情報
+     */
+    public DownloadArtifact resolveForDownload(String requestId, String fileKey, String language) {
+        ResolvedArtifact artifact = resolveArtifact(requestId, fileKey, language);
         Resource resource = new FileSystemResource(artifact.path());
         return new DownloadArtifact(resource, artifact.fileName(), artifact.contentType());
     }
@@ -58,7 +72,19 @@ public class DownloadArtifactService {
      * @throws IllegalArgumentException fileKey または参照パスが不正な場合
      */
     public PreviewArtifact resolveForPreview(String requestId, String fileKey) {
-        ResolvedArtifact artifact = resolveArtifact(requestId, fileKey);
+        return resolveForPreview(requestId, fileKey, null);
+    }
+
+    /**
+     * プレビュー表示で使う成果物内容を、必要に応じて表示言語に合わせて文字列として解決する。
+     *
+     * @param requestId 成果物保持先を識別する requestId
+     * @param fileKey 参照対象成果物を識別するキー
+     * @param language 表示言語。human 成果物の場合のみ ja / en を反映する。
+     * @return プレビュー画面で利用する成果物情報
+     */
+    public PreviewArtifact resolveForPreview(String requestId, String fileKey, String language) {
+        ResolvedArtifact artifact = resolveArtifact(requestId, fileKey, language);
         try {
             String content = Files.readString(artifact.path(), StandardCharsets.UTF_8);
             return new PreviewArtifact(
@@ -74,6 +100,10 @@ public class DownloadArtifactService {
     }
 
     private ResolvedArtifact resolveArtifact(String requestId, String fileKey) {
+        return resolveArtifact(requestId, fileKey, null);
+    }
+
+    private ResolvedArtifact resolveArtifact(String requestId, String fileKey, String language) {
         ArtifactDefinition definition = FILE_MAPPING.get(fileKey);
         if (definition == null) {
             throw new IllegalArgumentException("Invalid download file key.");
@@ -81,14 +111,27 @@ public class DownloadArtifactService {
 
         tempWorkspaceService.assertActive(requestId);
         Path rootDir = tempWorkspaceService.resolveWorkspaceRoot(requestId);
-        Path artifactPath = rootDir.resolve("output").resolve(definition.fileName()).normalize();
+        String fileName = localizedFileName(fileKey, definition.fileName(), language);
+        Path artifactPath = rootDir.resolve("output").resolve(fileName).normalize();
         if (!artifactPath.startsWith(rootDir)) {
             throw new IllegalArgumentException("Invalid download path.");
         }
         if (!Files.exists(artifactPath) || !Files.isRegularFile(artifactPath)) {
             throw new ArtifactExpiredException("ダウンロード期限が切れました。再度解析を実行してください。");
         }
-        return new ResolvedArtifact(fileKey, artifactPath, definition.fileName(), definition.contentType());
+        return new ResolvedArtifact(fileKey, artifactPath, fileName, definition.contentType());
+    }
+
+    private String localizedFileName(String fileKey, String defaultFileName, String language) {
+        if (!"human".equals(fileKey)) {
+            return defaultFileName;
+        }
+        String normalizedLanguage = language == null ? "" : Locale.forLanguageTag(language).getLanguage();
+        return switch (normalizedLanguage) {
+            case "ja" -> SharedAnalysisService.HUMAN_REPORT_JA_FILE_NAME;
+            case "en" -> SharedAnalysisService.HUMAN_REPORT_EN_FILE_NAME;
+            default -> defaultFileName;
+        };
     }
 
     private record ArtifactDefinition(
