@@ -6,6 +6,7 @@ import com.qscout.spring.web.exception.ArtifactExpiredException;
 import com.qscout.spring.web.service.DownloadArtifactService;
 import com.qscout.spring.web.service.MarkdownPreviewRenderer;
 import com.qscout.spring.web.service.RequestAccessTokenService;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.servlet.http.HttpServletResponse;
 
+import java.util.Locale;
 import java.util.Map;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -73,35 +75,42 @@ public class WebPreviewController {
             }
             applyNoStore(response);
             String language = normalizeLanguage(lang);
-            DownloadArtifactService.PreviewArtifact artifact = downloadArtifactService.resolveForPreview(requestId, fileKey, language);
-            String renderedHtml = "human".equals(artifact.fileKey()) ? markdownPreviewRenderer.render(artifact.content()) : null;
-            model.addAttribute("preview", new PreviewArtifactView(
-                    requestId,
-                    artifact.fileKey(),
-                    artifact.fileName(),
-                    artifact.scoreBandClass(),
-                    artifact.content(),
-                    requestAccessTokenService.createSignedUrl(
-                            "/download/" + requestId + "/" + fileKey,
-                            requestId,
-                            fileKey,
-                            Map.of("lang", language)
-                    ),
-                    requestAccessTokenService.createSignedUrl(
-                            "/preview/" + requestId + "/" + fileKey,
-                            requestId,
-                            fileKey,
-                            Map.of("lang", "ja")
-                    ),
-                    requestAccessTokenService.createSignedUrl(
-                            "/preview/" + requestId + "/" + fileKey,
-                            requestId,
-                            fileKey,
-                            Map.of("lang", "en")
-                    ),
-                    renderedHtml
-            ));
-            return "preview";
+            Locale previousLocale = LocaleContextHolder.getLocale();
+            LocaleContextHolder.setLocale(Locale.forLanguageTag(language));
+            try {
+                DownloadArtifactService.PreviewArtifact artifact = downloadArtifactService.resolveForPreview(requestId, fileKey, language);
+                String renderedHtml = "human".equals(artifact.fileKey()) ? markdownPreviewRenderer.render(artifact.content()) : null;
+                model.addAttribute("preview", new PreviewArtifactView(
+                        requestId,
+                        artifact.fileKey(),
+                        artifact.fileName(),
+                        artifact.scoreBandClass(),
+                        artifact.content(),
+                        requestAccessTokenService.createSignedUrl(
+                                "/download/" + requestId + "/" + fileKey,
+                                requestId,
+                                fileKey,
+                                Map.of("lang", language)
+                        ),
+                        requestAccessTokenService.createSignedUrl(
+                                "/preview/" + requestId + "/" + fileKey,
+                                requestId,
+                                fileKey,
+                                Map.of("lang", "ja")
+                        ),
+                        requestAccessTokenService.createSignedUrl(
+                                "/preview/" + requestId + "/" + fileKey,
+                                requestId,
+                                fileKey,
+                                Map.of("lang", "en")
+                        ),
+                        language,
+                        renderedHtml
+                ));
+                return "preview";
+            } finally {
+                LocaleContextHolder.setLocale(previousLocale);
+            }
         } catch (ArtifactExpiredException exception) {
             throw new ResponseStatusException(GONE, exception.getMessage(), exception);
         } catch (IllegalArgumentException exception) {
@@ -112,7 +121,7 @@ public class WebPreviewController {
     private String normalizeLanguage(String language) {
         String normalized = language == null || language.isBlank()
                 ? MessageSources.resolveLocale().getLanguage()
-                : language;
+                : Locale.forLanguageTag(language).getLanguage();
         return "en".equals(normalized) ? "en" : "ja";
     }
 
