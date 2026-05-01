@@ -97,7 +97,12 @@ public class WebAnalysisService {
                     scoreBandClass,
                     new DownloadLinkView(
                             message("result.download.human"),
-                            requestAccessTokenService.createSignedUrl("/download/" + workspace.requestId() + "/human", workspace.requestId(), "human"),
+                            requestAccessTokenService.createSignedUrl(
+                                    "/download/" + workspace.requestId() + "/human",
+                                    workspace.requestId(),
+                                    "human",
+                                    Map.of("lang", language)
+                            ),
                             "qscout-report.md"
                     ),
                     new DownloadLinkView(
