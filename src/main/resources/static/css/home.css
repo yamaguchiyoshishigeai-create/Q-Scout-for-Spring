@@ -664,7 +664,7 @@
 
 .result-lower {
     display: grid;
-    grid-template-columns: minmax(0, 1.35fr) minmax(260px, 0.9fr);
+    grid-template-columns: 1fr;
     gap: 14px;
     align-items: stretch;
 }
