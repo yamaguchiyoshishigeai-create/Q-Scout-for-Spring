@@ -693,45 +693,65 @@
 .severity-bar span {
     display: block;
     flex: 1 1 0;
+    min-width: 0;
     min-height: 14px;
     border-radius: 999px;
     background: #dceae5;
 }
 
 .severity-bar .high {
+    flex-grow: var(--severity-high, 0);
     background: #d36b6b;
 }
 
 .severity-bar .medium {
+    flex-grow: var(--severity-medium, 0);
     background: #e1ad57;
 }
 
 .severity-bar .low {
+    flex-grow: var(--severity-low, 0);
     background: #77ad86;
+}
+
+.severity-bar:has(.high[style]) span,
+.severity-bar:has(.medium[style]) span,
+.severity-bar:has(.low[style]) span {
+    min-width: 0;
 }
 
 .severity-list {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 10px;
+    gap: 8px;
 }
 
 .severity-item {
-    padding: 12px;
-    border-radius: 16px;
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 4px;
+    padding: 9px 10px;
+    border-radius: 14px;
     background: rgba(255, 255, 255, 0.78);
     border: 1px solid rgba(17, 100, 102, 0.1);
 }
 
 .severity-item small {
-    display: block;
-    margin-bottom: 6px;
+    display: inline;
+    margin-bottom: 0;
     color: var(--muted);
-    font-size: 0.85rem;
+    font-size: 0.9rem;
+    line-height: 1.2;
+}
+
+.severity-item small::after {
+    content: ":";
 }
 
 .severity-item strong {
-    font-size: 1.2rem;
+    font-size: 1.02rem;
+    line-height: 1.2;
 }
 
 .artifact-prompt .cta-link {
