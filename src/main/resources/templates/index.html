@@ -52,8 +52,8 @@
                     </div>
                     <div class="cta-row intro-actions"><a class="cta-link" href="#run-analysis" th:text="#{page.home.intro.cta.primary}">診断を実行する</a><a class="cta-link" th:href="@{/help(lang=${#locale.language})}" th:text="#{page.home.intro.cta.secondary}">使い方・仕様を見る</a></div>
                     <article class="sample-card" data-figma-section="sample-output-grid">
-                        <strong th:text="#{page.home.sample.title}">成果物サンプル</strong>
-                        <p class="artifact-copy" th:text="#{page.home.sample.copy}">診断後に返る結果を、まず画像でひと目で確認できます。</p>
+                        <strong th:text="${#locale.language == 'ja' ? '結果サマリ サンプル' : #messages.msg('page.home.sample.title')}">結果サマリ サンプル</strong>
+                        <p class="artifact-copy" th:text="${#locale.language == 'ja' ? '診断後に返る解析結果を、下記の形でひと目で確認できます。' : #messages.msg('page.home.sample.copy')}">診断後に返る解析結果を、下記の形でひと目で確認できます。</p>
                         <div class="sample-layout">
                             <th:block th:with="summaryDisplay=${sampleSummary}">
                                 <div th:replace="~{fragments/summary :: summaryDashboard}"></div>
