@@ -2,7 +2,7 @@
 
 ## 1. 目的
 
-本書は、Q-Scout for Spring における共通運用ルールの参照先を明確化するための文書である。
+本書は、Q-Scout-for-Spring における共通運用ルールの参照先を明確化するための文書である。
 
 共通運用ルールの正本は、`yamaguchiyoshishigeai-create/chatgpt-ops-rules` とする。
 
@@ -19,26 +19,13 @@
 | Q-Scout固有の環境依存手順 | `Q-Scout-for-Spring` |
 | 改善タスク個票 | 対象作業が属するリポジトリ |
 
-## 3. 作業開始時の参照順
-
-Q-Scout for Spring の作業開始時は、以下の順に確認する。
-
-1. Memory上のプロジェクト運用ルール。
-2. `chatgpt-ops-rules` の `PROJECT_START_PROMPT.md`。
-3. `chatgpt-ops-rules` の横断運用規程入口。
-4. Q-Scout側の `PROJECT_START_PROMPT.md`。
-5. Q-Scout側の `README.md`。
-6. Q-Scout側の `docs/README.md`。
-7. Q-Scout側の改善タスク課題一覧。
-8. Q-Scout固有の要件定義、設計、実装、公開サンプル評価文書。
-
-## 4. 衝突時の優先順位
+## 3. 衝突時の優先順位
 
 共通運用ルールとQ-Scout側文書に矛盾がある場合は、原則として `chatgpt-ops-rules` を優先する。
 
 ただし、Q-Scout固有の業務仕様、品質診断ツールとしての製品仕様、Public Free版 / Private Pro版の分離方針、Web UI / CLI / Markdownレポート / AI向け入力生成の仕様、公開サンプル評価仕様、環境依存手順はQ-Scout側文書を正とする。
 
-## 5. Q-Scout側に残す事項
+## 4. Q-Scout側に残す事項
 
 以下はQ-Scout側に残す。
 
@@ -48,14 +35,15 @@ Q-Scout for Spring の作業開始時は、以下の順に確認する。
 - Web UI、CLI、補助スクリプト、公開サンプル評価の仕様。
 - Maven Wrapper、Docker、ローカル起動、テスト手順。
 - Q-Scout側改善タスク課題一覧と個票。
+- `実装系文書配置規程.md`。
+- `公開サンプル評価運用方針.md`。
 
-## 6. Q-Scout側に重複保持しない事項
+## 5. Q-Scout側に重複保持しない事項
 
 以下の共通運用ルール本文は、Q-Scout側へ重複コピーしない。
 
 - ChatExec / ChatExec2方式の一般規程。
-- ChatExec2 Windows bat標準。
-- ChatExec2 FullFlow bat一括実行方針。
+- ChatExec2 Python単一ファイル方式。
 - ChatExec2 worktree分離実行方針。
 - 通常PR自動merge方針。
 - 個票先行main反映ゲート。
@@ -63,5 +51,16 @@ Q-Scout for Spring の作業開始時は、以下の順に確認する。
 - 安全チェック発生時の仕様不変切替方針。
 - 発生・残存課題の個票化最優先ルール。
 - 実行計画と実行指示の分離方針。
+- AIリポジトリ作業証跡管理の共通規程。
+- Codex連携運用の共通規程。
+- AI_REPO_RESULT証跡の共通規程。
 
-必要な場合は、Q-Scout側に本文を再掲せず、`chatgpt-ops-rules` への参照として扱う。
+必要な場合は、Q-Scout側に本文を再掲せず、`chatgpt-ops-rules` の該当規程を参照する。
+
+## 6. 旧本文履歴
+
+TSK-046で整理した旧横断運用規程本文は、履歴参照用に以下へ移動する。
+
+`docs/90_アーカイブ/旧横断運用規程/TSK-046_QScout_旧横断運用規程/`
+
+当該アーカイブは履歴確認用であり、現行運用ルールの正本ではない。
