@@ -1,140 +1,36 @@
 # AIリポジトリ作業証跡管理ルール
 
-## 1. 目的
+## 1. 位置づけ
 
-本書は、AI がリポジトリへ変更を加えた場合の修正履歴、確認結果、未確認事項、参照先を一貫して残すための横断運用規程である。
+本書は、Q-Scout-for-Spring の既存CI互換性を維持するための中枢参照スタブである。
 
-長大ログを Pull Request 差分へ混入させず、PR 本文、PR コメント、コミットメッセージ本文を中心に証跡を残すことを目的とする。
+共通運用ルールの正本は `yamaguchiyoshishigeai-create/chatgpt-ops-rules` とする。
 
-## 2. 適用対象
+本書に共通運用ルール本文を重複保持しない。詳細なAIリポジトリ作業証跡管理ルールは `chatgpt-ops-rules` 側の現行規程を参照する。
 
-本書は、以下の作業主体と作業に適用する。
+## 2. PRブランチ検証先行ルール
 
-- ChatGPT(リポジトリ編集)
-- ChatGPT によるリポジトリ操作
-- Codex
-- AI が branch / commit / PR 作成、docs 更新、README 更新、設定変更、実装変更、テスト・build 確認などを伴うリポジトリ作業を行う場合
+Q-Scout-for-Spring では、AIまたは外部実行支援により作成した変更について、main反映前にPRブランチ上で検証結果・変更範囲・未反映事項を確認する。
 
-## 3. 共通原則
+この項目名は、既存のRepository policy checksが参照しているため、Q-Scout側のactive文書に保持する。
 
-1. PR あり作業では、PR 本文または PR コメントに作業結果を記録する。
-2. PR あり作業でも、コミットメッセージ本文に短縮記録を残す。
-3. PR なし作業では、コミットメッセージ本文に短縮記録を残す。
-4. 長大ログ、生成物、サンプル出力、ローカル実行結果ファイルは原則 git 管理しない。
-5. 証跡には、作業主体、`TASK_ID`、`STATUS`、changed files、summary、verification、commit、PR URL、未確認事項を含める。
-6. コミットメッセージ本文の短縮記録は、原則 5 から 10 行程度、最大でも 20 行以内とする。
-7. PR 本文または PR コメントの記録は、レビュー時に読める粒度で要約し、長大ログ全文は貼らない。
-8. PR merge 前の動作確認・ローカル確認は、原則として main ではなく対象 PR ブランチ上で行う。
-9. main 上での確認は、PR merge 後の最終確認として扱う。
+## 3. Q-Scout側に残す事項
 
-## 4. ChatGPT(リポジトリ編集 / リポジトリ操作) の記録ルール
+Q-Scout側では、以下のリポジトリ固有事項のみを扱う。
 
-1. ChatGPT が GitHub connector 等でリポジトリを直接編集し、branch / commit / PR 作成を行う場合に適用する。
-2. PR 本文には、目的、変更内容、変更対象外、確認観点、テスト実行有無、未確認事項を記録する。
-3. 必要に応じて PR コメントへ `AI_REPO_RESULT` ブロックを残す。
-4. コミットメッセージ本文には `ChatGPT-Repo-Result` の短縮記録を残す。
-5. ChatGPT は `CodexExec_<作業内容>.result` を自分の証跡ファイルとして使用しない。
+- Q-Scout固有の検証対象。
+- Q-Scout固有の公開サンプル評価。
+- Q-Scout固有のWeb / CLI / Maven検証手順。
+- Q-Scout側改善タスクとの紐づけ。
 
-## 5. Codex の記録ルール
+## 4. 共通正本
 
-1. Codex に渡す実行指示書をファイル化する場合は、固定名 `CodexExec.md` ではなく、作業内容を識別できる `CodexExec_<作業内容>.md` を使用する。
-2. Codex の詳細補足結果ファイルを出力する場合は、固定名 `CodexExec.result` ではなく、対応する指示書と同じ作業識別子を持つ `CodexExec_<作業内容>.result` を使用する。
-3. `CodexExec_<作業内容>.md` と `CodexExec_<作業内容>.result` の作業内容部分には、TSK ID、対象機能、対象工程など、利用者と後続AIが識別しやすい短い英数字・ハイフン・アンダースコアを用いる。
-4. 固定 `CodexExec.result` の毎回上書き運用は、複数作業や再実行時に上書き・混同を招くため、新規作業の標準としない。
-5. Codex の主な実行結果は、PR 本文、PR コメント、コミットメッセージ本文に記録する。
-6. `CodexExec_<作業内容>.result` は、Issue/PRコメントだけでは不足する詳細補足が必要な場合のみ使用する。
-7. `CodexExec_<作業内容>.result` はgit管理対象にしない。
-8. `CodexExec_<作業内容>.result` には、APIキー、アクセストークン、`.env`、秘密鍵、フル環境変数、個人情報、不要な絶対パス、長大な生ログ全文を含めてはならない。
-9. 旧運用ログは `docs/90_アーカイブ/CodexExec.result旧運用ログ_2026-04-25.md` に保存する。
-10. 旧運用規程は `docs/90_アーカイブ/CodexExec.result運用ルール_旧運用規程_2026-04-25.md` に保存する。
+共通的なAI_REPO_RESULT、PRコメント証跡、Codex連携、ChatExec2方式、実行結果サマリ、秘密情報非掲載、長大ログ非掲載等の詳細は `chatgpt-ops-rules` を参照する。
 
-## 6. AI_REPO_RESULT ブロックテンプレート
+## 5. 旧本文履歴
 
-```text
-===== AI_REPO_RESULT_BEGIN =====
-ACTOR: ChatGPT(リポジトリ編集) / Codex
-TASK_ID: <作業ID>
-TITLE: <表題>
-STATUS: [OK] / [FAIL]
-changed files:
-- ...
+TSK-046で整理した旧本文は、履歴参照用に以下へ移動済みである。
 
-summary:
-- ...
+`docs/90_アーカイブ/旧横断運用規程/TSK-046_QScout_旧横断運用規程/AIリポジトリ作業証跡管理ルール.md`
 
-verification:
-- ...
-
-unverified:
-- ...
-
-commit:
-- <commit sha / none>
-message:
-- <commit message>
-push:
-- success / failed / none
-pr:
-- <PR number / none>
-pr url:
-- <URL / none>
-===== AI_REPO_RESULT_END =====
-```
-
-## 7. コミットメッセージ短縮記録テンプレート
-
-ChatGPT 用:
-
-```text
-ChatGPT-Repo-Result:
-- TASK_ID: <作業ID>
-- STATUS: OK
-- changed: <主要変更ファイル>
-- verification: <確認結果要約>
-- details: PR body / PR comment
-```
-
-Codex 用:
-
-```text
-Codex-Result:
-- TASK_ID: <作業ID>
-- STATUS: OK
-- changed: <主要変更ファイル>
-- verification: <確認結果要約>
-- details: PR body / PR comment
-```
-
-## 8. PRブランチ検証先行ルール
-
-AI が PR を作成した場合、merge 前の確認は、原則として対象 PR ブランチを checkout した状態で行う。
-
-main ブランチ上で `git pull` や `git status` を実行しても、未 merge の PR 差分は確認できないため、merge 前検証として扱ってはならない。
-
-標準的な確認順序は以下とする。
-
-1. PR を作成する。
-2. 対象 PR ブランチを checkout する。
-3. 対象 PR ブランチ上で、差分確認、動作確認、`git status`、`git check-ignore`、テスト、build など必要な確認を行う。
-4. 確認結果を PR 本文、PR コメント、または `AI_REPO_RESULT` の verification に記録する。
-5. 問題がなければ PR を main へ merge する。
-6. main へ戻して `git pull` を行い、main 上で最終確認する。
-
-ただし、GitHub 上の Files changed 確認だけで完結する軽微な文書差分では、ローカル checkout を省略できる。その場合も、PR 差分上で確認したことを明記する。
-
-## 9. 確認時の原則
-
-1. ChatGPT が AI リポジトリ作業の結果を確認する際は、PR 本文、PR コメント、コミットメッセージ本文、PR 差分を優先する。
-2. PR がない場合は、コミットメッセージ本文と変更ファイルを確認する。
-3. PR merge 前のローカル確認が必要な場合は、main ではなく対象 PR ブランチ上で確認する。
-4. main 上での確認は、PR merge 後の最終確認として扱う。
-5. `CodexExec_<作業内容>.result` は必要時のみ使うローカル補足確認用ファイルであり、正式な履歴保管先ではない。
-6. 旧運用時点の履歴確認が必要な場合のみ `docs/90_アーカイブ/` を参照する。
-
-## 10. 旧運用との優先関係
-
-本書は、AI によるリポジトリ作業証跡管理の現行正本である。
-
-旧 `CodexExec.result` 先頭追記型運用および固定 `CodexExec.md` / `CodexExec.result` 前提の運用は、新規作業の判断基準として使用しない。
-
-他文書に旧運用や Codex 専用の記載が残っていた場合は、本書を優先し、必要に応じて当該文書を修正する。
+当該アーカイブは履歴確認用であり、現行運用ルールの正本ではない。
