@@ -181,3 +181,12 @@ CLI 実行では、指定した出力先ディレクトリに以下のファイ�
    Windows では `mvnw.cmd -q -DskipTests package`
 2. `run-self-analysis.bat`
 3. 生成された `samples\sample-output\self-analysis\qscout-report.md` を確認する
+
+
+## 共通運用ルール正本
+
+共通運用ルールの正本は `yamaguchiyoshishigeai-create/chatgpt-ops-rules` です。
+
+本リポジトリでは、Q-Scout for Spring 固有の業務仕様、実装仕様、公開サンプル評価仕様、環境依存手順、Public Free版としての製品前提を管理します。
+
+共通運用ルールの参照方針は `docs/00_プロジェクト管理/05_横断運用規程/chatgpt-ops-rules中枢参照方針.md` を参照してください。

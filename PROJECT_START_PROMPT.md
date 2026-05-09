@@ -511,3 +511,16 @@ Codex 関連作業では、原則として次を入口に確認してくださ�
 です。
 
 以後は、この理解を基礎として作業してください。
+
+
+---
+
+## chatgpt-ops-rules 中枢参照
+
+共通運用ルールの正本は `yamaguchiyoshishigeai-create/chatgpt-ops-rules` とする。
+
+Q-Scout for Spring の新規チャット開始時または作業再開時は、本ファイルに加えて、先に `chatgpt-ops-rules` の `PROJECT_START_PROMPT.md` と横断運用規程入口を確認する。
+
+Q-Scout側には、Spring品質診断ツールとしての製品仕様、Public Free版 / Private Pro版の分離方針、Web UI、CLI、Markdownレポート、AI向け入力生成、公開サンプル評価、環境依存手順、改善タスク個票を残す。
+
+共通運用ルール本文はQ-Scout側へ重複コピーしない。ChatExec2 Windows bat標準、FullFlow bat一括実行方針、worktree分離実行方針、個票先行main反映ゲート、通常PR自動merge方針、Codex投入前ハンドオフゲート等は `chatgpt-ops-rules` を参照する。
